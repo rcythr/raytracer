@@ -3,9 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace raytracer
-{
+namespace raytracer {
 
 std::vector<std::string> split(std::string, char sep);
-
 }

@@ -5,17 +5,10 @@
 
 #include <glm/glm.hpp>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Matte : public Material
-{
+struct Matte : public Material {
 
-    Matte(float ka, float kd, ColorPtr color)
-    {
-    }
-        
-
+    Matte(float ka, float kd, ColorPtr color) {}
 };
-
 }

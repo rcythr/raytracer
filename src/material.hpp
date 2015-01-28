@@ -2,14 +2,9 @@
 
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Material
-{
-};
+struct Material {};
 
 typedef std::shared_ptr<Material> MaterialPtr;
-
 }
-

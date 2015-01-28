@@ -5,16 +5,10 @@
 
 #include <glm/glm.hpp>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Sphere : public Shape
-{
+struct Sphere : public Shape {
 
-    Sphere(glm::vec3 point, float radius, MaterialPtr material)
-    {
-    }
-
+    Sphere(glm::vec3 point, float radius, MaterialPtr material) {}
 };
-
 }

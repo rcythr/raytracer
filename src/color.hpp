@@ -2,18 +2,12 @@
 
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Color
-{
+struct Color {
 
-    Color(glm::vec3 values)
-    {
-    }
-
+    Color(glm::vec3 values) {}
 };
 
 typedef std::shared_ptr<Color> ColorPtr;
-
 }

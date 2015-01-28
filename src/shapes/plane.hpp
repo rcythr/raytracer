@@ -5,14 +5,9 @@
 
 #include <glm/glm.hpp>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Plane : public Shape
-{
-    Plane( glm::vec3 point, glm::vec3 normal, MaterialPtr material)
-    {
-    }
+struct Plane : public Shape {
+    Plane(glm::vec3 point, glm::vec3 normal, MaterialPtr material) {}
 };
-
 }

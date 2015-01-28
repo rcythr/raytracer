@@ -2,14 +2,9 @@
 
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Tracer
-{
-};
+struct Tracer {};
 
 typedef std::shared_ptr<Tracer> TracerPtr;
-
 }
-

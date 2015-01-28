@@ -2,14 +2,9 @@
 
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Camera
-{
-};
+struct Camera {};
 
 typedef std::shared_ptr<Camera> CameraPtr;
-
 }
-

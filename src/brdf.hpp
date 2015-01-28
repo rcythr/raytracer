@@ -2,13 +2,9 @@
 
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct BRDF
-{
-};
+struct BRDF {};
 
 typedef std::shared_ptr<BRDF> BRDFPtr;
-
 }

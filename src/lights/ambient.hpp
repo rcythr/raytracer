@@ -2,16 +2,10 @@
 
 #include "light.hpp"
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct AmbientLight : public Light
-{
+struct AmbientLight : public Light {
 
-    AmbientLight(float scale_radiance)
-    {
-    }
-
+    AmbientLight(float scale_radiance) {}
 };
-
 }
