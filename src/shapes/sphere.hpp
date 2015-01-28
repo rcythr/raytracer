@@ -1,0 +1,20 @@
+#pragma once
+
+#include "shape.hpp"
+#include "material.hpp"
+
+#include <glm/glm.hpp>
+
+namespace raytracer
+{
+
+struct Sphere : public Shape
+{
+
+    Sphere(glm::vec3 point, float radius, MaterialPtr material)
+    {
+    }
+
+};
+
+}
