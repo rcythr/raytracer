@@ -3,6 +3,9 @@ project(raytrace)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
+# Have CMake look for GLM in the include/directory.
+set(GLM_ROOT_DIR ${CMAKE_SOURCE_DIR})
+
 list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -Wall -pedantic") 
 
 # File all .cc files in the source dir and helpers dir
