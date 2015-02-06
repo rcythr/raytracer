@@ -3,11 +3,11 @@
 
 #pragma once
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace raytracer {
 
-typedef std::map<std::string, std::string> ParamMap;
+typedef std::unordered_map<std::string, std::string> ParamMap;
 
 enum class ParserState {
     None,

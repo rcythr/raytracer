@@ -15,7 +15,3 @@
 #include "shape.hpp"
 #include "shapes/sphere.hpp"
 #include "shapes/plane.hpp"
-
-#include "tracer.hpp"
-
-#include "color.hpp"
