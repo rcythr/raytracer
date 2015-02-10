@@ -100,7 +100,7 @@
         kd="0.75"
         color="darkPurple" />
     <matte 
-        name="greyMat"
+        name="grey"
         ka="0.25"
         kd="0.75"
         color="grey"/>
