@@ -15,3 +15,7 @@
 #include "shape.hpp"
 #include "shapes/sphere.hpp"
 #include "shapes/plane.hpp"
+#include "shapes/rect.hpp"
+
+#include "spatial_index.hpp"
+#include "spatial/naive.hpp"

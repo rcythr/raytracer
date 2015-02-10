@@ -106,7 +106,7 @@
         color="grey"/>
 </materials>
     
-<scene>
+<naive_index>
     <plane
         point="0 0 -150"
         normal="0 0 1"
@@ -251,4 +251,4 @@
         point="-3 -72 -130"
         radius="12"
         material="lightPurple" />
-</scene>
+</naive_index>

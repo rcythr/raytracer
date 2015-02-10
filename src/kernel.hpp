@@ -25,7 +25,7 @@ public:
     std::vector<LightPtr> lights;
     std::unordered_map<std::string, glm::vec3> colors;
     std::unordered_map<std::string, MaterialPtr> materials;
-    std::vector<ShapePtr> shapes;
+    SpatialIndexPtr spatial_index;
     
     Kernel();
 

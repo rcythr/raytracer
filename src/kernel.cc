@@ -13,6 +13,17 @@ using namespace raytracer;
 Kernel::Kernel() {
 
     handlers = {
+
+        // Spatial Indecies
+        {"naive_index", [this](ParamMap& params) {
+            spatial_index = std::make_shared<NaiveSpatialIndex>();
+        }},
+
+        {"kdtree_index", [this](ParamMap& params) {
+            // TODO:
+            //spatial_index = std::make_shared<KDTreeSpatialIndex>();
+        }},
+
         // Cameras
         {"pinhole", [this](ParamMap& params) {
             camera = std::make_shared<PinholeCamera>(
@@ -60,7 +71,7 @@ Kernel::Kernel() {
 
         // Shapes
         {"sphere", [this](ParamMap& params) {
-            shapes.push_back(
+            spatial_index->insert(
                 std::make_shared<Sphere>(
                     extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
                     extractFloat(params, "radius", 0.0f),
@@ -70,10 +81,22 @@ Kernel::Kernel() {
         }},
 
         {"plane", [this](ParamMap& params) {
-            shapes.push_back(
+            spatial_index->insert(
                 std::make_shared<Plane>(
                     extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
                     extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
+                    lookup_material(extractString(params, "material", ""))
+                )
+            );
+        }},
+
+        {"rect", [this](ParamMap& params) {
+            spatial_index->insert(
+                std::make_shared<Rect>(
+                    extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
+                    extractFloat(params, "width", 5.0f),
+                    extractFloat(params, "height", 5.0f),
                     lookup_material(extractString(params, "material", ""))
                 )
             );
@@ -142,11 +165,8 @@ std::string Kernel::toString(size_t depth)
         ss << material.second->toString(depth+2);
     }
 
-    ss << tabdepth << "SHAPES: \n";
-    for(auto& shape : shapes)
-    {
-        ss << tabdepth << shape->toString(depth+1);
-    }
+    ss << tabdepth << "SPATIAL INDEX: \n";
+    ss << spatial_index->toString(depth+1);
 
     return ss.str();
 }
