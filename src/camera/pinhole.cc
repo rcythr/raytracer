@@ -1,5 +1,8 @@
 
 #include "camera/pinhole.hpp"
+
+#include "spatial/spatial_index.hpp"
+#include "light/light.hpp"
 #include "view_plane/view_plane.hpp"
 
 #include "util/string_mult.hpp"
@@ -7,6 +10,18 @@
 #include <sstream>
 
 using namespace raytracer;
+
+void PinholeCamera::render(SpatialIndexPtr index, LightPtr ambient_light, std::vector<LightPtr>& lights)
+{
+    // For each Pixel in ViewPlane
+        // Generate the Ray
+        // Check intersections via SpatialIndex
+        // If Hit
+            // Color Pixel
+
+    // Output file
+    view_plane->finish();
+}
 
 std::string PinholeCamera::toString(size_t depth) 
 {

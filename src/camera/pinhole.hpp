@@ -22,7 +22,11 @@ struct PinholeCamera : public Camera {
 
     ~PinholeCamera() override {}
 
-    virtual std::string toString(size_t depth) override;
+    void render(std::shared_ptr<SpatialIndex> index,
+                std::shared_ptr<Light> ambient_light,
+                std::vector<std::shared_ptr<Light>>& lights) override;
+
+    std::string toString(size_t depth) override;
 
 private:
     int num_samples;

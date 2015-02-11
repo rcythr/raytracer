@@ -24,16 +24,9 @@ int main(int argc, char* argv[])
         std::cout << kernel.toString();
     }
 
-    /*
-    PPM test(800, 600);
-
-    for(size_t i=0; i < 800; ++i)
-    {
-        test.set_pixel(300, i, glm::vec3(1.0, 0.0, 0.0));
-    }
-
-    test.save("out.ppm");
-    */
+    kernel.camera->render(kernel.spatial_index, 
+                          kernel.ambient_light, 
+                          kernel.lights);
 
     return EXIT_SUCCESS;
 }
