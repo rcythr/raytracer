@@ -1,6 +1,6 @@
 #pragma once
 
-#include "light.hpp"
+#include "light/light.hpp"
 
 namespace raytracer {
 

@@ -1,5 +1,6 @@
 
-#include "cameras/pinhole.hpp"
+#include "camera/pinhole.hpp"
+#include "view_plane/view_plane.hpp"
 
 #include "util/string_mult.hpp"
 
@@ -13,8 +14,8 @@ std::string PinholeCamera::toString(size_t depth)
 
     std::stringstream ss;
     ss << tabdepth << "Type: PINHOLE\n";
-    ss << tabdepth << "HRES: " << hres << '\n';
-    ss << tabdepth << "VRES: " << vres << '\n';
+    ss << tabdepth << "HRES: " << view_plane->get_width() << '\n';
+    ss << tabdepth << "VRES: " << view_plane->get_height() << '\n';
     ss << tabdepth << "PIXEL SIZE: " << pixel_size << '\n';
     ss << tabdepth << "NUM SAMPLES: " << num_samples << '\n';
     ss << tabdepth << "LOCATION: (" << point.x << ',' << point.y << ',' << point.z << ")\n";

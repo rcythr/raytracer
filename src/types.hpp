@@ -1,21 +1,24 @@
 #pragma once
 
-#include "brdf.hpp"
+#include "brdf/brdf.hpp"
 
-#include "camera.hpp"
-#include "cameras/pinhole.hpp"
+#include "camera/camera.hpp"
+#include "camera/pinhole.hpp"
 
-#include "light.hpp"
-#include "lights/ambient.hpp"
-#include "lights/directional.hpp"
+#include "light/light.hpp"
+#include "light/ambient.hpp"
+#include "light/directional.hpp"
 
-#include "material.hpp"
-#include "materials/matte.hpp"
+#include "material/material.hpp"
+#include "material/matte.hpp"
 
-#include "shape.hpp"
-#include "shapes/sphere.hpp"
-#include "shapes/plane.hpp"
-#include "shapes/rect.hpp"
+#include "shape/shape.hpp"
+#include "shape/sphere.hpp"
+#include "shape/plane.hpp"
+#include "shape/rect.hpp"
 
-#include "spatial_index.hpp"
+#include "spatial/spatial_index.hpp"
 #include "spatial/naive.hpp"
+
+#include "view_plane/view_plane.hpp"
+#include "view_plane/ppm.hpp"

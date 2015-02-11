@@ -1,5 +1,5 @@
 
-#include "materials/matte.hpp"
+#include "material/matte.hpp"
 
 #include <sstream>
 #include "util/string_mult.hpp"

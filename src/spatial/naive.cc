@@ -1,7 +1,5 @@
 #include "spatial/naive.hpp"
 
-#include "shape.hpp"
-
 #include "util/string_mult.hpp"
 #include <sstream>
 

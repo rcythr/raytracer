@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shape.hpp"
-#include "material.hpp"
+#include "shape/shape.hpp"
+#include "material/material.hpp"
 
 #include <glm/glm.hpp>
 

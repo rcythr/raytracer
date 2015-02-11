@@ -15,7 +15,7 @@ struct PPM
 
     ~PPM();
 
-    glm::vec3 get_pixel(size_t row, size_t col, glm::vec3 color) { return data[row][col]; }
+    glm::vec3 get_pixel(size_t row, size_t col) { return data[row][col]; }
 
     void set_pixel(size_t row, size_t col, glm::vec3 color) { data[row][col] = color; }
 

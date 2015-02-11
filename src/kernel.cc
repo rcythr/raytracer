@@ -14,6 +14,15 @@ Kernel::Kernel() {
 
     handlers = {
 
+        // ViewPlanes
+        {"ppm_viewplane", [this](ParamMap& params) {
+            camera->view_plane = std::make_shared<PPMViewPlane>(
+                extractInt(params, "hres", 800),
+                extractInt(params, "vres", 600),
+                extractString(params, "filename", "out.ppm")
+            );
+        }},
+
         // Spatial Indecies
         {"naive_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<NaiveSpatialIndex>();
@@ -27,8 +36,6 @@ Kernel::Kernel() {
         // Cameras
         {"pinhole", [this](ParamMap& params) {
             camera = std::make_shared<PinholeCamera>(
-                extractInt(params, "hres", 400),
-                extractInt(params, "vres", 400),
                 extractFloat(params, "pixel_size", 0.50f),
                 extractInt(params, "num_samples", 1),
                 extractVec3(params, "eye", glm::vec3(0.0f, 0.0f, 0.0f)),

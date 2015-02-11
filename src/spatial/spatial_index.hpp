@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "ray.hpp"
-#include "shape.hpp"
+#include "shape/shape.hpp"
 
 namespace raytracer
 {

@@ -1,6 +1,4 @@
 <pinhole
-    hres="400"
-    vres="400"
     pixel_size="0.25"
     num_samples="1"
     eye="0 0 500"
@@ -8,6 +6,11 @@
     look_at="0 0 1"
     view_distance="600.0"
     />
+
+<ppm_viewplane
+    hres="800"
+    vres="600"
+    filename="out.ppm" />
 
 <lights>
     <ambient 

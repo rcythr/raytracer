@@ -1,4 +1,4 @@
-#include "shapes/sphere.hpp"
+#include "shape/sphere.hpp"
 
 #include "util/vec3_helpers.hpp"
 #include "util/string_mult.hpp"
