@@ -19,7 +19,9 @@ private:
     MaterialPtr lookup_material(std::string name);
 
 public:
-    
+
+    bool verbose;
+
     CameraPtr camera;
     LightPtr ambient_light;
     std::vector<LightPtr> lights;

@@ -9,16 +9,20 @@ using namespace raytracer;
 
 int main(int argc, char* argv[])
 {
-    std::string config_name = "config.xml";
-
-    if(argc == 2)
-        config_name = argv[1];
+    if(argc != 2)
+    {
+        std::cout << "Arguments: raytracer [config_filename]" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     // Load the user settings into a kernel.
     Kernel kernel;
-    loadXML(config_name, kernel);
+    loadXML(argv[1], kernel);
 
-    std::cout << kernel.toString();
+    if(kernel.verbose)
+    {
+        std::cout << kernel.toString();
+    }
 
     /*
     PPM test(800, 600);
@@ -31,6 +35,6 @@ int main(int argc, char* argv[])
     test.save("out.ppm");
     */
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 

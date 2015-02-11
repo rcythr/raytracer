@@ -11,8 +11,14 @@
 using namespace raytracer;
 
 Kernel::Kernel() {
+    verbose = true;
 
     handlers = {
+
+        // General
+        {"general", [this](ParamMap& params) {
+            verbose = extractBool(params, "verbose", true);
+        }},
 
         // ViewPlanes
         {"ppm_viewplane", [this](ParamMap& params) {
