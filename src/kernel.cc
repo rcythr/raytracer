@@ -57,6 +57,8 @@ Kernel::Kernel() {
                 extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
                 extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
                 extractFloat(params, "view_distance", 600));
+
+            world2camera = camera->build_transform_mat();
         }},
 
         // Lights
@@ -93,9 +95,12 @@ Kernel::Kernel() {
 
         // Shapes
         {"sphere", [this](ParamMap& params) {
+            auto inputPt = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
+            auto outputPt = world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
+
             spatial_index->insert(
                 std::make_shared<Sphere>(
-                    extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    glm::vec3(outputPt.x, outputPt.y, outputPt.z),
                     extractFloat(params, "radius", 0.0f),
                     lookup_material(extractString(params, "material", ""))
                 )
@@ -103,9 +108,12 @@ Kernel::Kernel() {
         }},
 
         {"rect", [this](ParamMap& params) {
+            auto inputPt = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
+            auto outputPt = world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
+
             spatial_index->insert(
                 std::make_shared<Rect>(
-                    extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    glm::vec3(outputPt.x, outputPt.y, outputPt.z),
                     extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
                     extractFloat(params, "width", 5.0f),
                     extractFloat(params, "height", 5.0f),

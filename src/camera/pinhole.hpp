@@ -22,6 +22,8 @@ struct PinholeCamera : public Camera {
 
     ~PinholeCamera() override {}
 
+    glm::mat4 build_transform_mat() override;
+
     void spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback) override;
 
     std::string toString(size_t depth) override;

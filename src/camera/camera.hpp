@@ -4,6 +4,8 @@
 #include <vector>
 #include <functional>
 
+#include <glm/glm.hpp>
+
 #include "ray.hpp"
 
 namespace raytracer {
@@ -16,6 +18,8 @@ struct ViewPlane;
 struct Camera {
 
     virtual ~Camera() {}
+
+    virtual glm::mat4 build_transform_mat() = 0;
 
     virtual std::string toString(size_t depth=0) = 0;
 

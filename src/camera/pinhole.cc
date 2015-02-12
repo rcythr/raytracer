@@ -11,8 +11,55 @@
 
 using namespace raytracer;
 
+glm::mat4 PinholeCamera::build_transform_mat()
+{
+    glm::vec3 zaxis = glm::normalize(point - look_at);
+    glm::vec3 xaxis = glm::normalize(glm::cross(up, zaxis));
+    glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+    // Please note this is given to mat4 as COLUMN vectors (so it appears transposed!)
+    glm::mat4 result = {
+        glm::vec4(      xaxis.x,                yaxis.x,                zaxis.x,       0),
+        glm::vec4(      xaxis.y,                yaxis.y,                zaxis.y,       0),
+        glm::vec4(      xaxis.z,                yaxis.z,                zaxis.z,       0),
+        glm::vec4(-glm::dot(xaxis, point), -glm::dot(yaxis, point), -glm::dot(zaxis, point), 1)
+    };
+
+    return result;
+}
+
 void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback)
 {
+    size_t num_rows = view_plane->get_height();
+    size_t num_cols = view_plane->get_width();
+
+    float half_width = 0.5 * pixel_size * num_cols;
+    float half_height = 0.5 * pixel_size * num_rows;
+
+    // First calculate the location of the top left pixel
+    glm::vec3 pixelPt;
+    pixelPt.z = -view_distance;
+    pixelPt.y = half_height;
+
+    // Build the ray located at the pinhole.
+    Ray r;
+    r.origin = point;
+    for(size_t row=0; row < num_rows; ++row)
+    {
+        pixelPt.x = -half_width;
+        for(size_t col=0; col < num_cols; ++col)
+        {
+            // Calculate the direction of the ray
+            r.direction = glm::normalize(pixelPt - point);
+
+            // Call the callback with the ray we found
+            spawn_callback(row, col, r);
+
+            // advance to the next pixel.
+            pixelPt.x += pixel_size;
+        }
+        pixelPt.y -= pixel_size;
+    }
 }
 
 std::string PinholeCamera::toString(size_t depth) 

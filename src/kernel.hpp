@@ -14,6 +14,9 @@ struct Kernel
 private:
     std::unordered_map<std::string, std::function<void(ParamMap&)>> handlers;
 
+    // Camera-space transformation matrix
+    glm::mat4 world2camera;
+
     // Lookup helper functions
     glm::vec3 lookup_color(std::string name);
     MaterialPtr lookup_material(std::string name);
