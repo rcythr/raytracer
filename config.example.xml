@@ -1,3 +1,7 @@
+<general
+    verbose="false"
+    />
+
 <pinhole
     pixel_size="0.25"
     num_samples="1"
@@ -110,10 +114,12 @@
 </materials>
     
 <naive_index>
-    <plane
+    <rect
         point="0 0 -150"
         normal="0 0 1"
-        material="grey" />
+        material="grey" 
+        width="1000"
+        height="1000" />
     <sphere
         point="5 3 0"
         radius="30"

@@ -22,9 +22,7 @@ struct PinholeCamera : public Camera {
 
     ~PinholeCamera() override {}
 
-    void render(std::shared_ptr<SpatialIndex> index,
-                std::shared_ptr<Light> ambient_light,
-                std::vector<std::shared_ptr<Light>>& lights) override;
+    void spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback) override;
 
     std::string toString(size_t depth) override;
 

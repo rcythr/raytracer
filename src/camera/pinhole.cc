@@ -11,16 +11,8 @@
 
 using namespace raytracer;
 
-void PinholeCamera::render(SpatialIndexPtr index, LightPtr ambient_light, std::vector<LightPtr>& lights)
+void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback)
 {
-    // For each Pixel in ViewPlane
-        // Generate the Ray
-        // Check intersections via SpatialIndex
-        // If Hit
-            // Color Pixel
-
-    // Output file
-    view_plane->finish();
 }
 
 std::string PinholeCamera::toString(size_t depth) 

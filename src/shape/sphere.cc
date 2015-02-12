@@ -7,6 +7,10 @@
 
 using namespace raytracer;
 
+bool Sphere::test_hit(Ray& ray, double& tmin)
+{
+}
+
 std::string Sphere::toString(size_t depth)
 {
     std::string tabdepth = std::string("\t") * depth;

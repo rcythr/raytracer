@@ -2,6 +2,9 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
+
+#include "ray.hpp"
 
 namespace raytracer {
 
@@ -14,11 +17,9 @@ struct Camera {
 
     virtual ~Camera() {}
 
-    virtual void render(std::shared_ptr<SpatialIndex> index,
-                        std::shared_ptr<Light> ambient_light,
-                        std::vector<std::shared_ptr<Light>>& lights) = 0;
-
     virtual std::string toString(size_t depth=0) = 0;
+
+    virtual void spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback) = 0;
 
     std::shared_ptr<ViewPlane> view_plane;
 };

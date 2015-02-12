@@ -18,6 +18,15 @@ Kernel::Kernel() {
         // General
         {"general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
+            switch(extractInt(params, "strategy", 1))
+            {
+            case 1:
+                render = std::bind(checkpoint1, this);
+                break;
+            default:
+                throw std::runtime_error("Invalid trace strategy in config file.");
+                break;
+            }
         }},
 
         // ViewPlanes
@@ -88,16 +97,6 @@ Kernel::Kernel() {
                 std::make_shared<Sphere>(
                     extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
                     extractFloat(params, "radius", 0.0f),
-                    lookup_material(extractString(params, "material", ""))
-                )
-            );
-        }},
-
-        {"plane", [this](ParamMap& params) {
-            spatial_index->insert(
-                std::make_shared<Plane>(
-                    extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
-                    extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
                     lookup_material(extractString(params, "material", ""))
                 )
             );

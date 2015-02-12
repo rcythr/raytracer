@@ -24,9 +24,7 @@ int main(int argc, char* argv[])
         std::cout << kernel.toString();
     }
 
-    kernel.camera->render(kernel.spatial_index, 
-                          kernel.ambient_light, 
-                          kernel.lights);
+    kernel.render();
 
     return EXIT_SUCCESS;
 }

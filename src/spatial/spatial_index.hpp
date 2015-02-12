@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include "ray.hpp"
 #include "shape/shape.hpp"
@@ -15,7 +16,7 @@ struct SpatialIndex
 
     virtual void insert(ShapePtr ptr) = 0;
 
-    virtual std::vector<ShapePtr> get_possible_hits(Ray& ray) = 0;
+    virtual void find_closest_hit(Ray& ray, std::function<void(ShapePtr&, double)> hit_callback) = 0;
 
     virtual std::string toString(size_t depth=0) = 0;
 };

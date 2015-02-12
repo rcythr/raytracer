@@ -13,7 +13,7 @@ public:
 
     void insert(ShapePtr ptr) override;
 
-    std::vector<ShapePtr> get_possible_hits(Ray& ray) override;
+    void find_closest_hit(Ray& ray, std::function<void(ShapePtr&, double)> hit_callback) override;
 
     std::string toString(size_t depth=0) override;
 };

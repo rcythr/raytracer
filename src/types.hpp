@@ -14,7 +14,6 @@
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"
-#include "shape/plane.hpp"
 #include "shape/rect.hpp"
 
 #include "spatial/spatial_index.hpp"
@@ -22,3 +21,5 @@
 
 #include "view_plane/view_plane.hpp"
 #include "view_plane/ppm.hpp"
+
+#include "tracers.hpp"

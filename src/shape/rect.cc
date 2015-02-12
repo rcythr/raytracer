@@ -7,6 +7,10 @@
 
 using namespace raytracer;
 
+bool Rect::test_hit(Ray& ray, double& tmin)
+{
+}
+
 std::string Rect::toString(size_t depth) 
 {
     std::string tabdepth = std::string("\t") * depth;

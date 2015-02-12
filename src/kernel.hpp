@@ -28,7 +28,9 @@ public:
     std::unordered_map<std::string, glm::vec3> colors;
     std::unordered_map<std::string, MaterialPtr> materials;
     SpatialIndexPtr spatial_index;
-    
+
+    std::function<void()> render;
+
     Kernel();
 
     // Called by XML library upon opening a tag.

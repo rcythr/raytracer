@@ -6,6 +6,11 @@
 
 using namespace raytracer;
 
+glm::vec3 Matte::get_raw_color()
+{
+    return color;
+}
+
 std::string Matte::toString(size_t depth)
 {
     std::string tabdepth = std::string("\t") * depth;

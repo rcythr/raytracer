@@ -10,9 +10,12 @@ void NaiveSpatialIndex::insert(ShapePtr ptr)
     objects.push_back(ptr);
 }
 
-std::vector<ShapePtr> NaiveSpatialIndex::get_possible_hits(Ray& ray) 
+void NaiveSpatialIndex::find_closest_hit(Ray& ray, std::function<void(ShapePtr&, double)> hit_callback)
 {
-    return objects;
+    for(auto obj : objects)
+    {
+        
+    }
 }
 
 std::string NaiveSpatialIndex::toString(size_t depth) 
