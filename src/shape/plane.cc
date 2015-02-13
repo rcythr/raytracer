@@ -31,7 +31,7 @@ std::string Plane::toString(size_t depth)
 
     std::stringstream ss;
 
-    ss << tabdepth << "TYPE: RECT\n";
+    ss << tabdepth << "TYPE: PLANE\n";
     ss << tabdepth << "LOCATION: " << point << "\n";
     ss << tabdepth << "NORMAL: (" << normal << "\n";
     ss << tabdepth << "MATERIAL: \n";

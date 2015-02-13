@@ -48,7 +48,7 @@ bool PPM::save(std::string filename)
     std::fwrite(header.c_str(), sizeof(char), header.size(), fd);
 
     // Write out all of the pixel data.
-    for(size_t i=0; i < height; ++i)
+    for(size_t i=height; i >= 0; --i)
     {
         for(size_t j=0; j < width; ++j)
         {

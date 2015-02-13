@@ -15,7 +15,7 @@ glm::mat4 PinholeCamera::build_transform_mat()
 {
     glm::vec3 zaxis = glm::normalize(point - look_at);
     glm::vec3 xaxis = glm::normalize(glm::cross(up, zaxis));
-    glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+    glm::vec3 yaxis = glm::normalize(glm::cross(zaxis, xaxis));
 
     // Please note this is given to mat4 as COLUMN vectors (so it appears transposed!)
     glm::mat4 result = {
@@ -38,19 +38,19 @@ void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_c
 
     // First calculate the location of the top left pixel
     glm::vec3 pixelPt;
-    pixelPt.z = point.z + view_distance;
-    pixelPt.y = point.y + half_height;
+    pixelPt.z = -view_distance;
+    pixelPt.y = half_height;
 
     // Build the ray located at the pinhole.
     Ray r;
-    r.origin = point;
+    r.origin = glm::vec3(0.0f, 0.0f, 0.0f);
     for(size_t row=0; row < num_rows; ++row)
     {
-        pixelPt.x = point.x - half_width;
+        pixelPt.x = -half_width;
         for(size_t col=0; col < num_cols; ++col)
         {
             // Calculate the direction of the ray
-            r.direction = glm::normalize(pixelPt - point);
+            r.direction = glm::normalize(pixelPt);
 
             // Call the callback with the ray we found
             spawn_callback(row, col, r);

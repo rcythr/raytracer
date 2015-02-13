@@ -3,6 +3,7 @@
 #include "util/vec3_helpers.hpp"
 #include "util/string_mult.hpp"
 
+#include <iostream>
 #include <sstream>
 
 using namespace raytracer;
