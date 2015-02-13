@@ -1,14 +1,14 @@
 <general
-    verbose="false"
+    verbose="true"
     />
 
 <pinhole
     pixel_size="0.25"
     num_samples="1"
-    eye="0 0 500"
+    eye="0 0 25"
     up="0 1 0"
     look_at="0 0 1"
-    view_distance="600.0"
+    view_distance="5.0"
     />
 
 <ppm_viewplane
@@ -114,12 +114,10 @@
 </materials>
     
 <naive_index>
-    <rect
-        point="0 0 -150"
+    <plane
+        point="0 0 -10"
         normal="0 0 1"
-        material="grey" 
-        width="1000"
-        height="1000" />
+        material="grey" />
     <sphere
         point="5 3 0"
         radius="30"

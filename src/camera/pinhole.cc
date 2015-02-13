@@ -38,15 +38,15 @@ void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_c
 
     // First calculate the location of the top left pixel
     glm::vec3 pixelPt;
-    pixelPt.z = -view_distance;
-    pixelPt.y = half_height;
+    pixelPt.z = point.z + view_distance;
+    pixelPt.y = point.y + half_height;
 
     // Build the ray located at the pinhole.
     Ray r;
     r.origin = point;
     for(size_t row=0; row < num_rows; ++row)
     {
-        pixelPt.x = -half_width;
+        pixelPt.x = point.x - half_width;
         for(size_t col=0; col < num_cols; ++col)
         {
             // Calculate the direction of the ray

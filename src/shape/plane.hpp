@@ -8,16 +8,12 @@
 namespace raytracer
 {
 
-struct Rect : public Shape
+struct Plane : public Shape
 {
-
-    Rect(glm::vec3 point, glm::vec3 normal, 
-            float width, float height, MaterialPtr material)
+    Plane(glm::vec3 point, glm::vec3 normal, MaterialPtr material)
         : Shape(material)
         , point(point)
         , normal(normal)
-        , width(width)
-        , height(height)
     {}
 
     bool test_hit(Ray& ray, double& tmin) override;
@@ -25,7 +21,6 @@ struct Rect : public Shape
     std::string toString(size_t depth=0) override;
 
     glm::vec3 point, normal;
-    float width, height;
 };
 
 }

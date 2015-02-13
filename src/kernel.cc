@@ -6,6 +6,7 @@
 #include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
 
+#include <iostream>
 #include <sstream>
 
 using namespace raytracer;
@@ -98,26 +99,38 @@ Kernel::Kernel() {
             auto inputPt = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
             auto outputPt = world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
 
+            auto materialName = extractString(params, "material", "");
+            auto material = lookup_material(materialName);
+            if(material == nullptr)
+            {
+                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
+            }
+
             spatial_index->insert(
                 std::make_shared<Sphere>(
                     glm::vec3(outputPt.x, outputPt.y, outputPt.z),
                     extractFloat(params, "radius", 0.0f),
-                    lookup_material(extractString(params, "material", ""))
+                    material
                 )
             );
         }},
 
-        {"rect", [this](ParamMap& params) {
+        {"plane", [this](ParamMap& params) {
             auto inputPt = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
             auto outputPt = world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
 
+            auto materialName = extractString(params, "material", "");
+            auto material = lookup_material(materialName);
+            if(material == nullptr)
+            {
+                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
+            }
+
             spatial_index->insert(
-                std::make_shared<Rect>(
+                std::make_shared<Plane>(
                     glm::vec3(outputPt.x, outputPt.y, outputPt.z),
                     extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
-                    extractFloat(params, "width", 5.0f),
-                    extractFloat(params, "height", 5.0f),
-                    lookup_material(extractString(params, "material", ""))
+                    material
                 )
             );
         }}

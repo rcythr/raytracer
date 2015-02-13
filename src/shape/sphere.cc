@@ -9,6 +9,7 @@ using namespace raytracer;
 
 bool Sphere::test_hit(Ray& ray, double& tmin)
 {
+    return false;
 }
 
 std::string Sphere::toString(size_t depth)
