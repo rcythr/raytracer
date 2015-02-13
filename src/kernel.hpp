@@ -24,6 +24,7 @@ private:
 public:
 
     bool verbose;
+    size_t num_threads;
 
     CameraPtr camera;
     LightPtr ambient_light;

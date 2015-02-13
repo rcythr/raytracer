@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 using namespace raytracer;
 
@@ -19,6 +20,7 @@ Kernel::Kernel() {
         // General
         {"general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
+            num_threads = extractInt(params, "num_threads", std::thread::hardware_concurrency());
             switch(extractInt(params, "strategy", 1))
             {
             case 1:

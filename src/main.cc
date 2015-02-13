@@ -2,8 +2,11 @@
 #include "kernel.hpp"
 #include "util/xml_helpers.hpp"
 #include <iostream>
+#include <chrono>
 
 #include "util/ppm/ppm.hpp"
+
+typedef std::chrono::high_resolution_clock Clock;
 
 using namespace raytracer;
 
@@ -24,7 +27,12 @@ int main(int argc, char* argv[])
         std::cout << kernel.toString();
     }
 
+
+    auto start = Clock::now();
     kernel.render();
+    auto end = Clock::now();
+
+    std::cout << "Render Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " miliseconds" << std::endl;
 
     return EXIT_SUCCESS;
 }
