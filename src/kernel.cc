@@ -159,6 +159,23 @@ Kernel::Kernel() {
             spatial_index->insert(
                 std::make_shared<Triangle>(p0, p1, p2, material)
             );
+        }},
+
+        {"objmesh", [this](ParamMap& params) {
+            auto materialName = extractString(params, "material", "");
+            auto material = lookup_material(materialName);
+            if(material == nullptr)
+            {
+                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
+            }
+
+            spatial_index->insert(
+                std::make_shared<ObjMesh>(
+                    extractString(params, "filename", ""),
+                    world2camera,
+                    material
+                )
+            );
         }}
     };
 

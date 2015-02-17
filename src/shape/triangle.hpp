@@ -24,4 +24,5 @@ struct Triangle : public Shape
     glm::vec3 p0, p1, p2;
 };
 
+
 }
