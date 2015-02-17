@@ -6,11 +6,18 @@
 #include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <thread>
 
 using namespace raytracer;
+
+glm::vec3 transform(glm::mat4 m4, glm::vec3 v3) 
+{ 
+    auto out = m4 * glm::vec4(v3.x, v3.y, v3.z, 1); 
+    return glm::vec3(out.x, out.y, out.z);
+}
 
 Kernel::Kernel() {
     verbose = true;
@@ -20,7 +27,7 @@ Kernel::Kernel() {
         // General
         {"general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
-            num_threads = extractInt(params, "num_threads", std::thread::hardware_concurrency());
+            num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
             switch(extractInt(params, "strategy", 1))
             {
             case 1:
@@ -134,6 +141,23 @@ Kernel::Kernel() {
                     extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
                     material
                 )
+            );
+        }},
+
+        {"triangle", [this](ParamMap& params) {
+            auto p0 = transform(world2camera, extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)));
+            auto p1 = transform(world2camera, extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)));
+            auto p2 = transform(world2camera, extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)));
+
+            auto materialName = extractString(params, "material", "");
+            auto material = lookup_material(materialName);
+            if(material == nullptr)
+            {
+                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
+            }
+
+            spatial_index->insert(
+                std::make_shared<Triangle>(p0, p1, p2, material)
             );
         }}
     };
