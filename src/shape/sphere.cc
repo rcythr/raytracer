@@ -30,8 +30,14 @@ void Sphere::test_hit(Ray& ray, HitResult& result)
 
 	//if b^2-c >= 0
 	if(testVal == 0.0){
+		//First intersection
+		tmin = -b/2;
 		return true;
 	} else if(testVal > 0.0) {
+		float t1, t2;
+		t1 = (-b/2) + sqrt(testVal);
+		t2 = (-b/2) - sqrt(testVal);
+		tmin = std::min(t1, t2);
 		return true;
 	}
 	else{
