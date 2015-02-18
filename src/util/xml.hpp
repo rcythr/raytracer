@@ -51,7 +51,8 @@ void parseXml(const std::string& data, Handler& handler) {
                             handler.ascii(ascii_buf);
                         }
 
-                        // If next char is / it's a closer
+                        // If next char is / it's a
+                        // closer
                         if (data[i + 1] == '/') {
                             ++i;
                             state = ParserState::InClosingTagName;
@@ -75,9 +76,7 @@ void parseXml(const std::string& data, Handler& handler) {
                         state = ParserState::None;
                     } break;
 
-                    default: {
-                        tag_name += c;
-                    } break;
+                    default: { tag_name += c; } break;
                 }
             } break;
 
@@ -86,10 +85,10 @@ void parseXml(const std::string& data, Handler& handler) {
                     case '\t':
                     case '\r':
                     case '\n':
-                    case ' ':  // Name is over, move into the first attribute.
-                    {
-                        state = ParserState::InTagAttribute;
-                    } break;
+                    case ' ':  // Name is over, move into
+                               // the first attribute.
+                        { state = ParserState::InTagAttribute; }
+                        break;
 
                     case '/': {
                         also_closes = true;
@@ -106,9 +105,7 @@ void parseXml(const std::string& data, Handler& handler) {
                         state = ParserState::None;
                     } break;
 
-                    default: {
-                        tag_name += c;
-                    } break;
+                    default: { tag_name += c; } break;
                 }
             } break;
 
@@ -123,10 +120,10 @@ void parseXml(const std::string& data, Handler& handler) {
                         }
                     } break;
 
-                    case '=':  // Okay, now we're in the value.
-                    {
-                        state = ParserState::InTagAttributeValue;
-                    } break;
+                    case '=':  // Okay, now we're in the
+                               // value.
+                        { state = ParserState::InTagAttributeValue; }
+                        break;
 
                     case '/': {
                         also_closes = true;
@@ -149,9 +146,7 @@ void parseXml(const std::string& data, Handler& handler) {
                         state = ParserState::None;
                     } break;
 
-                    default: {
-                        attribute_name += c;
-                    } break;
+                    default: { attribute_name += c; } break;
                 }
             } break;
 

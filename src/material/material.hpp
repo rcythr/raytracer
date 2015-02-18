@@ -6,13 +6,11 @@
 namespace raytracer {
 
 struct Material {
-
     virtual ~Material() {}
 
-    virtual std::string toString(size_t depth=0) = 0;
+    virtual std::string toString(size_t depth = 0) = 0;
 
     virtual glm::vec3 get_raw_color() = 0;
-
 };
 
 typedef std::shared_ptr<Material> MaterialPtr;

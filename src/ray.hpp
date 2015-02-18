@@ -2,13 +2,10 @@
 
 #include <glm/glm.hpp>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Ray
-{
+struct Ray {
     glm::vec3 origin;
     glm::vec3 direction;
 };
-
 }

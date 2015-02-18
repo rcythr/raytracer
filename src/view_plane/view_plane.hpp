@@ -3,11 +3,9 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct ViewPlane
-{
+struct ViewPlane {
     virtual ~ViewPlane() {}
 
     /**
@@ -38,9 +36,7 @@ struct ViewPlane
      * Ex. The PPMViewPlane writes out the image file when this is called.
      */
     virtual void finish() = 0;
-
 };
 
 typedef std::shared_ptr<ViewPlane> ViewPlanePtr;
-
 }

@@ -4,25 +4,17 @@
 
 #include <glm/glm.hpp>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct Triangle : public Shape
-{
+struct Triangle : public Shape {
+    Triangle(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2,
+             std::shared_ptr<Material> mat)
+        : Shape(mat), p0(p0), p1(p1), p2(p2) {}
 
-    Triangle(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, std::shared_ptr<Material> mat) 
-        : Shape(mat)
-        , p0(p0)
-        , p1(p1)
-        , p2(p2)
-    {}
-    
-    std::string toString(size_t depth=0) override;
+    std::string toString(size_t depth = 0) override;
 
     void test_hit(Ray& ray, HitResult& result) override;
-    
+
     glm::vec3 p0, p1, p2;
 };
-
-
 }

@@ -7,8 +7,7 @@
 
 using namespace raytracer;
 
-std::string DirectionalLight::toString(size_t depth) 
-{
+std::string DirectionalLight::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 
     std::stringstream ss;

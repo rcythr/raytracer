@@ -3,11 +3,9 @@
 #include <glm/glm.hpp>
 #include <string>
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct PPM
-{
+struct PPM {
     size_t width, height;
     glm::vec3** data;
 
@@ -17,9 +15,10 @@ struct PPM
 
     glm::vec3 get_pixel(size_t row, size_t col) { return data[row][col]; }
 
-    void set_pixel(size_t row, size_t col, glm::vec3 color) { data[row][col] = color; }
+    void set_pixel(size_t row, size_t col, glm::vec3 color) {
+        data[row][col] = color;
+    }
 
-    bool save(std::string filename); 
+    bool save(std::string filename);
 };
-
 }

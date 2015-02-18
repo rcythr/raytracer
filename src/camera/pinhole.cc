@@ -11,25 +11,25 @@
 
 using namespace raytracer;
 
-glm::mat4 PinholeCamera::build_transform_mat()
-{
+glm::mat4 PinholeCamera::build_transform_mat() {
     glm::vec3 zaxis = glm::normalize(point - look_at);
     glm::vec3 xaxis = glm::normalize(glm::cross(up, zaxis));
     glm::vec3 yaxis = glm::normalize(glm::cross(zaxis, xaxis));
 
-    // Please note this is given to mat4 as COLUMN vectors (so it appears transposed!)
+    // Please note this is given to mat4 as COLUMN vectors (so it appears
+    // transposed!)
     glm::mat4 result = {
-        glm::vec4(      xaxis.x,                yaxis.x,                zaxis.x,       0),
-        glm::vec4(      xaxis.y,                yaxis.y,                zaxis.y,       0),
-        glm::vec4(      xaxis.z,                yaxis.z,                zaxis.z,       0),
-        glm::vec4(-glm::dot(xaxis, point), -glm::dot(yaxis, point), -glm::dot(zaxis, point), 1)
-    };
+        glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0),
+        glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
+        glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
+        glm::vec4(-glm::dot(xaxis, point), -glm::dot(yaxis, point),
+                  -glm::dot(zaxis, point), 1)};
 
     return result;
 }
 
-void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback)
-{
+void PinholeCamera::spawn_rays(
+    std::function<void(size_t, size_t, Ray&)> spawn_callback) {
     size_t num_rows = view_plane->get_height();
     size_t num_cols = view_plane->get_width();
 
@@ -44,11 +44,9 @@ void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_c
     // Build the ray located at the pinhole.
     Ray r;
     r.origin = glm::vec3(0.0f, 0.0f, 0.0f);
-    for(size_t row=0; row < num_rows; ++row)
-    {
+    for (size_t row = 0; row < num_rows; ++row) {
         pixelPt.x = -half_width;
-        for(size_t col=0; col < num_cols; ++col)
-        {
+        for (size_t col = 0; col < num_cols; ++col) {
             // Calculate the direction of the ray
             r.direction = glm::normalize(pixelPt);
 
@@ -62,8 +60,7 @@ void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_c
     }
 }
 
-std::string PinholeCamera::toString(size_t depth) 
-{
+std::string PinholeCamera::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 
     std::stringstream ss;
@@ -72,9 +69,11 @@ std::string PinholeCamera::toString(size_t depth)
     ss << tabdepth << "VRES: " << view_plane->get_height() << '\n';
     ss << tabdepth << "PIXEL SIZE: " << pixel_size << '\n';
     ss << tabdepth << "NUM SAMPLES: " << num_samples << '\n';
-    ss << tabdepth << "LOCATION: (" << point.x << ',' << point.y << ',' << point.z << ")\n";
+    ss << tabdepth << "LOCATION: (" << point.x << ',' << point.y << ','
+       << point.z << ")\n";
     ss << tabdepth << "UP: (" << up.x << ',' << up.y << ',' << up.z << ")\n";
-    ss << tabdepth << "LOOK AT: (" << look_at.x << ',' << look_at.y << ',' << look_at.z << ")\n";
+    ss << tabdepth << "LOOK AT: (" << look_at.x << ',' << look_at.y << ','
+       << look_at.z << ")\n";
     ss << tabdepth << "VIEW DISTANCE: " << view_distance << '\n';
     return ss.str();
 }

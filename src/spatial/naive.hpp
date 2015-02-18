@@ -2,20 +2,18 @@
 
 #include "spatial_index.hpp"
 
-namespace raytracer
-{
+namespace raytracer {
 
-struct NaiveSpatialIndex : public SpatialIndex
-{
-private:
+struct NaiveSpatialIndex : public SpatialIndex {
+   private:
     std::vector<ShapePtr> objects;
-public:
 
+   public:
     void insert(ShapePtr ptr) override;
 
-    void find_closest_hit(Ray& ray, std::function<void(HitResult&)> hit_callback) override;
+    void find_closest_hit(
+        Ray& ray, std::function<void(HitResult&)> hit_callback) override;
 
-    std::string toString(size_t depth=0) override;
+    std::string toString(size_t depth = 0) override;
 };
-
 }

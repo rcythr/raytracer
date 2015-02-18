@@ -9,9 +9,8 @@
 
 namespace raytracer {
 
-struct Kernel
-{
-private:
+struct Kernel {
+   private:
     std::unordered_map<std::string, std::function<void(ParamMap&)>> handlers;
 
     // Camera-space transformation matrix
@@ -21,8 +20,7 @@ private:
     glm::vec3 lookup_color(std::string name);
     MaterialPtr lookup_material(std::string name);
 
-public:
-
+   public:
     bool verbose;
     size_t num_threads;
 
@@ -44,10 +42,9 @@ public:
     void ascii(std::string& content) {}
 
     // Called by XML library for the closing of a tag.
-    void close(std::string& tag) { }
+    void close(std::string& tag) {}
 
     // Usual to string function
-    std::string toString(size_t depth=0);
+    std::string toString(size_t depth = 0);
 };
-
 }

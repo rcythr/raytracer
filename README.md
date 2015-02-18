@@ -16,6 +16,13 @@ The raytracer program requires an argument [config_name] which specifies the con
 
     ./raytracer [config_name]
 
+## To Format Code
+Code formatting is always a pain. Use of clang-format can help code be more readable and more sane.
+
+First install clang-format-3.5. Then to do formatting simply run the following code from the src directory:
+
+    find -type f | xargs clang-format-3.5 -i -style="{BasedOnStyle: Google, IndentWidth: 4}"
+
 ## Valid Configuration Options
 
 ### general

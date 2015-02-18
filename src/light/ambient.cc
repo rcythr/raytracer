@@ -6,8 +6,7 @@
 
 using namespace raytracer;
 
-std::string AmbientLight::toString(size_t depth)
-{
+std::string AmbientLight::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 
     std::stringstream ss;
