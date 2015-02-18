@@ -13,10 +13,7 @@ void Sphere::test_hit(Ray& ray, HitResult& result)
 {
 
 	//Major values for texting interstion
-	//a, b, and c are part of the intersection equation
-	glm::vec3 oc;
-
-	oc = ray.origin-point;
+	auto oc = ray.origin-point;
 
 	//b=2(l*(o-c))
 	auto b = glm::dot(ray.direction,oc)*2.0f;
@@ -24,25 +21,29 @@ void Sphere::test_hit(Ray& ray, HitResult& result)
 	auto c = dot(oc,oc)- radius*radius;
 	//testVal = b^2-c;
 	auto testVal = b*b - c*4.0f;
-	//float x, y, z;
-	//x = testVec.x; y = testVec.y; z=testVec.z;
-	//float testVal = sqrt(x*x+y*y+z*z);
 
 	//if b^2-c >= 0
 	if(testVal == 0.0){
+        float tval = -b/2;
+        auto intersection_point = ray.origin + ray.direction * tval;
+
 		//First intersection
-		tmin = -b/2;
-		return true;
+        result.hit(shared_from_this(),
+                   tval,
+                   intersection_point,
+                   glm::normalize(intersection_point - point));
+		return;
 	} else if(testVal > 0.0) {
-		float t1, t2;
-		t1 = (-b/2) + sqrt(testVal);
-		t2 = (-b/2) - sqrt(testVal);
-		tmin = std::min(t1, t2);
-		return true;
+		float tval = std::min((-b/2) + sqrt(testVal), (-b/2) - sqrt(testVal));
+        auto intersection_point = ray.origin + ray.direction * tval;
+
+        result.hit(shared_from_this(),
+                   tval,
+                   intersection_point,
+                   glm::normalize(intersection_point - point));
+		return;
 	}
-	else{
-    	return false;
-    }
+    result.miss();
 }
 
 std::string Sphere::toString(size_t depth)
