@@ -5,7 +5,6 @@
 #include <sstream>
 #include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
-#include "util/triangle_test.hpp"
 
 using namespace raytracer;
 
@@ -25,6 +24,52 @@ std::string Triangle::toString(size_t depth)
 
 void Triangle::test_hit(Ray& ray, HitResult& result)
 {
-    return test_triangle_hit(ray, p0, p1, p2, tmin);
+    float a, f, u, v, t;
+    glm::vec3 e1, e2, h, s, q;
+
+    e1 = p1 - p0;
+    e2 = p2 - p0;
+
+    h = glm::cross(ray.direction, e2);
+    a = glm::dot(e1, h);
+
+    if(a > -0.00001 && a < 0.00001)
+    {
+        result.miss();
+        return;
+    }
+
+    f = 1/a;
+
+    s = ray.origin - p0;
+    u = f * glm::dot(s, h);
+
+    if(u < 0.0 || u > 1.0)
+    {
+        result.miss();
+        return;
+    }
+
+    q = glm::cross(s, e1);
+
+    v = f * glm::dot(ray.direction, q);
+
+    if(v < 0.0 || u + v > 1.0)
+    {
+        result.miss();
+        return;
+    }
+
+    t = f * glm::dot(e2, q);
+
+    if (t > 0.00001)
+    {
+        result.hit(shared_from_this(),
+                   t,
+                   ray.origin + ray.direction * t,
+                   glm::cross(e1, e2));
+        return;
+    }
+    result.miss();
 }
     

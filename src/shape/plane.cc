@@ -19,10 +19,14 @@ void Plane::test_hit(Ray& ray, HitResult& result)
     {
         // Now we find the distance along the ray where the intersection lies
         // Set the value of the tmin because it's valid.
-        tmin = glm::dot(point - ray.origin, normal) / rd_dot_pn;
-        return true;
+        float tval = glm::dot(point - ray.origin, normal) / rd_dot_pn;
+        result.hit(shared_from_this(),
+                   tval,
+                   ray.origin + ray.direction * tval,
+                   normal);
+        return;
     }
-    return false;
+    result.miss();
 }
 
 std::string Plane::toString(size_t depth) 

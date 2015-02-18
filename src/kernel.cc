@@ -5,6 +5,7 @@
 #include "util/xml_helpers.hpp"
 #include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
+#include "util/obj_mesh.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -169,13 +170,7 @@ Kernel::Kernel() {
                 std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
             }
 
-            spatial_index->insert(
-                std::make_shared<ObjMesh>(
-                    extractString(params, "filename", ""),
-                    world2camera,
-                    material
-                )
-            );
+            loadObj(extractString(params, "filename", ""), world2camera, material, spatial_index);
         }}
     };
 

@@ -16,6 +16,7 @@ void NaiveSpatialIndex::find_closest_hit(Ray& ray, std::function<void(HitResult&
     HitResult result;
     for(auto obj : objects)
     {
+        result.found_hit = false;
         obj->test_hit(ray, result);
         if(result.found_hit)
         {

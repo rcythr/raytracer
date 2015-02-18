@@ -16,7 +16,6 @@
 #include "shape/sphere.hpp"
 #include "shape/plane.hpp"
 #include "shape/triangle.hpp"
-#include "shape/obj_mesh.hpp"
 
 #include "spatial/spatial_index.hpp"
 #include "spatial/naive.hpp"
