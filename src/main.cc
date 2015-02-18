@@ -27,7 +27,6 @@ int main(int argc, char* argv[])
         std::cout << kernel.toString();
     }
 
-
     auto start = Clock::now();
     kernel.render();
     auto end = Clock::now();

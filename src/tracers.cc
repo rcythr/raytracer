@@ -14,9 +14,9 @@ void raytracer::checkpoint1(Kernel* kernel)
         size_t row = std::get<0>(data);
         size_t col = std::get<1>(data);
 
-        kernel->spatial_index->find_closest_hit(std::get<2>(data), [=](ShapePtr& hitShape, double tmin) {
+        kernel->spatial_index->find_closest_hit(std::get<2>(data), [=](HitResult& hit) {
             // Set the view plane pixel to the color of the object we hit.
-            kernel->camera->view_plane->set_pixel(row, col, hitShape->material->get_raw_color());
+            kernel->camera->view_plane->set_pixel(row, col, hit.shape->material->get_raw_color());
         });
     });
 

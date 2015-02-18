@@ -31,7 +31,7 @@ std::string ObjMesh::toString(size_t depth)
     return ss.str();
 }
 
-bool ObjMesh::test_hit(Ray& ray, double& tmin)
+void ObjMesh::test_hit(Ray& ray, HitResult& result)
 {
     bool found = false;
     size_t found_tri;

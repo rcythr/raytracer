@@ -114,10 +114,6 @@
 </materials>
     
 <naive_index>
-    <plane
-        point="0 0 -1000"
-        normal="0 0 -1"
-        material="grey" />
     <sphere
         point="5 3 0"
         radius="30"

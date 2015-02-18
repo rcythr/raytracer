@@ -9,7 +9,7 @@
 
 using namespace raytracer;
 
-bool Sphere::test_hit(Ray& ray, double& tmin)
+void Sphere::test_hit(Ray& ray, HitResult& result)
 {
 
 	//Major values for texting interstion

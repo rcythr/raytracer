@@ -23,7 +23,7 @@ std::string Triangle::toString(size_t depth)
     return ss.str();
 }
 
-bool Triangle::test_hit(Ray& ray, double& tmin)
+void Triangle::test_hit(Ray& ray, HitResult& result)
 {
     return test_triangle_hit(ray, p0, p1, p2, tmin);
 }

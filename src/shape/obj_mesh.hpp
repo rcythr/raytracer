@@ -17,7 +17,7 @@ struct ObjMesh : public Shape
 
     std::string toString(size_t depth=0) override;
 
-    bool test_hit(Ray& ray, double& tmin) override;
+    void test_hit(Ray& ray, HitResult& result) override;
     
 private:
     std::vector<Tri> triangles;

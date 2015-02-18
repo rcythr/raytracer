@@ -8,7 +8,7 @@
 
 using namespace raytracer;
 
-bool Plane::test_hit(Ray& ray, double& tmin)
+void Plane::test_hit(Ray& ray, HitResult& result)
 {
     // First compute the dot product of the plane's normal and the ray's direction. 
     float rd_dot_pn = glm::dot(ray.direction, normal);

@@ -10,25 +10,25 @@ void NaiveSpatialIndex::insert(ShapePtr ptr)
     objects.push_back(ptr);
 }
 
-void NaiveSpatialIndex::find_closest_hit(Ray& ray, std::function<void(ShapePtr&, double)> hit_callback)
+void NaiveSpatialIndex::find_closest_hit(Ray& ray, std::function<void(HitResult&)> hit_callback)
 {
-    double tmin, t;
-    ShapePtr hit_obj = nullptr;
+    HitResult best_result;
+    HitResult result;
     for(auto obj : objects)
     {
-        if(obj->test_hit(ray, t))
+        obj->test_hit(ray, result);
+        if(result.found_hit)
         {
-            if(hit_obj == nullptr || t < tmin)
+            if(best_result.found_hit == false || result.tval < best_result.tval)
             {
-                tmin = t;
-                hit_obj = obj;
+                best_result = result;
             }
         }
     }
 
-    if(hit_obj != nullptr)
+    if(best_result.found_hit)
     {
-        hit_callback(hit_obj, tmin);
+        hit_callback(best_result);
     }
 }
 
