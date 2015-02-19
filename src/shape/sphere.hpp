@@ -8,8 +8,8 @@
 namespace raytracer {
 
 struct Sphere : public Shape {
-    Sphere(glm::vec3 point, float radius, MaterialPtr material)
-        : Shape(material), point(point), radius(radius) {}
+    Sphere(glm::vec4 point, float radius, MaterialPtr material)
+        : Shape(material), point_(point), radius_(radius) {}
 
     ~Sphere() override {}
 
@@ -17,7 +17,12 @@ struct Sphere : public Shape {
 
     std::string toString(size_t depth = 0) override;
 
-    glm::vec3 point;
-    float radius;
+    glm::vec4 point() const { return viewTransform * point_; }
+
+    float radius() const { return radius_; }
+
+private:
+    glm::vec4 point_;
+    float radius_;
 };
 }

@@ -1,20 +1,36 @@
 <general
-    verbose="true"
+    verbose="false"
     />
 
 <pinhole
-    pixel_size="0.25"
+    pixel_size="0.30"
     num_samples="1"
-    eye="-100 0 0"
+    eye="0 0 30"
     up="0 1 0"
     look_at="0 0 0"
-    view_distance="200"
-    />
+    view_distance="50">
 
-<ppm_viewplane
-    hres="800"
-    vres="600"
-    filename="out.ppm" />
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out.ppm" />
+
+</pinhole>
+
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="-30 0 0"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="50">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out1.ppm" />
+
+</pinhole>
 
 <lights>
     <ambient 
@@ -127,14 +143,14 @@
         normal="0 0 -1"
         material="blue" />
     <triangle
-        p0="-40 10 -85"
-        p1="-05 35 65"
-        p2="25 35 45"
+        p0="-45 30 -85"
+        p1="-45 30 45"
+        p2="45 30 45"
         material="orange" />
     <triangle
-        p0="-40 10 -85"
-        p1="60 10 -85"
-        p2="25 35 45"
+        p0="-45 30 -85"
+        p1="45 30 -85"
+        p2="45 30 45"
         material="brown" />
     <sphere
         point="0 0 0"

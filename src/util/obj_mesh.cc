@@ -6,10 +6,9 @@
 
 #include <fstream>
 
-void raytracer::loadObj(std::string filename, glm::mat4 transform,
-                        MaterialPtr material, SpatialIndexPtr index) {
+void raytracer::loadObj(std::string filename, MaterialPtr material, SpatialIndexPtr index) {
     std::ifstream strm(filename.c_str());
-    std::vector<glm::vec3> points;
+    std::vector<glm::vec4> points;
     std::string line;
 
     while (std::getline(strm, line)) {
@@ -28,9 +27,7 @@ void raytracer::loadObj(std::string filename, glm::mat4 transform,
                         x = std::stod(parts[1]);
                         break;
                 }
-
-                auto pt = transform * glm::vec4(x, y, z, w);
-                points.push_back(glm::vec3(pt.x, pt.y, pt.z));
+                points.push_back(glm::vec4(x, y, z, w));
             } else if (parts[0] == "f") {
                 index->insert(std::make_shared<Triangle>(
                     points[std::stoi(parts[1])], points[std::stoi(parts[2])],

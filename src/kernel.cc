@@ -11,13 +11,9 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <chrono>
 
 using namespace raytracer;
-
-glm::vec3 transform(glm::mat4 m4, glm::vec3 v3) {
-    auto out = m4 * glm::vec4(v3.x, v3.y, v3.z, 1);
-    return glm::vec3(out.x, out.y, out.z);
-}
 
 Kernel::Kernel() {
     verbose = true;
@@ -32,7 +28,7 @@ Kernel::Kernel() {
                            std::max(std::thread::hardware_concurrency(), 1u));
             switch (extractInt(params, "strategy", 1)) {
                 case 1:
-                    render = std::bind(checkpoint1, this);
+                    trace_strategy = checkpoint1;
                     break;
                 default:
                     throw std::runtime_error(
@@ -40,14 +36,6 @@ Kernel::Kernel() {
                         "file.");
                     break;
             }
-        }},
-
-        // ViewPlanes
-        {"ppm_viewplane", [this](ParamMap& params) {
-            camera->view_plane = std::make_shared<PPMViewPlane>(
-                extractInt(params, "hres", 800),
-                extractInt(params, "vres", 600),
-                extractString(params, "filename", "out.ppm"));
         }},
 
         // Spatial Indecies
@@ -62,16 +50,26 @@ Kernel::Kernel() {
 
         // Cameras
         {"pinhole", [this](ParamMap& params) {
-            camera = std::make_shared<PinholeCamera>(
-                extractFloat(params, "pixel_size", 0.50f),
-                extractInt(params, "num_samples", 1),
-                extractVec3(params, "eye", glm::vec3(0.0f, 0.0f, 0.0f)),
-                extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
-                extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
-                extractFloat(params, "view_distance", 600));
-
-            world2camera = camera->build_transform_mat();
+            cameras.push_back(
+                std::make_shared<PinholeCamera>(
+                    extractFloat(params, "pixel_size", 0.50f),
+                    extractInt(params, "num_samples", 1),
+                    extractVec3(params, "eye", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
+                    extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
+                    extractFloat(params, "view_distance", 600)
+                )
+            );
         }},
+        
+        // ViewPlanes
+        {"ppm_viewplane", [this](ParamMap& params) {
+            cameras.at(cameras.size()-1)->view_plane = std::make_shared<PPMViewPlane>(
+                extractInt(params, "hres", 800),
+                extractInt(params, "vres", 600),
+                extractString(params, "filename", "out.ppm"));
+        }},
+
 
         // Lights
         {"ambient", [this](ParamMap& params) {
@@ -107,11 +105,6 @@ Kernel::Kernel() {
 
         // Shapes
         {"sphere", [this](ParamMap& params) {
-            auto inputPt =
-                extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
-            auto outputPt =
-                world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
-
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -120,16 +113,11 @@ Kernel::Kernel() {
             }
 
             spatial_index->insert(std::make_shared<Sphere>(
-                glm::vec3(outputPt.x, outputPt.y, outputPt.z),
+                glm::vec4(extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f),
                 extractFloat(params, "radius", 0.0f), material));
         }},
 
         {"plane", [this](ParamMap& params) {
-            auto inputPt =
-                extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.f));
-            auto outputPt =
-                world2camera * glm::vec4(inputPt.x, inputPt.y, inputPt.z, 1.0);
-
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -138,22 +126,12 @@ Kernel::Kernel() {
             }
 
             spatial_index->insert(std::make_shared<Plane>(
-                glm::vec3(outputPt.x, outputPt.y, outputPt.z),
-                extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)),
+                glm::vec4(extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f),
+                glm::vec4(extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)), 0.0f),
                 material));
         }},
 
         {"triangle", [this](ParamMap& params) {
-            auto p0 = transform(
-                world2camera,
-                extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)));
-            auto p1 = transform(
-                world2camera,
-                extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)));
-            auto p2 = transform(
-                world2camera,
-                extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)));
-
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -162,7 +140,11 @@ Kernel::Kernel() {
             }
 
             spatial_index->insert(
-                std::make_shared<Triangle>(p0, p1, p2, material));
+                std::make_shared<Triangle>(
+                    glm::vec4(extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
+                    glm::vec4(extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
+                    glm::vec4(extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
+                    material));
         }},
 
         {"objmesh", [this](ParamMap& params) {
@@ -173,8 +155,7 @@ Kernel::Kernel() {
                           << "' not found!" << std::endl;
             }
 
-            loadObj(extractString(params, "filename", ""), world2camera,
-                    material, spatial_index);
+            loadObj(extractString(params, "filename", ""), material, spatial_index);
         }}};
 }
 
@@ -209,7 +190,11 @@ std::string Kernel::toString(size_t depth) {
     std::stringstream ss;
 
     // Now we'll print out the pieces.
-    ss << tabdepth << "CAMERA: \n" << camera->toString(depth + 1);
+    ss << tabdepth << "CAMERAS: \n";
+    for(CameraPtr& camera : cameras) 
+    {
+        ss << camera->toString(depth + 1);
+    }
 
     ss << tabdepth << "LIGHTS: \n";
     ss << tabdepth << ambient_light->toString(depth + 1);
@@ -233,4 +218,22 @@ std::string Kernel::toString(size_t depth) {
     ss << spatial_index->toString(depth + 1);
 
     return ss.str();
+}
+    
+void Kernel::render() {
+    typedef std::chrono::high_resolution_clock Clock;
+    
+    size_t i = 1;
+    for(CameraPtr& c : cameras)
+    {
+        auto start = Clock::now();
+        trace_strategy(this, c);
+        auto end = Clock::now();
+        
+        std::cout << "Camera " << i << " Render Time: "
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+                  << " miliseconds" << std::endl;
+
+        ++i;
+    }
 }

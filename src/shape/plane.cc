@@ -9,9 +9,12 @@
 using namespace raytracer;
 
 void Plane::test_hit(Ray& ray, HitResult& result) {
+    auto plane_point = glm::vec3(point());
+    auto plane_normal = glm::vec3(normal());
+
     // First compute the dot product of the plane's normal and the ray's
     // direction.
-    float rd_dot_pn = glm::dot(ray.direction, normal);
+    float rd_dot_pn = glm::dot(ray.direction, plane_normal);
 
     // If 0 then no intersection exists at any point.
     // If < 0 then an intersection exists behind us, so ignore it.
@@ -19,9 +22,9 @@ void Plane::test_hit(Ray& ray, HitResult& result) {
         // Now we find the distance along the ray where the intersection
         // lies
         // Set the value of the tmin because it's valid.
-        float tval = glm::dot(point - ray.origin, normal) / rd_dot_pn;
+        float tval = glm::dot(plane_point - ray.origin, plane_normal) / rd_dot_pn;
         result.hit(shared_from_this(), tval, ray.origin + ray.direction * tval,
-                   normal);
+                   plane_normal);
         return;
     }
     result.miss();
@@ -33,8 +36,8 @@ std::string Plane::toString(size_t depth) {
     std::stringstream ss;
 
     ss << tabdepth << "TYPE: PLANE\n";
-    ss << tabdepth << "LOCATION: " << point << "\n";
-    ss << tabdepth << "NORMAL: (" << normal << "\n";
+    ss << tabdepth << "LOCATION: " << point_ << "\n";
+    ss << tabdepth << "NORMAL: (" << normal_ << "\n";
     ss << tabdepth << "MATERIAL: \n";
     ss << material->toString(depth + 1);
 

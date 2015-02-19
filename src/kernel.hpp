@@ -13,9 +13,6 @@ struct Kernel {
    private:
     std::unordered_map<std::string, std::function<void(ParamMap&)>> handlers;
 
-    // Camera-space transformation matrix
-    glm::mat4 world2camera;
-
     // Lookup helper functions
     glm::vec3 lookup_color(std::string name);
     MaterialPtr lookup_material(std::string name);
@@ -24,14 +21,13 @@ struct Kernel {
     bool verbose;
     size_t num_threads;
 
-    CameraPtr camera;
+    std::vector<CameraPtr> cameras;
     LightPtr ambient_light;
     std::vector<LightPtr> lights;
     std::unordered_map<std::string, glm::vec3> colors;
     std::unordered_map<std::string, MaterialPtr> materials;
     SpatialIndexPtr spatial_index;
-
-    std::function<void()> render;
+    std::function<void(Kernel*, CameraPtr)> trace_strategy;
 
     Kernel();
 
@@ -46,5 +42,7 @@ struct Kernel {
 
     // Usual to string function
     std::string toString(size_t depth = 0);
+
+    void render();
 };
 }

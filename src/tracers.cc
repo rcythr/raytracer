@@ -8,7 +8,15 @@
 
 using namespace raytracer;
 
-void raytracer::checkpoint1(Kernel* kernel) {
+void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
+
+    // First transform all objects into camera space for this camera.
+    auto viewTransform = camera->build_transform_mat();
+    kernel->spatial_index->view_all_objects([&](ShapePtr& shape) {
+        shape->set_view_transform(viewTransform);
+    });
+
+    // Now fire up a thread pool that does hit calculations and tone reproduction.
     ThreadPool<std::tuple<size_t, size_t, Ray>> tp(
         kernel->num_threads, [=](std::tuple<size_t, size_t, Ray>& data) {
             size_t row = std::get<0>(data);
@@ -18,13 +26,12 @@ void raytracer::checkpoint1(Kernel* kernel) {
                                                     [=](HitResult& hit) {
                 // Set the view plane pixel to the color of the
                 // object we hit.
-                kernel->camera->view_plane->set_pixel(
-                    row, col, hit.shape->material->get_raw_color());
+                camera->view_plane->set_pixel(row, col, hit.shape->material->get_raw_color());
             });
         });
 
     // Give the camera a function to call on each ray it generates.
-    kernel->camera->spawn_rays([&](size_t row, size_t col, Ray& ray) {
+    camera->spawn_rays([&](size_t row, size_t col, Ray& ray) {
         tp.enqueue(std::tie(row, col, ray));
     });
 
@@ -33,5 +40,5 @@ void raytracer::checkpoint1(Kernel* kernel) {
     tp.join();
 
     // Signal to the view plane that we are finished writing.
-    kernel->camera->view_plane->finish();
+    camera->view_plane->finish();
 }

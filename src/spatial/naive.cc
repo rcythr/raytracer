@@ -27,6 +27,14 @@ void NaiveSpatialIndex::find_closest_hit(
     }
 }
 
+void NaiveSpatialIndex::view_all_objects(std::function<void(ShapePtr&)> functor)
+{
+    for(auto& obj : objects)
+    {
+        functor(obj);
+    }
+}
+
 std::string NaiveSpatialIndex::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 
