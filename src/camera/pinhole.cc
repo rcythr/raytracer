@@ -7,6 +7,7 @@
 
 #include "util/string_mult.hpp"
 
+#include <glm/gtc/matrix_inverse.hpp>
 #include <sstream>
 
 using namespace raytracer;
@@ -28,8 +29,10 @@ glm::mat4 PinholeCamera::build_transform_mat() {
     return result;
 }
 
-void PinholeCamera::spawn_rays(
-    std::function<void(size_t, size_t, Ray&)> spawn_callback) {
+void PinholeCamera::spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback) {
+ 
+    auto inverseTransform = glm::inverse(build_transform_mat());
+    
     size_t num_rows = view_plane->get_height();
     size_t num_cols = view_plane->get_width();
 
@@ -43,12 +46,12 @@ void PinholeCamera::spawn_rays(
 
     // Build the ray located at the pinhole.
     Ray r;
-    r.origin = glm::vec3(0.0f, 0.0f, 0.0f);
+    r.origin = glm::vec3(inverseTransform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     for (size_t row = 0; row < num_rows; ++row) {
         pixelPt.x = -half_width;
         for (size_t col = 0; col < num_cols; ++col) {
             // Calculate the direction of the ray
-            r.direction = glm::normalize(pixelPt);
+            r.direction = glm::vec3(glm::normalize(inverseTransform * glm::vec4(pixelPt, 0.0f)));
 
             // Call the callback with the ray we found
             spawn_callback(row, col, r);

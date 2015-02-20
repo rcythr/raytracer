@@ -10,12 +10,6 @@ using namespace raytracer;
 
 void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
 
-    // First transform all objects into camera space for this camera.
-    auto viewTransform = camera->build_transform_mat();
-    kernel->spatial_index->view_all_objects([&](ShapePtr& shape) {
-        shape->set_view_transform(viewTransform);
-    });
-
     // Now fire up a thread pool that does hit calculations and tone reproduction.
     ThreadPool<std::tuple<size_t, size_t, Ray>> tp(
         kernel->num_threads, [=](std::tuple<size_t, size_t, Ray>& data) {

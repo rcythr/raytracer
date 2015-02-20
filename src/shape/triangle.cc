@@ -13,9 +13,9 @@ std::string Triangle::toString(size_t depth) {
 
     std::stringstream ss;
     ss << tabdepth << "TYPE: TRIANGLE" << std::endl;
-    ss << tabdepth << "P_0: " << p0_ << std::endl;
-    ss << tabdepth << "P_1: " << p1_ << std::endl;
-    ss << tabdepth << "P_2: " << p2_ << std::endl;
+    ss << tabdepth << "P_0: " << p0 << std::endl;
+    ss << tabdepth << "P_1: " << p1 << std::endl;
+    ss << tabdepth << "P_2: " << p2 << std::endl;
     ss << tabdepth << "MATERIAL: " << std::endl;
     ss << material->toString(depth + 1);
     return ss.str();
@@ -23,15 +23,11 @@ std::string Triangle::toString(size_t depth) {
 
 void Triangle::test_hit(Ray& ray, HitResult& result) {
 
-    auto vP0 = glm::vec3(p0());
-    auto vP1 = glm::vec3(p1());
-    auto vP2 = glm::vec3(p2());
-
     float a, f, u, v, t;
     glm::vec3 e1, e2, h, s, q;
 
-    e1 = vP1 - vP0;
-    e2 = vP2 - vP0;
+    e1 = p1 - p0;
+    e2 = p2 - p0;
 
     h = glm::cross(ray.direction, e2);
     a = glm::dot(e1, h);
@@ -43,7 +39,7 @@ void Triangle::test_hit(Ray& ray, HitResult& result) {
 
     f = 1 / a;
 
-    s = ray.origin - vP0;
+    s = ray.origin - p0;
     u = f * glm::dot(s, h);
 
     if (u < 0.0 || u > 1.0) {

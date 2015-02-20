@@ -113,22 +113,8 @@ Kernel::Kernel() {
             }
 
             spatial_index->insert(std::make_shared<Sphere>(
-                glm::vec4(extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f),
+                extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
                 extractFloat(params, "radius", 0.0f), material));
-        }},
-
-        {"plane", [this](ParamMap& params) {
-            auto materialName = extractString(params, "material", "");
-            auto material = lookup_material(materialName);
-            if (material == nullptr) {
-                std::cerr << "WARNING: Material '" << materialName
-                          << "' not found!" << std::endl;
-            }
-
-            spatial_index->insert(std::make_shared<Plane>(
-                glm::vec4(extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f),
-                glm::vec4(extractVec3(params, "normal", glm::vec3(0.0f, 0.0f, 1.0f)), 0.0f),
-                material));
         }},
 
         {"triangle", [this](ParamMap& params) {
@@ -141,9 +127,9 @@ Kernel::Kernel() {
 
             spatial_index->insert(
                 std::make_shared<Triangle>(
-                    glm::vec4(extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
-                    glm::vec4(extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
-                    glm::vec4(extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)), 1.0f), 
+                    extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
+                    extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
                     material));
         }},
 

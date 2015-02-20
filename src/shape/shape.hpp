@@ -10,6 +10,7 @@ namespace raytracer {
 struct Material;
 
 struct Shape : std::enable_shared_from_this<Shape> {
+
     Shape(std::shared_ptr<Material> material) : material(material) {}
 
     virtual ~Shape() {}
@@ -18,9 +19,6 @@ struct Shape : std::enable_shared_from_this<Shape> {
 
     virtual void test_hit(Ray& ray, HitResult& result) = 0;
 
-    void set_view_transform(glm::mat4 transform) { viewTransform = transform; }
-
-    glm::mat4 viewTransform;
     std::shared_ptr<Material> material;
 };
 
