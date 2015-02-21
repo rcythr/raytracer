@@ -16,7 +16,7 @@ void Sphere::test_hit(Ray& ray, HitResult& result) {
     // b=2(l*(o-c))
     auto b = glm::dot(ray.direction, oc) * 2.0f;
     // c = (o-c)^2-r^2
-    auto c = dot(oc, oc) - radius * radius;
+    auto c = glm::dot(oc, oc) - radius * radius;
     // testVal = b^2-c;
     auto testVal = b * b - c * 4.0f;
 
