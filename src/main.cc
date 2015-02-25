@@ -22,6 +22,8 @@ int main(int argc, char* argv[]) {
         std::cout << kernel.toString();
     }
 
+    kernel.spatial_index->optimize();
+
     kernel.render();
     return EXIT_SUCCESS;
 }

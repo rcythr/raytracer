@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "AABB.hpp"
 #include "ray.hpp"
 #include "hit_result.hpp"
 
@@ -18,6 +19,8 @@ struct Shape : std::enable_shared_from_this<Shape> {
     virtual std::string toString(size_t depth = 0) = 0;
 
     virtual void test_hit(Ray& ray, HitResult& result) = 0;
+
+    virtual AABB& get_aabb() = 0;
 
     std::shared_ptr<Material> material;
 };

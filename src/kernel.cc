@@ -44,8 +44,7 @@ Kernel::Kernel() {
         }},
 
         {"kdtree_index", [this](ParamMap& params) {
-            // TODO:
-            // spatial_index = std::make_shared<KDTreeSpatialIndex>();
+            spatial_index = std::make_shared<KDTreeSpatialIndex>();
         }},
 
         // Cameras
