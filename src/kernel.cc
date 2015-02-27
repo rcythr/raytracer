@@ -128,6 +128,11 @@ Kernel::Kernel() {
         } },
 
         { "obj_mesh", [this](ParamMap& params) {
+
+            auto point = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f));
+            auto rotate = extractVec3(params, "rotate", glm::vec3(0.0f, 0.0f, 0.0f));
+            auto scale = extractFloat(params, "scale", 1.0f);
+
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -135,7 +140,7 @@ Kernel::Kernel() {
                           << "' not found!" << std::endl;
             }
 
-            loadObj(extractString(params, "filename", ""), material,
+            loadObj(extractString(params, "filename", ""), point, rotate, scale, material,
                     spatial_index);
         } }
     };

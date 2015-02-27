@@ -1,13 +1,26 @@
 
+#include "shape/triangle.hpp"
+
 #include "util/obj_mesh.hpp"
 #include "util/split.hpp"
-
-#include "shape/triangle.hpp"
+#include "util/transforms.hpp"
 
 #include <fstream>
 
-void raytracer::loadObj(std::string filename, MaterialPtr material,
+void raytracer::loadObj(std::string filename, 
+                        glm::vec3 point, 
+                        glm::vec3 rotate,
+                        float scale,
+                        MaterialPtr material,
                         SpatialIndexPtr index) {
+
+    // First construct the matrix to transform things into world space.
+    auto trans =  buildRotationZ(rotate.z) 
+                * buildRotationY(rotate.y) 
+                * buildRotationX(rotate.x) 
+                * buildTranslation(point)
+                * buildScale(scale);
+
     std::ifstream strm(filename.c_str());
     std::vector<glm::vec3> points;
     std::string line;
@@ -28,7 +41,8 @@ void raytracer::loadObj(std::string filename, MaterialPtr material,
                         x = std::stod(parts[1]);
                         break;
                 }
-                points.push_back(glm::vec3(x / w, y / w, z / w));
+                auto pt = trans * glm::vec4(x, y, z, w);
+                points.push_back(glm::vec3(pt.x / pt.w, pt.y / pt.w, pt.z / pt.w));
             } else if (parts[0] == "f") {
                 index->insert(std::make_shared<Triangle>(
                     points[std::stoi(parts[1])], points[std::stoi(parts[2])],

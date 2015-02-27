@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include <tuple>
 #include "util/vec3_helpers.hpp"
 
@@ -105,7 +103,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
 }
 
 template <typename T, typename AABBTy, typename RayTy>
-bool find_closest_hit(KDNodePtr<T, AABBTy> node, RayTy& ray,
+bool find_closest_hit(KDNodePtr<T, AABBTy>& node, RayTy& ray,
                       std::function<bool(std::vector<T>)> confirm_hit) {
     if(node->type == Type::INNER)
     {
@@ -163,7 +161,6 @@ template <typename T, typename AABBTy> struct CutInHalf {
         : max_per_leaf(max_per_leaf), max_depth(max_depth) {}
 
     bool terminal(std::vector<T>& shapes, AABBTy& bounds, size_t depth) {
-        std::cout << "Terminal Check: min: " << bounds.min << " max: " << bounds.max << "\n";
         return depth > max_depth || shapes.size() < max_per_leaf;
     }
 
