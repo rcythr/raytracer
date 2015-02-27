@@ -127,7 +127,7 @@ Kernel::Kernel() {
                 material));
         } },
 
-        { "objmesh", [this](ParamMap& params) {
+        { "obj_mesh", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {

@@ -10,7 +10,7 @@ void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
     node = kdtree::create(shapes,
-                          kdtree::policies::CutInHalf<ShapePtr, AABB>(10, 10));
+                          kdtree::policies::CutInHalf<ShapePtr, AABB>(10, 20));
 }
 
 void KDTreeSpatialIndex::find_closest_hit(
@@ -50,7 +50,7 @@ std::string KDTreeSpatialIndex::toString(size_t depth) {
 
     std::stringstream ss;
 
-    ss << tabdepth << "TYPE: NAIVE\n";
+    ss << tabdepth << "TYPE: KDTREE\n";
     ss << tabdepth << "OBJECTS:\n";
     for (auto& obj : shapes) {
         ss << obj->toString(depth + 1);

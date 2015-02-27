@@ -14,7 +14,7 @@ struct AABB {
         max = o.max;
     }
 
-    bool test_hit(Ray& r);
+    bool test_hit(Ray& r, float& tval);
 
     glm::vec3 min, max;
 };

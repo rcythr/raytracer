@@ -6,7 +6,7 @@ using namespace raytracer;
 
 enum class Quadrant { Left, Right, Middle };
 
-bool AABB::test_hit(Ray& ray) {
+bool AABB::test_hit(Ray& ray, float& tval) {
     bool inside = true;
     Quadrant quadrant[3];
     float candidatePlane[3];
@@ -30,9 +30,8 @@ bool AABB::test_hit(Ray& ray) {
     }
 
     // Find the maximum intersection
-    float maxT;
     int whichPlane;
-    bool maxSet = false;
+    bool minSet = false;
     for (int i = 0; i < 3; ++i) {
         float calcVal;
         if (quadrant[i] != Quadrant::Middle && val(ray.direction, i) != 0.0f) {
@@ -42,21 +41,24 @@ bool AABB::test_hit(Ray& ray) {
             calcVal = -1.0f;
         }
 
-        if (!maxSet || maxT < calcVal) {
-            maxT = calcVal;
-            whichPlane = i;
-            maxSet = true;
+        if (!minSet || calcVal < tval) {
+            if(tval > 0.0f)
+            {
+                tval = calcVal;
+                whichPlane = i;
+                minSet = true;
+            }
         }
     }
 
     // If the intersection is behind the ray's origin, no intersection
-    if (maxT < 0.0f)
+    if (!minSet)
         return false;
 
     // Perform the final check of the condidate.
     for (int i = 0; i < 3; ++i) {
         if (whichPlane != i) {
-            float coord = val(ray.origin, i) + maxT * val(ray.direction, i);
+            float coord = val(ray.origin, i) + tval * val(ray.direction, i);
             if (coord < min[i] || coord > max[i])
                 return false;
         }

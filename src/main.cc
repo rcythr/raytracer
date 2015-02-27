@@ -2,6 +2,7 @@
 #include "kernel.hpp"
 #include "util/xml_helpers.hpp"
 #include <iostream>
+#include <chrono>
 
 #include "util/ppm/ppm.hpp"
 
@@ -21,7 +22,14 @@ int main(int argc, char* argv[]) {
         std::cout << kernel.toString();
     }
 
+    
+    typedef std::chrono::high_resolution_clock Clock;
+    auto start = Clock::now();
     kernel.spatial_index->optimize();
+    auto end = Clock::now();
+    std::cout << "KD-Tree Build Time: " 
+              << std::chrono::duration_cast<std::chrono::milliseconds>(
+                     end - start).count() << " miliseconds" << std::endl;
 
     kernel.render();
     return EXIT_SUCCESS;
