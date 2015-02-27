@@ -5,7 +5,7 @@ namespace raytracer {
 struct Shape;
 
 struct HitResult {
-    bool found_hit;  // true iff a hit was detected.
+    bool found_hit; // true iff a hit was detected.
     float tval;
     glm::vec3 intersection_point;
     glm::vec3 intersection_normal;

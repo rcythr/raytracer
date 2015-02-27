@@ -7,15 +7,14 @@ namespace kdtree {
 
 enum class Type { INNER, LEAF };
 
-template <typename T, typename AABBTy>
-struct KDNode {
+template <typename T, typename AABBTy> struct KDNode {
     KDNode(Type type) : type(type) {}
 
     Type type;
 };
 
 template <typename T, typename AABBTy>
-using KDNodePtr = std::shared_ptr<KDNode<T, AABBTy>>;
+using KDNodePtr = std::shared_ptr<KDNode<T, AABBTy> >;
 
 template <typename T, typename AABBTy>
 struct KDNodeInner : public KDNode<T, AABBTy> {
@@ -52,7 +51,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
 
     // Check if the terminal condition is true
     if (policy.terminal(shapes, bounds, depth))
-        return std::make_shared<KDNodeLeaf<T, AABBTy>>(bounds, shapes);
+        return std::make_shared<KDNodeLeaf<T, AABBTy> >(bounds, shapes);
 
     // Find a partitioning plane
     size_t split_dim;
@@ -81,7 +80,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
     }
 
     // Create the node recursively
-    return std::make_shared<KDNodeInner<T, AABBTy>>(
+    return std::make_shared<KDNodeInner<T, AABBTy> >(
         bounds, split_dim, split_val,
         create(lhs, lhs_bound, policy, split_dim, depth + 1),
         create(rhs, rhs_bound, policy, split_dim, depth + 1));
@@ -100,7 +99,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
         }
         return create(shapes, acc, policy);
     }
-    return std::make_shared<KDNodeLeaf<T, AABBTy>>(AABBTy(), shapes);
+    return std::make_shared<KDNodeLeaf<T, AABBTy> >(AABBTy(), shapes);
 }
 
 template <typename T, typename AABBTy, typename RayTy>
@@ -108,8 +107,7 @@ void find_closest_hit(KDNodePtr<T, AABBTy> node, RayTy ray,
                       std::function<bool(std::vector<T>)> confirm_hit) {}
 
 namespace policies {
-template <typename T, typename AABBTy>
-struct CutInHalf {
+template <typename T, typename AABBTy> struct CutInHalf {
     typedef T value_type;
     typedef AABBTy aabb_type;
 
@@ -124,7 +122,8 @@ struct CutInHalf {
                                         size_t dim) {
         // Determine the proper axis to use.
         ++dim;
-        if (dim >= 3) dim = 0;
+        if (dim >= 3)
+            dim = 0;
 
         // Now find the mid-point of the AABB in that dimension.
         float max = raytracer::val(bounds.max, dim),

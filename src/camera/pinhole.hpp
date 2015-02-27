@@ -25,7 +25,7 @@ struct PinholeCamera : public Camera {
 
     std::string toString(size_t depth) override;
 
-   private:
+  private:
     int num_samples;
     float pixel_size, view_distance;
     glm::vec3 point, up, look_at;

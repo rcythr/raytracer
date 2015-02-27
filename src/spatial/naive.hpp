@@ -5,10 +5,10 @@
 namespace raytracer {
 
 struct NaiveSpatialIndex : public SpatialIndex {
-   private:
+  private:
     std::vector<ShapePtr> objects;
 
-   public:
+  public:
     void insert(ShapePtr ptr) override;
 
     void find_closest_hit(

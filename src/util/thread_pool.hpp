@@ -9,8 +9,7 @@
 
 namespace raytracer {
 
-template <typename TaskTy>
-class ThreadPool {
+template <typename TaskTy> class ThreadPool {
     struct EventConcept {
         EventConcept(int val) : event_type(val) {}
 
@@ -30,11 +29,11 @@ class ThreadPool {
     };
 
     std::vector<std::thread> threads;
-    std::queue<std::unique_ptr<EventConcept>> queue;
+    std::queue<std::unique_ptr<EventConcept> > queue;
     std::mutex mutex;
     std::condition_variable cv;
 
-   public:
+  public:
     typedef std::function<void(TaskTy&)> TaskHandler;
 
     ThreadPool(size_t num_threads, TaskHandler handler) {
@@ -53,7 +52,8 @@ class ThreadPool {
                         queue.pop();
                     }
 
-                    if (event->event_type == 0) break;
+                    if (event->event_type == 0)
+                        break;
 
                     handler(static_cast<RunEvent*>(event.get())->task);
                 }

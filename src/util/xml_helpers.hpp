@@ -18,12 +18,11 @@ bool extractBool(ParamMap& params, const char* key, bool default_value);
 glm::vec3 extractVec3(ParamMap& params, const char* key,
                       glm::vec3 default_value);
 
-template <typename T>
-void loadXML(const std::string filename, T& handler) {
+template <typename T> void loadXML(const std::string filename, T& handler) {
     std::ifstream input(filename);
     if (input.good()) {
-        std::string data{std::istreambuf_iterator<char>(input),
-                         std::istreambuf_iterator<char>()};
+        std::string data{ std::istreambuf_iterator<char>(input),
+                          std::istreambuf_iterator<char>() };
         parseXml(data, handler);
     } else {
         throw std::runtime_error(filename + " is missing!!");

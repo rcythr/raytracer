@@ -57,7 +57,7 @@ void parseXml(const std::string& data, Handler& handler) {
                             ++i;
                             state = ParserState::InClosingTagName;
 
-                        } else  // it's an opener
+                        } else // it's an opener
                         {
                             state = ParserState::InOpeningTagName;
                         }
@@ -85,8 +85,8 @@ void parseXml(const std::string& data, Handler& handler) {
                     case '\t':
                     case '\r':
                     case '\n':
-                    case ' ':  // Name is over, move into
-                               // the first attribute.
+                    case ' ': // Name is over, move into
+                              // the first attribute.
                         { state = ParserState::InTagAttribute; }
                         break;
 
@@ -120,8 +120,8 @@ void parseXml(const std::string& data, Handler& handler) {
                         }
                     } break;
 
-                    case '=':  // Okay, now we're in the
-                               // value.
+                    case '=': // Okay, now we're in the
+                              // value.
                         { state = ParserState::InTagAttributeValue; }
                         break;
 

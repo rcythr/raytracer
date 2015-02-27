@@ -21,7 +21,7 @@ Kernel::Kernel() {
     handlers = {
 
         // General
-        {"general", [this](ParamMap& params) {
+        { "general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
             num_threads =
                 extractInt(params, "num_threads",
@@ -31,24 +31,23 @@ Kernel::Kernel() {
                     trace_strategy = checkpoint1;
                     break;
                 default:
-                    throw std::runtime_error(
-                        "Invalid trace strategy in config "
-                        "file.");
+                    throw std::runtime_error("Invalid trace strategy in config "
+                                             "file.");
                     break;
             }
-        }},
+        } },
 
         // Spatial Indecies
-        {"naive_index", [this](ParamMap& params) {
+        { "naive_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<NaiveSpatialIndex>();
-        }},
+        } },
 
-        {"kdtree_index", [this](ParamMap& params) {
+        { "kdtree_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<KDTreeSpatialIndex>();
-        }},
+        } },
 
         // Cameras
-        {"pinhole", [this](ParamMap& params) {
+        { "pinhole", [this](ParamMap& params) {
             cameras.push_back(std::make_shared<PinholeCamera>(
                 extractFloat(params, "pixel_size", 0.50f),
                 extractInt(params, "num_samples", 1),
@@ -56,40 +55,40 @@ Kernel::Kernel() {
                 extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
                 extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
                 extractFloat(params, "view_distance", 600)));
-        }},
+        } },
 
         // ViewPlanes
-        {"ppm_viewplane", [this](ParamMap& params) {
+        { "ppm_viewplane", [this](ParamMap& params) {
             cameras.at(cameras.size() - 1)->view_plane =
                 std::make_shared<PPMViewPlane>(
                     extractInt(params, "hres", 800),
                     extractInt(params, "vres", 600),
                     extractString(params, "filename", "out.ppm"));
-        }},
+        } },
 
         // Lights
-        {"ambient", [this](ParamMap& params) {
+        { "ambient", [this](ParamMap& params) {
             ambient_light = std::make_shared<AmbientLight>(
                 extractFloat(params, "scale_radiance", 1.0f));
-        }},
+        } },
 
-        {"directional", [this](ParamMap& params) {
+        { "directional", [this](ParamMap& params) {
             lights.push_back(std::make_shared<DirectionalLight>(
                 extractVec3(params, "direction",
                             glm::vec3(100.0f, 100.0f, 100.f)),
                 extractFloat(params, "scale_radiance", 3.0f)));
-        }},
+        } },
 
         // Color
-        {"color", [this](ParamMap& params) {
+        { "color", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
             colors.emplace(
                 extractString(params, "name", ""),
                 extractVec3(params, "value", glm::vec3(0.0f, 0.0f, 0.0f)));
-        }},
+        } },
 
         // Materials
-        {"matte", [this](ParamMap& params) {
+        { "matte", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
             materials.insert(std::make_pair(
                 std::move(name),
@@ -97,10 +96,10 @@ Kernel::Kernel() {
                     extractFloat(params, "ka", 0.25f),
                     extractFloat(params, "kd", 0.75f),
                     lookup_color(extractString(params, "color", "")))));
-        }},
+        } },
 
         // Shapes
-        {"sphere", [this](ParamMap& params) {
+        { "sphere", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -111,9 +110,9 @@ Kernel::Kernel() {
             spatial_index->insert(std::make_shared<Sphere>(
                 extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
                 extractFloat(params, "radius", 0.0f), material));
-        }},
+        } },
 
-        {"triangle", [this](ParamMap& params) {
+        { "triangle", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -126,9 +125,9 @@ Kernel::Kernel() {
                 extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
                 extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
                 material));
-        }},
+        } },
 
-        {"objmesh", [this](ParamMap& params) {
+        { "objmesh", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
             auto material = lookup_material(materialName);
             if (material == nullptr) {
@@ -138,7 +137,8 @@ Kernel::Kernel() {
 
             loadObj(extractString(params, "filename", ""), material,
                     spatial_index);
-        }}};
+        } }
+    };
 }
 
 glm::vec3 Kernel::lookup_color(std::string name) {

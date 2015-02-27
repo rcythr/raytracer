@@ -10,14 +10,14 @@
 namespace raytracer {
 
 struct Kernel {
-   private:
-    std::unordered_map<std::string, std::function<void(ParamMap&)>> handlers;
+  private:
+    std::unordered_map<std::string, std::function<void(ParamMap&)> > handlers;
 
     // Lookup helper functions
     glm::vec3 lookup_color(std::string name);
     MaterialPtr lookup_material(std::string name);
 
-   public:
+  public:
     bool verbose;
     size_t num_threads;
 

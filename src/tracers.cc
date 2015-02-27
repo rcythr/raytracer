@@ -11,7 +11,7 @@ using namespace raytracer;
 void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
     // Now fire up a thread pool that does hit calculations and tone
     // reproduction.
-    ThreadPool<std::tuple<size_t, size_t, Ray>> tp(
+    ThreadPool<std::tuple<size_t, size_t, Ray> > tp(
         kernel->num_threads, [=](std::tuple<size_t, size_t, Ray>& data) {
             size_t row = std::get<0>(data);
             size_t col = std::get<1>(data);

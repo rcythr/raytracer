@@ -19,12 +19,12 @@ glm::mat4 PinholeCamera::build_transform_mat() {
 
     // Please note this is given to mat4 as COLUMN vectors (so it appears
     // transposed!)
-    glm::mat4 result = {
-        glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0),
-        glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
-        glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
-        glm::vec4(-glm::dot(xaxis, point), -glm::dot(yaxis, point),
-                  -glm::dot(zaxis, point), 1)};
+    glm::mat4 result = { glm::vec4(xaxis.x, yaxis.x, zaxis.x, 0),
+                         glm::vec4(xaxis.y, yaxis.y, zaxis.y, 0),
+                         glm::vec4(xaxis.z, yaxis.z, zaxis.z, 0),
+                         glm::vec4(-glm::dot(xaxis, point),
+                                   -glm::dot(yaxis, point),
+                                   -glm::dot(zaxis, point), 1) };
 
     return result;
 }

@@ -8,11 +8,11 @@
 namespace raytracer {
 
 struct PPMViewPlane : public ViewPlane {
-   private:
+  private:
     PPM ppm;
     std::string filename;
 
-   public:
+  public:
     PPMViewPlane(size_t width, size_t height, std::string output_filename);
 
     size_t get_width() override;

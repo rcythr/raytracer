@@ -50,13 +50,15 @@ bool AABB::test_hit(Ray& ray) {
     }
 
     // If the intersection is behind the ray's origin, no intersection
-    if (maxT < 0.0f) return false;
+    if (maxT < 0.0f)
+        return false;
 
     // Perform the final check of the condidate.
     for (int i = 0; i < 3; ++i) {
         if (whichPlane != i) {
             float coord = val(ray.origin, i) + maxT * val(ray.direction, i);
-            if (coord < min[i] || coord > max[i]) return false;
+            if (coord < min[i] || coord > max[i])
+                return false;
         }
     }
 

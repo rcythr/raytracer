@@ -21,7 +21,7 @@ Code formatting is always a pain. Use of clang-format can help code be more read
 
 First install clang-format-3.5. Then to do formatting simply run the following code from the src directory:
 
-    find -type f | xargs clang-format-3.5 -i -style="{BasedOnStyle: Google, IndentWidth: 4}"
+    find -type f | xargs clang-format-3.5 -i -style="{BasedOnStyle: Mozilla, IndentWidth: 4}"
 
 ## Valid Configuration Options
 
