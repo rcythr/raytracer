@@ -9,15 +9,12 @@ namespace raytracer {
 
 struct Sphere : public Shape {
     Sphere(glm::vec3 point, float radius, MaterialPtr material)
-        : Shape(material), point(point), radius(radius) 
-    {
-        aabb.min = glm::vec3(point.x - radius,
-                             point.y - radius,
-                             point.z - radius);
+        : Shape(material), point(point), radius(radius) {
+        aabb.min =
+            glm::vec3(point.x - radius, point.y - radius, point.z - radius);
 
-        aabb.max = glm::vec3(point.x + radius,
-                             point.y + radius,
-                             point.z + radius);
+        aabb.max =
+            glm::vec3(point.x + radius, point.y + radius, point.z + radius);
     }
 
     ~Sphere() override {}

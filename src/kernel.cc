@@ -49,26 +49,23 @@ Kernel::Kernel() {
 
         // Cameras
         {"pinhole", [this](ParamMap& params) {
-            cameras.push_back(
-                std::make_shared<PinholeCamera>(
-                    extractFloat(params, "pixel_size", 0.50f),
-                    extractInt(params, "num_samples", 1),
-                    extractVec3(params, "eye", glm::vec3(0.0f, 0.0f, 0.0f)),
-                    extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
-                    extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
-                    extractFloat(params, "view_distance", 600)
-                )
-            );
-        }},
-        
-        // ViewPlanes
-        {"ppm_viewplane", [this](ParamMap& params) {
-            cameras.at(cameras.size()-1)->view_plane = std::make_shared<PPMViewPlane>(
-                extractInt(params, "hres", 800),
-                extractInt(params, "vres", 600),
-                extractString(params, "filename", "out.ppm"));
+            cameras.push_back(std::make_shared<PinholeCamera>(
+                extractFloat(params, "pixel_size", 0.50f),
+                extractInt(params, "num_samples", 1),
+                extractVec3(params, "eye", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec3(params, "up", glm::vec3(0.0f, 1.0f, 0.0f)),
+                extractVec3(params, "look_at", glm::vec3(0.0f, 0.0f, 1.0f)),
+                extractFloat(params, "view_distance", 600)));
         }},
 
+        // ViewPlanes
+        {"ppm_viewplane", [this](ParamMap& params) {
+            cameras.at(cameras.size() - 1)->view_plane =
+                std::make_shared<PPMViewPlane>(
+                    extractInt(params, "hres", 800),
+                    extractInt(params, "vres", 600),
+                    extractString(params, "filename", "out.ppm"));
+        }},
 
         // Lights
         {"ambient", [this](ParamMap& params) {
@@ -124,12 +121,11 @@ Kernel::Kernel() {
                           << "' not found!" << std::endl;
             }
 
-            spatial_index->insert(
-                std::make_shared<Triangle>(
-                    extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)),
-                    extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
-                    extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
-                    material));
+            spatial_index->insert(std::make_shared<Triangle>(
+                extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
+                material));
         }},
 
         {"objmesh", [this](ParamMap& params) {
@@ -140,7 +136,8 @@ Kernel::Kernel() {
                           << "' not found!" << std::endl;
             }
 
-            loadObj(extractString(params, "filename", ""), material, spatial_index);
+            loadObj(extractString(params, "filename", ""), material,
+                    spatial_index);
         }}};
 }
 
@@ -176,8 +173,7 @@ std::string Kernel::toString(size_t depth) {
 
     // Now we'll print out the pieces.
     ss << tabdepth << "CAMERAS: \n";
-    for(CameraPtr& camera : cameras) 
-    {
+    for (CameraPtr& camera : cameras) {
         ss << camera->toString(depth + 1);
     }
 
@@ -204,20 +200,19 @@ std::string Kernel::toString(size_t depth) {
 
     return ss.str();
 }
-    
+
 void Kernel::render() {
     typedef std::chrono::high_resolution_clock Clock;
-    
+
     size_t i = 1;
-    for(CameraPtr& c : cameras)
-    {
+    for (CameraPtr& c : cameras) {
         auto start = Clock::now();
         trace_strategy(this, c);
         auto end = Clock::now();
-        
+
         std::cout << "Camera " << i << " Render Time: "
-                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
-                  << " miliseconds" << std::endl;
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(
+                         end - start).count() << " miliseconds" << std::endl;
 
         ++i;
     }

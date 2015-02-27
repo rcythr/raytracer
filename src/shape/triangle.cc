@@ -22,7 +22,6 @@ std::string Triangle::toString(size_t depth) {
 }
 
 void Triangle::test_hit(Ray& ray, HitResult& result) {
-
     float a, f, u, v, t;
     glm::vec3 e1, e2, h, s, q;
 

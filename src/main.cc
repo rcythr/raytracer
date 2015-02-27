@@ -5,7 +5,6 @@
 
 #include "util/ppm/ppm.hpp"
 
-
 using namespace raytracer;
 
 int main(int argc, char* argv[]) {

@@ -1,10 +1,7 @@
 
 #include "spatial/spatial_index.hpp"
 
-namespace kdtree
-{
-    struct KDNode;
-}
+#include "util/kdtree/kdtree.hpp"
 
 namespace raytracer {
 
@@ -23,7 +20,6 @@ struct KDTreeSpatialIndex : public SpatialIndex {
     std::string toString(size_t depth = 0) override;
 
     std::vector<ShapePtr> shapes;
-    std::shared_ptr<kdtree::KDNode> node;
+    std::shared_ptr<kdtree::KDNode<ShapePtr, AABB>> node;
 };
-
 }

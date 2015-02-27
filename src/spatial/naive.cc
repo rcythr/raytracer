@@ -27,10 +27,9 @@ void NaiveSpatialIndex::find_closest_hit(
     }
 }
 
-void NaiveSpatialIndex::view_all_objects(std::function<void(ShapePtr&)> functor)
-{
-    for(auto& obj : objects)
-    {
+void NaiveSpatialIndex::view_all_objects(
+    std::function<void(ShapePtr&)> functor) {
+    for (auto& obj : objects) {
         functor(obj);
     }
 }

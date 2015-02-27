@@ -11,7 +11,6 @@ namespace raytracer {
 struct Material;
 
 struct Shape : std::enable_shared_from_this<Shape> {
-
     Shape(std::shared_ptr<Material> material) : material(material) {}
 
     virtual ~Shape() {}

@@ -6,7 +6,8 @@
 
 #include <fstream>
 
-void raytracer::loadObj(std::string filename, MaterialPtr material, SpatialIndexPtr index) {
+void raytracer::loadObj(std::string filename, MaterialPtr material,
+                        SpatialIndexPtr index) {
     std::ifstream strm(filename.c_str());
     std::vector<glm::vec3> points;
     std::string line;
