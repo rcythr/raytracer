@@ -181,5 +181,33 @@ template <typename T, typename AABBTy> struct CutInHalf {
     size_t max_per_leaf;
     size_t max_depth;
 };
+
+template<typename T, typename AABBTy> struct BestSplit {
+    enum class TokenType
+    {
+        Open,
+        Close
+    }
+
+    struct Token {
+        TokenType type;
+    }
+
+    typedef T value_type;
+    typedef AABBTy aabb_type;
+
+    BestSplit(size_t max_per_leaf, size_t max_depth)
+        : max_per_leaf(max_per_leaf), max_depth(max_depth) {}
+
+    bool terminal(std::vector<T>& shapes, AABBTy& bounds, size_t depth) {
+        return depth > max_depth || shapes.size() < max_per_leaf;
+    }
+
+    std::tuple<size_t, float> partition(std::vector<T>& shapes, AABBTy& bounds,
+                                        size_t dim) {
+        // First we need to break the shapes into start and end 'tokens' sorted along each dimension.
+
+    }
+};
 }
 }
