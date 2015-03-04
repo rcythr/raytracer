@@ -9,7 +9,7 @@
 
 using namespace raytracer;
 
-void Sphere::test_hit(Ray& ray, HitResult& result) {
+void Sphere::test_hit(const Ray& ray, HitResult& result) {
     // Major values for texting interstion
     auto oc = ray.origin - point;
 

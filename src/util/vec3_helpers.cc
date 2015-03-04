@@ -14,7 +14,7 @@ std::ostream& raytracer::operator<<(std::ostream& os, glm::vec4 vector) {
     return os;
 }
 
-float raytracer::val(glm::vec3& obj, size_t indx) {
+float raytracer::val(const glm::vec3& obj, size_t indx) {
     switch (indx) {
         case 0:
             return obj.x;
@@ -27,7 +27,7 @@ float raytracer::val(glm::vec3& obj, size_t indx) {
     }
 }
 
-float raytracer::val(glm::vec4& obj, size_t indx) {
+float raytracer::val(const glm::vec4& obj, size_t indx) {
     switch (indx) {
         case 0:
             return obj.x;

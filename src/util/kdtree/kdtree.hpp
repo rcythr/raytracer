@@ -113,7 +113,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
 }
 
 template <typename T, typename AABBTy, typename RayTy>
-bool find_closest_hit(KDNodePtr<T, AABBTy>& node, RayTy& ray,
+bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
                       std::function<bool(std::vector<T>)> confirm_hit) {
     if(node->type == Type::INNER)
     {

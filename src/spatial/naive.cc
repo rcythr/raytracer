@@ -8,7 +8,7 @@ using namespace raytracer;
 void NaiveSpatialIndex::insert(ShapePtr ptr) { objects.push_back(ptr); }
 
 void NaiveSpatialIndex::find_closest_hit(
-    Ray& ray, std::function<void(HitResult&)> hit_callback) {
+    const Ray& ray, std::function<void(HitResult&)> hit_callback) {
     HitResult best_result;
     HitResult result;
     for (auto obj : objects) {

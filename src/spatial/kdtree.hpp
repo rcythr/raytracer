@@ -13,7 +13,7 @@ struct KDTreeSpatialIndex : public SpatialIndex {
     void optimize() override;
 
     void find_closest_hit(
-        Ray& ray, std::function<void(HitResult&)> hit_callback) override;
+        const Ray& ray, std::function<void(HitResult&)> hit_callback) override;
 
     void view_all_objects(std::function<void(ShapePtr&)> functor) override;
 

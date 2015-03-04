@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <thread>
 #include <vector>
 #include <queue>
@@ -9,42 +10,31 @@
 
 namespace raytracer {
 
-template <typename TaskTy> class ThreadPool {
-    struct EventConcept {
-        EventConcept(int val) : event_type(val) {}
-
-        virtual ~EventConcept() {}
-
-        int event_type;
-    };
-
-    struct StopEvent : EventConcept {
-        StopEvent() : EventConcept(0) {}
-    };
-
-    struct RunEvent : EventConcept {
-        RunEvent(TaskTy&& task) : EventConcept(1), task(task) {}
-
-        TaskTy task;
-    };
-
+class ThreadPool {
+    
+    std::atomic<bool> shutdown_flag;
     std::vector<std::thread> threads;
-    std::queue<std::unique_ptr<EventConcept> > queue;
+    std::queue<std::function<void()>> queue;
     std::mutex mutex;
     std::condition_variable cv;
 
   public:
-    typedef std::function<void(TaskTy&)> TaskHandler;
 
-    ThreadPool(size_t num_threads, TaskHandler handler) {
+    ThreadPool(size_t num_threads)
+        : shutdown_flag(false)
+    {
         for (size_t i = 0; i < num_threads; ++i) {
             threads.push_back(std::thread([=]() {
                 while (true) {
                     // Retrieve an element from the queue
-                    std::unique_ptr<EventConcept> event;
+                    std::function<void()> event;
                     {
                         std::unique_lock<std::mutex> ul(mutex);
                         while (queue.empty()) {
+                            if(shutdown_flag.load())
+                            {
+                                return;
+                            }
                             cv.wait(ul);
                         }
 
@@ -52,31 +42,22 @@ template <typename TaskTy> class ThreadPool {
                         queue.pop();
                     }
 
-                    if (event->event_type == 0)
-                        break;
-
-                    handler(static_cast<RunEvent*>(event.get())->task);
+                    event();
                 }
             }));
         }
     }
 
-    void enqueue(TaskTy&& task) {
+    void enqueue(std::function<void()>&& task) {
         {
             std::lock_guard<std::mutex> lg(mutex);
-            queue.push(std::unique_ptr<RunEvent>(
-                new RunEvent(std::forward<TaskTy>(task))));
+            queue.push(std::forward<std::function<void()>>(task));
         }
         cv.notify_one();
     }
 
     void stop() {
-        {
-            std::lock_guard<std::mutex> lg(mutex);
-            for (size_t i = threads.size(); i > 0; --i) {
-                queue.push(std::unique_ptr<StopEvent>(new StopEvent()));
-            }
-        }
+        shutdown_flag.store(true);
         cv.notify_all();
     }
 

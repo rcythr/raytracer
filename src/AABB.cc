@@ -6,7 +6,7 @@ using namespace raytracer;
 
 enum class Quadrant { Left, Right, Middle };
 
-bool AABB::test_hit(Ray& ray, float& tval) {
+bool AABB::test_hit(const Ray& ray, float& tval) {
     bool inside = true;
     Quadrant quadrant[3];
     float candidatePlane[3];

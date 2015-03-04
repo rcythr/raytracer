@@ -21,7 +21,7 @@ struct Triangle : public Shape {
 
     std::string toString(size_t depth = 0) override;
 
-    void test_hit(Ray& ray, HitResult& result) override;
+    void test_hit(const Ray& ray, HitResult& result) override;
 
     AABB& get_aabb() override { return aabb; }
 

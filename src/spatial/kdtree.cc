@@ -10,11 +10,11 @@ void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
     node = kdtree::create(shapes,
-                          kdtree::policies::BestSplit<ShapePtr, AABB>(10, 20));
+                          kdtree::policies::BestSplit<ShapePtr, AABB>(3, 20));
 }
 
 void KDTreeSpatialIndex::find_closest_hit(
-    Ray& ray, std::function<void(HitResult&)> hit_callback) {
+    const Ray& ray, std::function<void(HitResult&)> hit_callback) {
     kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
         node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
             HitResult best_result;

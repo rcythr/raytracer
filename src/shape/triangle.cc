@@ -21,46 +21,37 @@ std::string Triangle::toString(size_t depth) {
     return ss.str();
 }
 
-void Triangle::test_hit(Ray& ray, HitResult& result) {
-    float a, f, u, v, t;
-    glm::vec3 e1, e2, h, s, q;
+void Triangle::test_hit(const Ray& ray, HitResult& result) {
+    glm::vec3 e1, e2;
 
     e1 = p1 - p0;
     e2 = p2 - p0;
 
-    h = glm::cross(ray.direction, e2);
-    a = glm::dot(e1, h);
+    auto T = ray.origin - p0;
+    auto P = glm::cross(ray.direction, e2);
+    auto Q = glm::cross(T, e1);
 
-    if (a > -0.00001 && a < 0.00001) {
+    float p_dot_e1 = glm::dot(P, e1);
+
+    if(p_dot_e1 == 0.0f)
+    {
         result.miss();
         return;
     }
 
-    f = 1 / a;
+    float t = glm::dot(Q, e2) / p_dot_e1;
+    float u = glm::dot(P, T) / p_dot_e1;
+    float v = glm::dot(Q, ray.direction) / p_dot_e1;
 
-    s = ray.origin - p0;
-    u = f * glm::dot(s, h);
-
-    if (u < 0.0 || u > 1.0) {
+    if(u < 0.0f || v < 0.0f || (u+v) > 1.0f)
+    {
         result.miss();
         return;
     }
 
-    q = glm::cross(s, e1);
-
-    v = f * glm::dot(ray.direction, q);
-
-    if (v < 0.0 || u + v > 1.0) {
-        result.miss();
-        return;
-    }
-
-    t = f * glm::dot(e2, q);
-
-    if (t > 0.00001) {
-        result.hit(shared_from_this(), t, ray.origin + ray.direction * t,
-                   glm::cross(e1, e2));
-        return;
-    }
-    result.miss();
+    result.hit(
+        shared_from_this(),
+        t,
+        ((1.0f - u - v) * p0) + (u * p1) + (v * p2),
+        glm::cross(e1, e2));
 }
