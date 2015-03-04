@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <algorithm>
 #include "util/vec3_helpers.hpp"
 
 using namespace raytracer;
@@ -97,6 +98,15 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
         for (size_t i = 1; i < shapes.size(); ++i) {
             acc = acc + shapes[i]->get_aabb();
         }
+
+        // Adjust the bounding box to contain a little extra space than the actual object extents.
+        acc.min.x -= 2.5f;
+        acc.min.y -= 2.5f;
+        acc.min.z -= 2.5f;
+        acc.max.x += 2.5f; 
+        acc.max.y += 2.5f; 
+        acc.max.z += 2.5f; 
+
         return create(shapes, acc, policy);
     }
     return std::make_shared<KDNodeLeaf<T, AABBTy> >(AABBTy(), shapes);
@@ -183,15 +193,20 @@ template <typename T, typename AABBTy> struct CutInHalf {
 };
 
 template<typename T, typename AABBTy> struct BestSplit {
-    enum class TokenType
-    {
-        Open,
-        Close
-    }
+    enum class TokenType { Open, Close };
 
     struct Token {
         TokenType type;
-    }
+        size_t object_indx;
+        float cost;
+        float value;
+
+        float get_cost() const { return (type == TokenType::Open) ? cost : -cost; }
+
+        bool operator<(const Token& other) const {
+            return value < other.value;
+        }
+    };
 
     typedef T value_type;
     typedef AABBTy aabb_type;
@@ -205,9 +220,106 @@ template<typename T, typename AABBTy> struct BestSplit {
 
     std::tuple<size_t, float> partition(std::vector<T>& shapes, AABBTy& bounds,
                                         size_t dim) {
-        // First we need to break the shapes into start and end 'tokens' sorted along each dimension.
+        // First we need to break the shapes into start and end 'tokens' for each dim.
+        std::vector<Token> x_tokens, y_tokens, z_tokens;
 
+        size_t num_shapes = shapes.size();
+        for(size_t i=0; i < num_shapes; ++i)
+        {
+            auto& aabb = shapes[i]->get_aabb();
+            x_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.x});
+            x_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.x});
+            y_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.y});
+            y_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.y});
+            z_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.z});
+            z_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.z});
+        }
+
+        // Now we want to find the best candidate for each dim.
+        float best_x_loc, x_abs_diff;
+        std::tie(best_x_loc, x_abs_diff) = find_best_candidate(x_tokens);
+
+        float best_y_loc, y_abs_diff;
+        std::tie(best_y_loc, y_abs_diff) = find_best_candidate(y_tokens);
+        
+        float best_z_loc, z_abs_diff;
+        std::tie(best_z_loc, z_abs_diff) = find_best_candidate(z_tokens);
+
+        // Now we have to compare the 3 abs_diffs to find the smallest.
+        if(x_abs_diff <= y_abs_diff)
+        {
+            if(x_abs_diff <= z_abs_diff)
+            {
+                return std::tuple<size_t, float>(0, best_x_loc);
+            }
+        }
+        else
+        {
+            if(y_abs_diff <= z_abs_diff)
+            {
+                return std::tuple<size_t, float>(1, best_y_loc);
+            }
+        }
+        return std::tuple<size_t, float>(2, best_z_loc);
     }
+
+private:
+    size_t max_per_leaf;
+    size_t max_depth;
+
+    std::tuple<float, float> find_best_candidate(std::vector<Token>& tokens) {
+        bool found_best = false;
+        float best_location, best_abs_cost;
+
+        size_t num_tokens = tokens.size();
+
+        // First sort the tokens.
+        std::sort(tokens.begin(), tokens.end());
+
+        // Calculate our prefix and postfix sums of cost.
+        std::vector<float> prefix_cost(num_tokens+1);
+        prefix_cost[0] = 0.0f;
+        for(size_t i=0; i < num_tokens; ++i)
+            prefix_cost[i+1] = prefix_cost[i] + tokens[i].get_cost();
+
+        std::vector<float> postfix_cost(num_tokens+1);
+        postfix_cost[num_tokens] = 0.0f;
+        for(size_t i=num_tokens; i > 0; --i)
+            postfix_cost[i-1] = postfix_cost[i] + tokens[i-1].get_cost();
+
+        // If token's size is N then there are N+1 **distinct** partition planes.
+        for(size_t i=0; i < num_tokens+1; ++i)
+        {
+            float location, abs_cost;
+            if(i == 0) // First Plane
+            {
+                location = tokens[i].value - 0.0001f; // Just a little bit left of the first object.
+            }
+            else if(i == num_tokens-1) //Last Plane
+            {
+                location = tokens[i].value + 0.0001f; // Just a little bit right of the first object.
+            }
+            else // General Case
+            {
+                location = (tokens[i].value + tokens[i-1].value) / 2.0f;
+            }
+
+            // Calculate the cost difference between left and right sides.
+            abs_cost = std::abs(prefix_cost[i] - postfix_cost[i]);
+            
+            // We want the lowest difference.
+            if(!found_best || abs_cost < best_abs_cost)
+            {
+                best_location = location;
+                best_abs_cost = abs_cost;
+                found_best = true;
+            }
+        }
+        
+        // Return what we found.
+        return std::tuple<float, float>(best_location, best_abs_cost);
+    }
+
 };
 }
 }

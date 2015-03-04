@@ -10,7 +10,7 @@ void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
     node = kdtree::create(shapes,
-                          kdtree::policies::CutInHalf<ShapePtr, AABB>(10, 20));
+                          kdtree::policies::BestSplit<ShapePtr, AABB>(10, 20));
 }
 
 void KDTreeSpatialIndex::find_closest_hit(
