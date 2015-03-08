@@ -19,6 +19,8 @@ struct Shape : std::enable_shared_from_this<Shape> {
 
     virtual void test_hit(const Ray& ray, HitResult& result) = 0;
 
+    virtual bool test_hit(const AABB& aabb) = 0;
+
     virtual AABB& get_aabb() = 0;
 
     std::shared_ptr<Material> material;

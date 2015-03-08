@@ -20,6 +20,8 @@ struct Sphere : public Shape {
     ~Sphere() override {}
 
     void test_hit(const Ray& ray, HitResult& result) override;
+    
+    bool test_hit(const AABB& aabb) override;
 
     std::string toString(size_t depth = 0) override;
 
