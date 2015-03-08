@@ -11,6 +11,10 @@ struct HitResult {
     glm::vec3 intersection_normal;
     std::shared_ptr<Shape> shape;
 
+
+
+    glm::vec3 L;
+
     HitResult() : found_hit(false) {}
 
     ~HitResult() = default;

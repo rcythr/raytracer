@@ -14,6 +14,8 @@ std::string DirectionalLight::toString(size_t depth) {
     ss << tabdepth << "TYPE: DIRECTIONAL\n";
     ss << tabdepth << "DIRECTION: " << direction << "\n";
     ss << tabdepth << "SCALE RADIANCE: " << scale_radiance << "\n";
+    ss << tabdepth << "COLOR: (" << color.r << ',' << color.g << ',' << color.b
+       << ")\n";
 
     return ss.str();
 }

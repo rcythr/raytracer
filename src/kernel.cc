@@ -69,14 +69,16 @@ Kernel::Kernel() {
         // Lights
         { "ambient", [this](ParamMap& params) {
             ambient_light = std::make_shared<AmbientLight>(
-                extractFloat(params, "scale_radiance", 1.0f));
+                extractFloat(params, "scale_radiance", 1.0f),
+                lookup_color(extractString(params, "color", "")));
         } },
 
         { "directional", [this](ParamMap& params) {
             lights.push_back(std::make_shared<DirectionalLight>(
                 extractVec3(params, "direction",
                             glm::vec3(100.0f, 100.0f, 100.f)),
-                extractFloat(params, "scale_radiance", 3.0f)));
+                extractFloat(params, "scale_radiance", 3.0f),
+                lookup_color(extractString(params, "color", ""))));
         } },
 
         // Color
@@ -95,6 +97,8 @@ Kernel::Kernel() {
                 std::make_shared<Matte>(
                     extractFloat(params, "ka", 0.25f),
                     extractFloat(params, "kd", 0.75f),
+                    extractFloat(params, "ks", 0.20f),
+                    extractFloat(params, "ke", 0.20f),
                     lookup_color(extractString(params, "color", "")))));
         } },
 
