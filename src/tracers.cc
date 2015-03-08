@@ -11,18 +11,23 @@ using namespace raytracer;
 
 
 glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lights){
-    glm::vec3 color = hit.shape->material->get_raw_color();
+
+    glm::vec3 objCol = hit.shape->material->get_raw_color();
 
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
 
+    float ka = hit.shape->material->ka;
+    float kd = hit.shape->material->kd;
+    float ks = hit.shape->material->ks;
+    float ke = hit.shape->material->ke;
 
-    //ambient = ambient_light->color;
 
-    color.r = 1.0f; color.g = 0.0f; color.b = 1.0f;
-   
-    return ambient_light->color;
+    //Ambient Component
+    ambient = ka*objCol*ambient_light->color;
+
+    return color;
 }
 
 
