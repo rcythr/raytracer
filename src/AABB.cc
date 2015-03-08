@@ -12,13 +12,13 @@ bool AABB::test_hit(const Ray& ray, float& tval) {
     float candidatePlane[3];
 
     for (int i = 0; i < 3; ++i) {
-        if (val(ray.origin, i) < val(min, i)) {
+        if (ray.origin[i] < min[i]) {
             quadrant[i] = Quadrant::Left;
-            candidatePlane[i] = val(min, i);
+            candidatePlane[i] = min[i];
             inside = false;
-        } else if (val(ray.origin, i) > val(max, i)) {
+        } else if (ray.origin[i] > max[i]) {
             quadrant[i] = Quadrant::Right;
-            candidatePlane[i] = val(max, i);
+            candidatePlane[i] = max[i];
             inside = false;
         } else {
             quadrant[i] = Quadrant::Middle;
@@ -34,9 +34,8 @@ bool AABB::test_hit(const Ray& ray, float& tval) {
     bool minSet = false;
     for (int i = 0; i < 3; ++i) {
         float calcVal;
-        if (quadrant[i] != Quadrant::Middle && val(ray.direction, i) != 0.0f) {
-            calcVal = (candidatePlane[i] - val(ray.origin, i)) /
-                      val(ray.direction, i);
+        if (quadrant[i] != Quadrant::Middle && ray.direction[i] != 0.0f) {
+            calcVal = (candidatePlane[i] - ray.origin[i]) / ray.direction[i];
         } else {
             calcVal = -1.0f;
         }
@@ -58,7 +57,7 @@ bool AABB::test_hit(const Ray& ray, float& tval) {
     // Perform the final check of the condidate.
     for (int i = 0; i < 3; ++i) {
         if (whichPlane != i) {
-            float coord = val(ray.origin, i) + tval * val(ray.direction, i);
+            float coord = ray.origin[i] + tval * ray.direction[i];
             if (coord < min[i] || coord > max[i])
                 return false;
         }
@@ -66,6 +65,23 @@ bool AABB::test_hit(const Ray& ray, float& tval) {
 
     return true;
 }
+
+glm::vec3 AABB::center() const
+{
+    return glm::vec3( 
+        (max[0] + min[0]) / 2.0f,
+        (max[1] + min[1]) / 2.0f,
+        (max[2] + min[2]) / 2.0f);
+}
+
+glm::vec3 AABB::half_size() const
+{
+    return glm::vec3( 
+        (max[0] - min[0]) / 2.0f,
+        (max[1] - min[1]) / 2.0f,
+        (max[2] - min[2]) / 2.0f);
+}
+
 
 AABB raytracer::operator+(AABB& lhs, AABB& rhs) {
     AABB result;

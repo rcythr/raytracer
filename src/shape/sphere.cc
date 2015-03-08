@@ -44,6 +44,28 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
     result.miss();
 }
 
+inline float squared(float v) { return v * v; }
+bool Sphere::test_hit(const AABB& aabb) {
+    float dist_squared = radius * radius;
+
+    if (point.x < aabb.min[0]) 
+        dist_squared -= squared(point.x - aabb.min[0]);
+    else if (point.x > aabb.max[0]) 
+        dist_squared -= squared(point.x - aabb.max[0]);
+
+    if (point.y < aabb.min[1]) 
+        dist_squared -= squared(point.y - aabb.min[1]);
+    else if (point.y > aabb.max[1]) 
+        dist_squared -= squared(point.y - aabb.max[1]);
+
+    if (point.z < aabb.min[2]) 
+        dist_squared -= squared(point.z - aabb.min[2]);
+    else if (point.z > aabb.max[2]) 
+        dist_squared -= squared(point.z - aabb.max[2]);
+
+    return dist_squared > 0;
+}
+
 std::string Sphere::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 

@@ -14,6 +14,10 @@ struct AABB {
         max = o.max;
     }
 
+    glm::vec3 center() const;
+
+    glm::vec3 half_size() const;
+
     bool test_hit(const Ray& r, float& tval);
 
     glm::vec3 min, max;

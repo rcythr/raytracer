@@ -2,6 +2,7 @@
 
 #include <tuple>
 #include <algorithm>
+#include <iostream>
 #include "util/vec3_helpers.hpp"
 
 using namespace raytracer;
@@ -43,7 +44,7 @@ struct KDNodeLeaf : public KDNode<T, AABBTy> {
 };
 
 template <typename PolicyTy>
-KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
+KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create_rec(
     std::vector<typename PolicyTy::value_type> shapes,
     typename PolicyTy::aabb_type bounds, PolicyTy policy, size_t dim = 0,
     size_t depth = 0) {
@@ -60,31 +61,34 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
     std::tie(split_dim, split_val) = policy.partition(shapes, bounds, dim);
 
     // Create the two sub-AABBs
-    AABBTy lhs_bound = bounds;
+    AABBTy lhs_bound;
+    lhs_bound.max = bounds.max;
+    lhs_bound.min = bounds.min;
     lhs_bound.max[split_dim] = split_val;
 
-    AABBTy rhs_bound = bounds;
+    AABBTy rhs_bound;
+    rhs_bound.max = bounds.max;
+    rhs_bound.min = bounds.min;
     rhs_bound.min[split_dim] = split_val;
 
     // Separate our objects into left and right sides.
     std::vector<T> lhs, rhs;
     for (auto& shape : shapes) {
-        auto& aabb = shape->get_aabb();
-        if (aabb.max[split_dim] < split_val) {
+        if(shape->test_hit(lhs_bound))
+        {
             lhs.push_back(shape);
-        } else if (aabb.min[split_dim] > split_val) {
-            rhs.push_back(shape);
-        } else {
-            lhs.push_back(shape);
+        }
+        if(shape->test_hit(rhs_bound))
+        {
             rhs.push_back(shape);
         }
     }
 
+    auto left = create_rec(lhs, lhs_bound, policy, split_dim, depth + 1);
+    auto right = create_rec(rhs, rhs_bound, policy, split_dim, depth + 1);
+
     // Create the node recursively
-    return std::make_shared<KDNodeInner<T, AABBTy> >(
-        bounds, split_dim, split_val,
-        create(lhs, lhs_bound, policy, split_dim, depth + 1),
-        create(rhs, rhs_bound, policy, split_dim, depth + 1));
+    return std::make_shared<KDNodeInner<T, AABBTy> >( bounds, split_dim, split_val, left, right);
 }
 
 template <typename PolicyTy>
@@ -107,7 +111,7 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
         acc.max.y += 2.5f; 
         acc.max.z += 2.5f; 
 
-        return create(shapes, acc, policy);
+        return create_rec(shapes, acc, policy);
     }
     return std::make_shared<KDNodeLeaf<T, AABBTy> >(AABBTy(), shapes);
 }
@@ -161,6 +165,17 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
     }
 }
 
+template<typename T, typename AABBTy>
+void dump(KDNodePtr<T, AABBTy>& node, std::function<void(size_t,AABBTy&,size_t, float)> dump_fun, size_t depth=0)
+{
+    if(node->type == Type::INNER)
+    {
+        auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy>>(node);
+        dump_fun(depth, inner->bounds, inner->dim, inner->split_val);
+        dump(inner->left, dump_fun, depth+1);
+        dump(inner->right, dump_fun, depth+1);
+    }
+}
 
 namespace policies {
 template <typename T, typename AABBTy> struct CutInHalf {
@@ -182,8 +197,7 @@ template <typename T, typename AABBTy> struct CutInHalf {
             dim = 0;
 
         // Now find the mid-point of the AABB in that dimension.
-        float max = raytracer::val(bounds.max, dim),
-              min = raytracer::val(bounds.min, dim);
+        float max = bounds.max[dim], min = bounds.min[dim];
 
         return std::tuple<size_t, float>(dim, (max + min) / 2.0f);
     }
