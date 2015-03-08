@@ -4,11 +4,13 @@
 #include "util/ppm/ppm.hpp"
 
 #include <string>
+#include <mutex>
 
 namespace raytracer {
 
 struct PPMViewPlane : public ViewPlane {
   private:
+    std::mutex mut;
     PPM ppm;
     std::string filename;
 

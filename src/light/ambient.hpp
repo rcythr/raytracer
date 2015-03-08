@@ -7,13 +7,15 @@
 namespace raytracer {
 
 struct AmbientLight : public Light {
-    AmbientLight(float scale_radiance, glm::vec3 color) : scale_radiance(scale_radiance), color(color) {}
+    AmbientLight(float scale_radiance, glm::vec3 color) 
+        : Light(color)
+        , scale_radiance(scale_radiance) 
+    {}
 
     ~AmbientLight() override {}
 
     std::string toString(size_t depth = 0) override;
 
     float scale_radiance;
-    glm::vec3 color;
 };
 }

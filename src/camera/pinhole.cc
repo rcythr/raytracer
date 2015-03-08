@@ -8,6 +8,7 @@
 #include "util/string_mult.hpp"
 
 #include <glm/gtc/matrix_inverse.hpp>
+#include <random>
 #include <sstream>
 
 using namespace raytracer;
@@ -31,6 +32,12 @@ glm::mat4 PinholeCamera::build_transform_mat() {
 
 void PinholeCamera::spawn_rays(
     std::function<void(size_t, size_t, Ray&)> spawn_callback) {
+
+    // Prepare random device
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0, pixel_size);
+
     auto inverseTransform = glm::inverse(build_transform_mat());
 
     size_t num_rows = view_plane->get_height();
@@ -51,11 +58,16 @@ void PinholeCamera::spawn_rays(
         pixelPt.x = -half_width;
         for (size_t col = 0; col < num_cols; ++col) {
             // Calculate the direction of the ray
-            r.direction = glm::vec3(
-                glm::normalize(inverseTransform * glm::vec4(pixelPt, 0.0f)));
 
-            // Call the callback with the ray we found
-            spawn_callback(row, col, r);
+            for(size_t i=0; i < num_samples; ++i)
+            {
+                r.direction = glm::vec3(
+                    glm::normalize(inverseTransform * glm::vec4(pixelPt + glm::vec3(dis(gen), dis(gen), 0.0f), 0.0f))
+                );
+
+                // Call the callback with the ray we found
+                spawn_callback(row, col, r);
+            }
 
             // advance to the next pixel.
             pixelPt.x += pixel_size;
