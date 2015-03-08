@@ -29,7 +29,7 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
 
         // First intersection
         result.hit(shared_from_this(), tval, intersection_point,
-                   glm::normalize(intersection_point - point));
+                   glm::normalize(intersection_point - point), ray);
         return;
 
     } else if (testVal > 0.0) {
@@ -38,7 +38,7 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
         auto intersection_point = ray.origin + ray.direction * tval;
 
         result.hit(shared_from_this(), tval, intersection_point,
-                   glm::normalize(intersection_point - point));
+                   glm::normalize(intersection_point - point), ray);
         return;
     }
     result.miss();

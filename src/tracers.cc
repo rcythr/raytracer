@@ -4,6 +4,8 @@
 #include "util/thread_pool.hpp"
 #include "util/vec3_helpers.hpp"
 
+#include <math.h>
+
 #include <tuple>
 #include <iostream>
 
@@ -53,13 +55,14 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
         specColor.r = 1.0f; specColor.g = 1.0f; specColor.b = 1.0f;
 
         //Need to get direction of mirror reflection
+        glm::vec3 v = hit.incomming_ray.direction;
         glm::vec3 r = reflect(S , hit.intersection_normal);
-        //specular = specular + (light->color * specColor) * pow(glm::dot(r, v), ke);
+        specular = specular + (light->color * specColor) * std::pow(glm::dot(r, v), ke);
     }
 
 
 
-    L = ambient + kd*diffuse;
+    L = ambient + kd*diffuse + ks*specular;
 
     return L;
 }
