@@ -1,4 +1,3 @@
-
 #include "kernel.hpp"
 
 #include "util/split.hpp"
