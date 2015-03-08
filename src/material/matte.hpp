@@ -15,6 +15,14 @@ struct Matte : public Material {
 
     glm::vec3 get_raw_color() override;
 
+    float get_ka() override;
+
+    float get_kd() override;
+
+    float get_ks() override;
+
+    float get_ke() override;
+
     float ka, kd, ks, ke;
     glm::vec3 color;
 };

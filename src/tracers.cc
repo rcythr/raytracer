@@ -17,17 +17,27 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+    glm::vec3 L;
 
-    float ka = hit.shape->material->ka;
-    float kd = hit.shape->material->kd;
-    float ks = hit.shape->material->ks;
-    float ke = hit.shape->material->ke;
+    float ka = hit.shape->material->get_ka();
+    //float kd = hit.shape->material->get_kd();
+    //float ks = hit.shape->material->get_ks();
+    //float ke = hit.shape->material->get_ke();
 
 
     //Ambient Component
     ambient = ka*objCol*ambient_light->color;
 
-    return color;
+    //Calculate Diffuse Component
+    for(int i = 0; i < lights.size(); i++){
+        LightPtr light = lights.at(i);
+        //glm::vec3 S = glm::normalize(hit.intersection_point - light->get_direction());
+        diffuse = diffuse + (light->color * objCol);
+    }
+
+    L = ambient + diffuse;
+
+    return L;
 }
 
 

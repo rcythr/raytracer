@@ -32,18 +32,19 @@
 
 </pinhole>
 
-<lights>
-    <ambient 
-        scale_radiance="1.0" />
-    <directional 
-        direction="100 100 200" 
-        scale_radiance="3.0" />
-</lights>
-
 <colors>
+    <color
+        name="white"
+        value="1 1 1" />
     <color 
         name="yellow" 
         value="1 1 0" />
+    <color 
+        name="red" 
+        value="1 0 0" />
+    <color 
+        name="blue" 
+        value="0 0 1" />
     <color 
         name="brown" 
         value="0.71 0.40 0.16" />
@@ -76,56 +77,86 @@
         value="0 0 0" />
 </colors>
 
+<lights>
+    <ambient 
+        scale_radiance="1.0" 
+        color="red"/>
+    <directional 
+        direction="100 100 200" 
+        scale_radiance="3.0"
+        color="blue" />
+</lights>
+
 <materials>
     <matte
         name="yellow"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="yellow" />
     <matte
         name="brown"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="brown" />
     <matte
         name="darkGreen"
         ka="0.25"
         kd="0.7"
+        ks="0.20"
+        ke="0.00"
         color="darkGreen" />
     <matte
         name="orange"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="orange" />
     <matte
         name="green"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="green" />
     <matte
         name="lightGreen"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="lightGreen" />
     <matte
         name="darkYellow"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="darkYellow" />
     <matte 
         name="lightPurple"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="lightPurple" />
     <matte 
         name="darkPurple"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="darkPurple" />
     <matte 
         name="grey"
         ka="0.25"
         kd="0.75"
+        ks="0.20"
+        ke="0.00"
         color="grey"/>
 </materials>
     
