@@ -29,7 +29,7 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
     float ka = hit.shape->material->get_ka();
     float kd = hit.shape->material->get_kd();
     float ks = hit.shape->material->get_ks();
-    //float ke = hit.shape->material->get_ke();
+    float ke = hit.shape->material->get_ke();
 
     glm::vec3 r; r.x=1.0f; r.y = 0.0f; r.z = 0.0f;
     glm::vec3 n; n.x= 0.0f; r.y = 1.0f; r.z = 0.0f;
@@ -52,12 +52,14 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
         glm::vec3 specColor;
         specColor.r = 1.0f; specColor.g = 1.0f; specColor.b = 1.0f;
 
-        specular = specular + (light->color * specColor);
+        //Need to get direction of mirror reflection
+        glm::vec3 r = reflect(S , hit.intersection_normal);
+        //specular = specular + (light->color * specColor) * pow(glm::dot(r, v), ke);
     }
 
 
 
-    L = ambient + kd*diffuse + ks*specular;
+    L = ambient + kd*diffuse;
 
     return L;
 }

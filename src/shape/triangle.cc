@@ -53,7 +53,7 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
         shared_from_this(),
         t,
         ((1.0f - u - v) * p0) + (u * p1) + (v * p2),
-        glm::cross(e1, e2));
+        glm::normalize(glm::cross(e1, e2)));
 }
 
 // Code adapted from http://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/code/tribox3.txt
