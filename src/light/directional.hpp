@@ -8,7 +8,9 @@ namespace raytracer {
 
 struct DirectionalLight : public Light {
     DirectionalLight(glm::vec3 direction, float scale_radiance, glm::vec3 color)
-        : direction(direction), scale_radiance(scale_radiance), color(color) {}
+        : Light(color)
+        , direction(direction)
+        , scale_radiance(scale_radiance) {}
 
     ~DirectionalLight() override {}
 
@@ -16,6 +18,5 @@ struct DirectionalLight : public Light {
 
     glm::vec3 direction;
     float scale_radiance;
-    glm::vec3 color;
 };
 }
