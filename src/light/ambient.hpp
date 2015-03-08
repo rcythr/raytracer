@@ -16,6 +16,8 @@ struct AmbientLight : public Light {
 
     std::string toString(size_t depth = 0) override;
 
+    LightType get_type() { return LightType::AMBIENT; }
+
     float scale_radiance;
 };
 }

@@ -16,6 +16,8 @@ struct DirectionalLight : public Light {
 
     virtual std::string toString(size_t depth = 0) override;
 
+    LightType get_type() { return LightType::DIRECTION; }
+
     glm::vec3 direction;
     float scale_radiance;
 };

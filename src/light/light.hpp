@@ -5,6 +5,8 @@
 
 namespace raytracer {
 
+enum class LightType { AMBIENT, DIRECTION };
+
 struct Light {
     Light(glm::vec3 color)
         : color(color)
@@ -14,6 +16,8 @@ struct Light {
     virtual ~Light() {}
 
     virtual std::string toString(size_t depth = 0) = 0;
+
+    virtual LightType get_type() = 0;
 
     glm::vec3 color;
 };
