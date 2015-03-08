@@ -13,7 +13,7 @@ using namespace raytracer;
 Reflects ray 'r' in respect to the normal 'n'
 **/
 glm::vec3 reflect(glm::vec3 r, glm::vec3 n){
-    return r-2*(glm::dot(r, s)/(glm::length(n)*glm::length(n))*n;
+    return r-2*(glm::dot(r, n)/(glm::length(n)*glm::length(n)))*n;
 }
 
 
@@ -28,21 +28,36 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
 
     float ka = hit.shape->material->get_ka();
     float kd = hit.shape->material->get_kd();
-    //float ks = hit.shape->material->get_ks();
+    float ks = hit.shape->material->get_ks();
     //float ke = hit.shape->material->get_ke();
+
+    glm::vec3 r; r.x=1.0f; r.y = 0.0f; r.z = 0.0f;
+    glm::vec3 n; n.x= 0.0f; r.y = 1.0f; r.z = 0.0f;
+
+    reflect(r, n);
 
 
     //Ambient Component
     ambient = ka*objCol*ambient_light->color;
 
-    //Calculate Diffuse Component
+    //Calculate Diffuse and Specular Component
     for(int i = 0; i < lights.size(); i++){
-        LightPtr light = lights.at(i);
-        //glm::vec3 S = glm::normalize(hit.intersection_point - light->get_direction());
-        diffuse = diffuse + (light->color * objCol);
+        auto light = std::static_pointer_cast<DirectionalLight>(lights.at(i));
+
+        //Diffuse
+        glm::vec3 S = glm::normalize(hit.intersection_point - light->direction);
+        diffuse = diffuse + (light->color * objCol * glm::dot(S, hit.intersection_normal));
+
+        //Specular
+        glm::vec3 specColor;
+        specColor.r = 1.0f; specColor.g = 1.0f; specColor.b = 1.0f;
+
+        specular = specular + (light->color * specColor);
     }
 
-    L = ambient + kd*diffuse;
+
+
+    L = ambient + kd*diffuse + ks*specular;
 
     return L;
 }
