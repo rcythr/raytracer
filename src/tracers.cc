@@ -9,6 +9,13 @@
 
 using namespace raytracer;
 
+/**
+Reflects ray 'r' in respect to the normal 'n'
+**/
+glm::vec3 reflect(glm::vec3 r, glm::vec3 n){
+    return r-2*(glm::dot(r, s)/(glm::length(n)*glm::length(n))*n;
+}
+
 
 glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lights){
 
@@ -20,7 +27,7 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
     glm::vec3 L;
 
     float ka = hit.shape->material->get_ka();
-    //float kd = hit.shape->material->get_kd();
+    float kd = hit.shape->material->get_kd();
     //float ks = hit.shape->material->get_ks();
     //float ke = hit.shape->material->get_ke();
 
@@ -35,7 +42,7 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
         diffuse = diffuse + (light->color * objCol);
     }
 
-    L = ambient + diffuse;
+    L = ambient + kd*diffuse;
 
     return L;
 }
