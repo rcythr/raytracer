@@ -15,6 +15,8 @@ std::string Matte::toString(size_t depth) {
     ss << tabdepth << "TYPE: MATTE\n";
     ss << tabdepth << "KA: " << ka << "\n";
     ss << tabdepth << "KD: " << kd << "\n";
+    ss << tabdepth << "KS: " << ks << "\n";
+    ss << tabdepth << "KE: " << ke << "\n";
     ss << tabdepth << "COLOR: (" << color.r << ',' << color.g << ',' << color.b
        << ")\n";
 

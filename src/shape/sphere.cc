@@ -10,7 +10,7 @@
 using namespace raytracer;
 
 void Sphere::test_hit(const Ray& ray, HitResult& result) {
-    // Major values for texting interstion
+    // Major values for texting intersection
     auto oc = ray.origin - point;
 
     // b=2(l*(o-c))
@@ -25,10 +25,13 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
         float tval = -b / 2;
         auto intersection_point = ray.origin + ray.direction * tval;
 
+
+
         // First intersection
         result.hit(shared_from_this(), tval, intersection_point,
                    glm::normalize(intersection_point - point));
         return;
+
     } else if (testVal > 0.0) {
         float tval =
             std::min((-b / 2) + sqrt(testVal), (-b / 2) - sqrt(testVal));

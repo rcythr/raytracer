@@ -7,7 +7,7 @@
 namespace raytracer {
 
 struct Matte : public Material {
-    Matte(float ka, float kd, glm::vec3 color) : ka(ka), kd(kd), color(color) {}
+    Matte(float ka, float kd, float ks, float ke, glm::vec3 color) : ka(ka), kd(kd), ks(ks), ke(ke), color(color) {}
 
     virtual ~Matte() override {}
 
@@ -15,7 +15,8 @@ struct Matte : public Material {
 
     glm::vec3 get_raw_color() override;
 
-    float ka, kd;
+    float ka, kd, ks, ke;
     glm::vec3 color;
 };
+
 }
