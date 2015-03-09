@@ -67,15 +67,13 @@ Kernel::Kernel() {
 
         // Lights
         { "ambient", [this](ParamMap& params) {
-            ambient_light = std::make_shared<AmbientLight>(
-                extractFloat(params, "scale_radiance", 1.0f),
-                lookup_color(extractString(params, "color", "")));
+            lights.push_back(std::make_shared<AmbientLight>(
+                lookup_color(extractString(params, "color", ""))));
         } },
 
         { "directional", [this](ParamMap& params) {
             lights.push_back(std::make_shared<DirectionalLight>(
                 glm::normalize(extractVec3(params, "direction", glm::vec3(1.0f, 1.0f, 1.f))),
-                extractFloat(params, "scale_radiance", 3.0f),
                 lookup_color(extractString(params, "color", ""))));
         } },
 
@@ -93,9 +91,9 @@ Kernel::Kernel() {
             materials.insert(std::make_pair(
                 std::move(name),
                 std::make_shared<Matte>(
-                    extractFloat(params, "ka", 0.0f),
-                    extractFloat(params, "kd", 0.75f),
-                    extractFloat(params, "ks", 1.00f),
+                    extractFloat(params, "ka", 0.50f),
+                    extractFloat(params, "kd", 0.10f),
+                    extractFloat(params, "ks", 0.20f),
                     extractFloat(params, "ke", 50.00f),
                     lookup_color(extractString(params, "color", "")))));
         } },
@@ -185,7 +183,6 @@ std::string Kernel::toString(size_t depth) {
     }
 
     ss << tabdepth << "LIGHTS: \n";
-    ss << tabdepth << ambient_light->toString(depth + 1);
     for (auto& light : lights) {
         ss << tabdepth << light->toString(depth + 1);
     }

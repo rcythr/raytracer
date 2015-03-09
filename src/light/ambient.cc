@@ -11,7 +11,6 @@ std::string AmbientLight::toString(size_t depth) {
 
     std::stringstream ss;
     ss << tabdepth << "TYPE: AMBIENT\n";
-    ss << tabdepth << "SCALE RADIANCE: " << scale_radiance << "\n";
     ss << tabdepth << "COLOR: (" << color.r << ',' << color.g << ',' << color.b
        << ")\n";
 
