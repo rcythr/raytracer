@@ -10,7 +10,7 @@ struct HitResult {
     glm::vec3 intersection_point;
     glm::vec3 intersection_normal;
     std::shared_ptr<Shape> shape;
-    Ray incomming_ray;
+    Ray incoming_ray;
 
     HitResult() : found_hit(false) {}
 
@@ -25,13 +25,13 @@ struct HitResult {
 
     void hit(std::shared_ptr<Shape> shape, float tval,
              glm::vec3 intersection_point, glm::vec3 intersection_normal, 
-             Ray incomming_ray) {
+             Ray incoming_ray) {
         this->found_hit = true;
         this->shape = shape;
         this->tval = tval;
         this->intersection_point = intersection_point;
         this->intersection_normal = intersection_normal;
-        this->incomming_ray = incomming_ray;
+        this->incoming_ray = incoming_ray;
     }
 };
 }

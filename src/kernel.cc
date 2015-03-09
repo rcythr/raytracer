@@ -74,8 +74,7 @@ Kernel::Kernel() {
 
         { "directional", [this](ParamMap& params) {
             lights.push_back(std::make_shared<DirectionalLight>(
-                extractVec3(params, "direction",
-                            glm::vec3(100.0f, 100.0f, 100.f)),
+                glm::normalize(extractVec3(params, "direction", glm::vec3(1.0f, 1.0f, 1.f))),
                 extractFloat(params, "scale_radiance", 3.0f),
                 lookup_color(extractString(params, "color", ""))));
         } },
@@ -94,10 +93,10 @@ Kernel::Kernel() {
             materials.insert(std::make_pair(
                 std::move(name),
                 std::make_shared<Matte>(
-                    extractFloat(params, "ka", 0.25f),
+                    extractFloat(params, "ka", 0.0f),
                     extractFloat(params, "kd", 0.75f),
-                    extractFloat(params, "ks", 0.20f),
-                    extractFloat(params, "ke", 0.20f),
+                    extractFloat(params, "ks", 1.00f),
+                    extractFloat(params, "ke", 50.00f),
                     lookup_color(extractString(params, "color", "")))));
         } },
 

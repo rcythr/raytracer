@@ -12,59 +12,36 @@
 using namespace raytracer;
 
 /**
-Reflects ray 'r' in respect to the normal 'n'
+ * Reflects ray 'r' in respect to the normal 'n'
+ * @pre n vector is normalized.
 **/
-glm::vec3 reflect(glm::vec3 r, glm::vec3 n){
-    return r-2*(glm::dot(r, n)/(glm::length(n)*glm::length(n)))*n;
-}
-
+glm::vec3 reflect(glm::vec3 r, glm::vec3 n){ return glm::normalize(r - 2.0f * glm::dot(r, n) * n); }
 
 glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lights){
 
-    glm::vec3 objCol = hit.shape->material->get_raw_color();
+    auto& material = hit.shape->material;
 
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    glm::vec3 L;
+    glm::vec3 objCol = material->get_raw_color();
 
-    float ka = hit.shape->material->get_ka();
-    float kd = hit.shape->material->get_kd();
-    float ks = hit.shape->material->get_ks();
-    float ke = hit.shape->material->get_ke();
-
-    glm::vec3 r; r.x=1.0f; r.y = 0.0f; r.z = 0.0f;
-    glm::vec3 n; n.x= 0.0f; r.y = 1.0f; r.z = 0.0f;
-
-    reflect(r, n);
-
-
-    //Ambient Component
-    ambient = ka*objCol*ambient_light->color;
+    glm::vec3 result; 
 
     //Calculate Diffuse and Specular Component
     for(int i = 0; i < lights.size(); i++){
-        auto light = std::static_pointer_cast<DirectionalLight>(lights.at(i));
+        if(lights[i]->get_type() == LightType::DIRECTION)
+        {
+            auto light = std::static_pointer_cast<DirectionalLight>(lights[i]);
 
-        //Diffuse
-        glm::vec3 S = glm::normalize(hit.intersection_point - light->direction);
-        diffuse = diffuse + (light->color * objCol * glm::dot(S, hit.intersection_normal));
+            // For a directional light the vector to the light is the negation of it's direction.
+            auto S = -light->direction;
+            auto R = reflect(-light->direction, hit.intersection_normal);
+            auto V = -hit.incoming_ray.direction;
 
-        //Specular
-        glm::vec3 specColor;
-        specColor.r = 1.0f; specColor.g = 1.0f; specColor.b = 1.0f;
-
-        //Need to get direction of mirror reflection
-        glm::vec3 v = hit.incomming_ray.direction;
-        glm::vec3 r = reflect(S , hit.intersection_normal);
-        specular = specular + (light->color * specColor) * std::pow(glm::dot(r, v), ke);
+            result += material->kd() * light->color * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
+            result += material->ks() * light->color * objCol * std::pow(glm::dot(R, V), material->ke());
+        }
     }
 
-
-
-    L = ambient + kd*diffuse + ks*specular;
-
-    return L;
+    return result;
 }
 
 
