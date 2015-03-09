@@ -1,0 +1,95 @@
+<general
+    verbose="false"
+    />
+
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="0 0 30"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="50">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out.ppm" />
+
+</pinhole>
+
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="-30 0 0"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="50">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out1.ppm" />
+
+</pinhole>
+
+<colors>
+    <color 
+        name="brown" 
+        value="0.71 0.40 0.16" />
+    <color 
+        name="orange" 
+        value="1 0.75 0" />
+    <color 
+        name="lightGreen" 
+        value="0.65 1 0.30" />
+    <color
+        name="grey"
+        value="0.25 0.25 0.25" />
+    <color
+        name="white"
+        value="1 1 1" />
+    <color
+        name="black"
+        value="0 0 0" />
+</colors>
+
+<lights>
+    <ambient 
+        color="white"
+        color="black" />
+    <directional 
+        color="white"
+        direction="100 100 200" />
+</lights>
+
+<materials>
+    <matte
+        name="brown"
+        color="brown" />
+    <matte
+        name="orange"
+        color="orange" />
+    <matte
+        name="lightGreen"
+        color="lightGreen" />
+    <matte 
+        name="grey"
+        color="grey"/>
+</materials>
+    
+<kdtree_index>
+    <triangle
+        p0="-45 30 -85"
+        p1="-45 30 45"
+        p2="45 30 45"
+        material="orange" />
+    <triangle
+        p0="-45 30 -85"
+        p1="45 30 -85"
+        p2="45 30 45"
+        material="brown" />
+    <sphere 
+        point="20 12 -15.0"
+        radius="13"
+        material="grey" />
+</naive_index>
