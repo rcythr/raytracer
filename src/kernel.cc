@@ -91,9 +91,9 @@ Kernel::Kernel() {
             materials.insert(std::make_pair(
                 std::move(name),
                 std::make_shared<Matte>(
-                    extractFloat(params, "ka", 0.50f),
-                    extractFloat(params, "kd", 0.10f),
-                    extractFloat(params, "ks", 0.20f),
+                    extractFloat(params, "ka", 0.10f),
+                    extractFloat(params, "kd", 0.40f),
+                    extractFloat(params, "ks", 0.50f),
                     extractFloat(params, "ke", 50.00f),
                     lookup_color(extractString(params, "color", "")))));
         } },

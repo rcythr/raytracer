@@ -17,7 +17,7 @@ using namespace raytracer;
 **/
 glm::vec3 reflect(glm::vec3 r, glm::vec3 n){ return glm::normalize(r - 2.0f * glm::dot(r, n) * n); }
 
-glm::vec3 brdf(HitResult& hit, std::vector<LightPtr> lights){
+glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
     auto& material = hit.shape->material;
 
@@ -26,23 +26,32 @@ glm::vec3 brdf(HitResult& hit, std::vector<LightPtr> lights){
     glm::vec3 result; 
 
     //Calculate Diffuse and Specular Component
-    for(int i = 0; i < lights.size(); i++){
-        auto type = lights[i]->get_type();
+    for(int i = 0; i < kernel->lights.size(); i++){
+        auto type = kernel->lights[i]->get_type();
         if(type == LightType::DIRECTION)
         {
-            auto light = std::static_pointer_cast<DirectionalLight>(lights[i]);
+            auto light = std::static_pointer_cast<DirectionalLight>(kernel->lights[i]);
 
             // For a directional light the vector to the light is the negation of it's direction.
             auto S = -light->direction;
-            auto R = reflect(-light->direction, hit.intersection_normal);
-            auto V = -hit.incoming_ray.direction;
 
-            result += material->kd() * light->color * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
-            result += material->ks() * light->color * objCol * std::pow(glm::dot(R, V), material->ke());
+            Ray shadow_ray{hit.incoming_ray.origin + hit.tval * hit.incoming_ray.direction, S};
+
+            //bool in_shadow = false;
+            //kernel->spatial_index->find_closest_hit(shadow_ray, [&](HitResult& hit) { in_shadow = true; });
+
+            //if(in_shadow)
+            //{
+                auto R = reflect(-light->direction, hit.intersection_normal);
+                auto V = -hit.incoming_ray.direction;
+
+                result += material->kd() * light->color * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
+                result += material->ks() * light->color * objCol * std::pow(glm::dot(R, V), material->ke());
+            //}
         }
         else if(type == LightType::AMBIENT)
         {
-            auto light = std::static_pointer_cast<AmbientLight>(lights[i]);
+            auto light = std::static_pointer_cast<AmbientLight>(kernel->lights[i]);
             result += material->ka() * light->color * objCol;
         }
     }
@@ -63,7 +72,7 @@ void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
             kernel->spatial_index->find_closest_hit(ray, [=](HitResult& hit) {
                 // Set the view plane pixel to the color of the
                 // object we hit.
-                glm::vec3 color = brdf(hit, kernel->lights);
+                glm::vec3 color = brdf(kernel, hit);
 
                 camera->view_plane->set_pixel(row, col, color);
             });
