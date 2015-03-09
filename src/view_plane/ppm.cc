@@ -31,5 +31,6 @@ void PPMViewPlane::set_pixel(size_t row, size_t col, glm::vec3 color) {
 
 void PPMViewPlane::finish() { 
     std::lock_guard<std::mutex> lg(mut);
+    ppm.apply_guassian();
     ppm.save(filename); 
 }
