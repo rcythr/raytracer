@@ -67,8 +67,8 @@ Kernel::Kernel() {
 
         // Lights
         { "ambient", [this](ParamMap& params) {
-            ambient_light = std::make_shared<AmbientLight>(
-                lookup_color(extractString(params, "color", "")));
+            lights.push_back(std::make_shared<AmbientLight>(
+                lookup_color(extractString(params, "color", ""))));
         } },
 
         { "directional", [this](ParamMap& params) {
@@ -183,7 +183,6 @@ std::string Kernel::toString(size_t depth) {
     }
 
     ss << tabdepth << "LIGHTS: \n";
-    ss << tabdepth << ambient_light->toString(depth + 1);
     for (auto& light : lights) {
         ss << tabdepth << light->toString(depth + 1);
     }

@@ -22,7 +22,6 @@ struct Kernel {
     size_t num_threads;
 
     std::vector<CameraPtr> cameras;
-    LightPtr ambient_light;
     std::vector<LightPtr> lights;
     std::unordered_map<std::string, glm::vec3> colors;
     std::unordered_map<std::string, MaterialPtr> materials;
