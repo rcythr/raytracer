@@ -23,7 +23,7 @@ glm::vec3 brdf(HitResult& hit, LightPtr ambient_light, std::vector<LightPtr> lig
 
     glm::vec3 objCol = material->get_raw_color();
 
-    glm::vec3 result; 
+    glm::vec3 result = material->ka() * ambient_light->color * objCol; 
 
     //Calculate Diffuse and Specular Component
     for(int i = 0; i < lights.size(); i++){
