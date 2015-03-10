@@ -19,6 +19,8 @@ struct SpatialIndex {
 
     virtual void find_closest_hit(const Ray& ray, std::function<void(HitResult&)> hit_callback) = 0;
 
+    virtual bool has_hit(Ray& ray, ShapePtr omit_shape) = 0;
+
     virtual void view_all_objects(std::function<void(ShapePtr&)> functor) = 0;
 
     virtual std::string toString(size_t depth = 0) = 0;

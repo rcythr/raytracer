@@ -77,6 +77,13 @@ Kernel::Kernel() {
                 lookup_color(extractString(params, "color", ""))));
         } },
 
+        { "point", [this] (ParamMap& params) {
+            lights.push_back(std::make_shared<PointLight>(
+                extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
+                lookup_color(extractString(params, "color", ""))
+            ));
+        } },
+
         // Color
         { "color", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
@@ -91,9 +98,9 @@ Kernel::Kernel() {
             materials.insert(std::make_pair(
                 std::move(name),
                 std::make_shared<Matte>(
-                    extractFloat(params, "ka", 0.10f),
-                    extractFloat(params, "kd", 0.40f),
-                    extractFloat(params, "ks", 0.50f),
+                    extractFloat(params, "ka", 0.30f),
+                    extractFloat(params, "kd", 0.50f),
+                    extractFloat(params, "ks", 0.20f),
                     extractFloat(params, "ke", 50.00f),
                     lookup_color(extractString(params, "color", "")))));
         } },

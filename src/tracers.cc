@@ -35,19 +35,32 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
             // For a directional light the vector to the light is the negation of it's direction.
             auto S = -light->direction;
 
-            Ray shadow_ray{hit.incoming_ray.origin + hit.tval * hit.incoming_ray.direction, S};
+            Ray shadow_ray{hit.intersection_point, S};
 
-            //bool in_shadow = false;
-            //kernel->spatial_index->find_closest_hit(shadow_ray, [&](HitResult& hit) { in_shadow = true; });
-
-            //if(in_shadow)
-            //{
-                auto R = reflect(-light->direction, hit.intersection_normal);
+            if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
+            {
+                auto R = reflect(S, hit.intersection_normal);
                 auto V = -hit.incoming_ray.direction;
 
-                result += material->kd() * light->color * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
-                result += material->ks() * light->color * objCol * std::pow(glm::dot(R, V), material->ke());
-            //}
+                result += material->kd() * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
+                result += material->ks() * light->color * std::pow(glm::dot(R, V), material->ke());
+            }
+        }
+        else if(type == LightType::POINT)
+        {
+            auto light = std::static_pointer_cast<PointLight>(kernel->lights[i]);
+
+            auto S = glm::normalize(light->point - hit.intersection_point);
+
+            Ray shadow_ray{hit.intersection_point, S};
+            if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
+            {
+                auto R = reflect(S, hit.intersection_normal);
+                auto V = -hit.incoming_ray.direction;
+
+                result += material->kd() * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
+                result += material->ks() * light->color * std::pow(glm::dot(R, V), material->ke());
+            }
         }
         else if(type == LightType::AMBIENT)
         {
