@@ -8,6 +8,7 @@
 #include "light/light.hpp"
 #include "light/ambient.hpp"
 #include "light/directional.hpp"
+#include "light/point.hpp"
 
 #include "material/material.hpp"
 #include "material/matte.hpp"

@@ -5,7 +5,7 @@
 
 namespace raytracer {
 
-enum class LightType { AMBIENT, DIRECTION };
+enum class LightType { AMBIENT, DIRECTION, POINT };
 
 struct Light {
     Light(glm::vec3 color)

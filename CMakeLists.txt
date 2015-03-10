@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # Have CMake look for GLM in the include/directory.
 set(GLM_ROOT_DIR ${CMAKE_SOURCE_DIR})
 
-list(APPEND CMAKE_CXX_FLAGS "-ggdb -std=c++11 -Wall -pedantic") 
+list(APPEND CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall -pedantic") 
 
 # File all .cc files in the source dir and helpers dir
 file(GLOB_RECURSE SOURCES "src/*.cc")

@@ -11,7 +11,7 @@ void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
     node = kdtree::create(shapes,
-                          kdtree::policies::BestSplit<ShapePtr, AABB>(3, 20));
+                          kdtree::policies::CutInHalf<ShapePtr, AABB>(3, 20));
 
     std::vector<glm::vec3> points;
     kdtree::dump<ShapePtr, AABB>(node, [&](size_t depth, AABB& aabb, size_t dim, float split_val) {
@@ -58,7 +58,7 @@ void KDTreeSpatialIndex::find_closest_hit(
         node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
             HitResult best_result;
             HitResult result;
-            for (auto obj : shapes) {
+            for (auto obj : possible_hits) {
                 result.found_hit = false;
                 obj->test_hit(ray, result);
                 if (result.found_hit) {
@@ -75,6 +75,29 @@ void KDTreeSpatialIndex::find_closest_hit(
             }
             return false;
         });
+}
+
+bool KDTreeSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape)
+{
+    bool result = false;
+    kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
+        node, ray, [&] (std::vector<ShapePtr> possible_hits) -> bool {
+            HitResult hit;
+            for(auto obj : possible_hits)
+            {
+                if(obj != omit_shape)
+                {
+                    obj->test_hit(ray, hit);
+                    if(hit.found_hit)
+                    {
+                        result = true;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+    return result;
 }
 
 void KDTreeSpatialIndex::view_all_objects(
