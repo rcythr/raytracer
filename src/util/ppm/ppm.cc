@@ -5,16 +5,16 @@
 
 using namespace raytracer;
 
-PPM::PPM(size_t width, size_t height) : width(width), height(height) {
+PPM::PPM(int64_t width, int64_t height) : width(width), height(height) {
     data = new glm::vec3* [height];
-    for (size_t i = 0; i < height; ++i) {
+    for (int64_t i = 0; i < height; ++i) {
         data[i] = new glm::vec3[width];
     }
 }
 
 PPM::~PPM() {
     if (data != nullptr) {
-        for (size_t i = 0; i < height; ++i) {
+        for (int64_t i = 0; i < height; ++i) {
             delete[] data[i];
         }
         delete[] data;
@@ -31,7 +31,7 @@ void PPM::apply_guassian()
 
     // Create temporary storage for the output data.
     glm::vec3** out_data = new glm::vec3*[height];
-    for(size_t i=0; i < height; ++i)
+    for(int64_t i=0; i < height; ++i)
     {
         out_data[i] = new glm::vec3[width];
     }
@@ -60,7 +60,7 @@ void PPM::apply_guassian()
     }
 
     // Delete the old data array.
-    for(size_t i=0; i < height; ++i)
+    for(int64_t i=0; i < height; ++i)
     {
         delete[] data[i];
     }
@@ -88,13 +88,17 @@ bool PPM::save(std::string filename) {
     std::fwrite(header.c_str(), sizeof(char), header.size(), fd);
 
     // Write out all of the pixel data.
-    for (size_t i = height; i > 0; --i) {
-        for (size_t j = 0; j < width; ++j) {
+    for (int64_t i = height; i > 0; --i) {
+        for (int64_t j = 0; j < width; ++j) {
             auto& pix = data[i - 1][j];
 
-            std::fputc((uint8_t)(pix.r * 255), fd);
-            std::fputc((uint8_t)(pix.g * 255), fd);
-            std::fputc((uint8_t)(pix.b * 255), fd);
+            int32_t r = std::min(std::max((int32_t) (pix.r * 255), 0), 255);
+            int32_t g = std::min(std::max((int32_t) (pix.g * 255), 0), 255);
+            int32_t b = std::min(std::max((int32_t) (pix.b * 255), 0), 255);
+
+            std::fputc((uint8_t)r, fd);
+            std::fputc((uint8_t)g, fd);
+            std::fputc((uint8_t)b, fd);
         }
     }
 

@@ -15,7 +15,10 @@ using namespace raytracer;
  * Reflects ray 'r' in respect to the normal 'n'
  * @pre n vector is normalized.
 **/
-glm::vec3 reflect(glm::vec3 r, glm::vec3 n){ return glm::normalize(r - 2.0f * glm::dot(r, n) * n); }
+glm::vec3 reflect(glm::vec3 L, glm::vec3 N)
+{ 
+    return glm::normalize(2.0f * glm::dot(N, L) * N - L);
+}
 
 glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
@@ -26,7 +29,7 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
     glm::vec3 result; 
 
     //Calculate Diffuse and Specular Component
-    for(int i = 0; i < kernel->lights.size(); i++){
+    for(size_t i = 0; i < kernel->lights.size(); i++){
         auto type = kernel->lights[i]->get_type();
         if(type == LightType::DIRECTION)
         {
@@ -39,7 +42,7 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
-                auto R = reflect(S, hit.intersection_normal);
+                auto R = reflect(-S, hit.intersection_normal);
                 auto V = -hit.incoming_ray.direction;
 
                 result += material->kd() * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
@@ -50,16 +53,16 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
         {
             auto light = std::static_pointer_cast<PointLight>(kernel->lights[i]);
 
-            auto S = glm::normalize(light->point - hit.intersection_point);
+            auto S = glm::normalize(hit.intersection_point - light->point);
 
-            Ray shadow_ray{hit.intersection_point, S};
+            Ray shadow_ray{hit.intersection_point, -S};
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
-                auto R = reflect(S, hit.intersection_normal);
+                auto R = reflect(-S, hit.intersection_normal);
                 auto V = -hit.incoming_ray.direction;
 
-                result += material->kd() * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
-                result += material->ks() * light->color * std::pow(glm::dot(R, V), material->ke());
+                result += material->kd() * objCol * light->color * std::max(0.0f, glm::dot(-S, hit.intersection_normal));
+                result += material->ks() * light->color * std::pow(std::max(0.0f, glm::dot(R, V)), material->ke());
             }
         }
         else if(type == LightType::AMBIENT)

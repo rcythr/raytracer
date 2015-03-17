@@ -6,16 +6,16 @@
 namespace raytracer {
 
 struct PPM {
-    size_t width, height;
+    int64_t width, height;
     glm::vec3** data;
 
-    PPM(size_t width, size_t height);
+    PPM(int64_t width, int64_t height);
 
     ~PPM();
 
-    glm::vec3 get_pixel(size_t row, size_t col) { return data[row][col]; }
+    glm::vec3 get_pixel(int64_t row, int64_t col) { return data[row][col]; }
 
-    void set_pixel(size_t row, size_t col, glm::vec3 color) {
+    void set_pixel(int64_t row, int64_t col, glm::vec3 color) {
         data[row][col] = color;
     }
 
