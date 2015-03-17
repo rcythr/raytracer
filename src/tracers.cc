@@ -55,12 +55,6 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
             auto S = glm::normalize(light->point - hit.intersection_point);
 
-            auto sphereptr = dynamic_cast<Sphere*>(hit.shape.get());
-            if(sphereptr != nullptr)
-            {
-                std::cout << S << std::endl;
-            }
-
             Ray shadow_ray{hit.intersection_point, S};
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
@@ -91,13 +85,16 @@ void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
     // Give the camera a function to call on each ray it generates.
     camera->spawn_rays([&](size_t row, size_t col, Ray& ray) { 
         tp.enqueue([=]() {
-            kernel->spatial_index->find_closest_hit(ray, [=](HitResult& hit) {
-                // Set the view plane pixel to the color of the
-                // object we hit.
-                glm::vec3 color = brdf(kernel, hit);
+            bool hit_found = false;
 
-                camera->view_plane->set_pixel(row, col, color);
+            kernel->spatial_index->find_closest_hit(ray, [=,&hit_found](HitResult& hit) {
+                camera->view_plane->set_pixel(row, col, brdf(kernel, hit));
+                hit_found = true;
             });
+
+            if(!hit_found) {
+                camera->view_plane->set_pixel(row, col, kernel->background_color);
+            }
 
             if(col == 0)
             {

@@ -20,6 +20,7 @@ struct Kernel {
   public:
     bool verbose;
     size_t num_threads;
+    glm::vec3 background_color;
 
     std::vector<CameraPtr> cameras;
     std::vector<LightPtr> lights;

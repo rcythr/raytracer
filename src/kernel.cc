@@ -22,6 +22,7 @@ Kernel::Kernel() {
         // General
         { "general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
+            background_color = extractVec3(params, "background_color", glm::vec3(0, 0, 0));
             num_threads =
                 extractInt(params, "num_threads",
                            std::max(std::thread::hardware_concurrency(), 1u));

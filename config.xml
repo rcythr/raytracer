@@ -1,5 +1,6 @@
 <general
     num_threads="1"
+    background_color="0.675 0.843 0.898"
     verbose="false" />
 
 <!-- Front View --!>
@@ -73,16 +74,16 @@
         p1="-45 30 -85"
         p0="-45 30 45"
         p2="45 30 45"
-        material="blue" />
+        material="red" />
     <triangle
         p0="-45 30 -85"
         p1="45 30 -85"
         p2="45 30 45"
-        material="blue" />
+        material="red" />
     <sphere
         point="20 5 -15"
         radius="10"
-        material="red" />
+        material="white" />
     <sphere 
         point="0 0 0"
         radius="13"
