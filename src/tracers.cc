@@ -42,7 +42,7 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
-                auto R = reflect(-S, hit.intersection_normal);
+                auto R = reflect(S, hit.intersection_normal);
                 auto V = -hit.incoming_ray.direction;
 
                 result += material->kd() * objCol * std::max(0.0f, glm::dot(S, hit.intersection_normal));
@@ -53,15 +53,15 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
         {
             auto light = std::static_pointer_cast<PointLight>(kernel->lights[i]);
 
-            auto S = glm::normalize(hit.intersection_point - light->point);
+            auto S = glm::normalize(light->point - hit.intersection_point);
 
-            Ray shadow_ray{hit.intersection_point, -S};
+            Ray shadow_ray{hit.intersection_point, S};
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
-                auto R = reflect(-S, hit.intersection_normal);
+                auto R = reflect(S, hit.intersection_normal);
                 auto V = -hit.incoming_ray.direction;
 
-                result += material->kd() * objCol * light->color * std::max(0.0f, glm::dot(-S, hit.intersection_normal));
+                result += material->kd() * objCol * light->color * std::max(0.0f, glm::dot(S, hit.intersection_normal));
                 result += material->ks() * light->color * std::pow(std::max(0.0f, glm::dot(R, V)), material->ke());
             }
         }

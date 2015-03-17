@@ -23,18 +23,34 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
     // if b^2-c >= 0
     if (testVal == 0.0) {
         float tval = -b / 2;
-        auto intersection_point = ray.origin + ray.direction * tval;
+        if(tval >= 0.0f) {
+            auto intersection_point = ray.origin + ray.direction * tval;
 
-
-
-        // First intersection
-        result.hit(shared_from_this(), tval, intersection_point,
-                   glm::normalize(intersection_point - point), ray);
+            // First intersection
+            result.hit(shared_from_this(), tval, intersection_point,
+                       glm::normalize(intersection_point - point), ray);
         return;
-
+        }
     } else if (testVal > 0.0) {
-        float tval =
-            std::min((-b / 2) + sqrt(testVal), (-b / 2) - sqrt(testVal));
+        float testValSqrt = sqrt(testVal);
+        float tval;
+
+        float tval1 = (-b / 2) + testValSqrt;
+        float tval2 = (-b / 2) - testValSqrt;
+        
+        bool tval1gt0 = tval1 > 0.0f;
+        bool tval2gt0 = tval2 > 0.0f;
+        if(tval1gt0 && tval2gt0) {
+            tval = std::min(tval1, tval2);
+        } else if(tval1gt0 && !tval2gt0) {
+            tval = tval1;
+        } else if(!tval1gt0 && tval2gt0) {
+            tval = tval2;
+        } else {
+            result.miss();
+            return;
+        }
+
         auto intersection_point = ray.origin + ray.direction * tval;
 
         result.hit(shared_from_this(), tval, intersection_point,
