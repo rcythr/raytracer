@@ -1,0 +1,90 @@
+<general
+    num_threads="1"
+    verbose="false" />
+
+<!-- Front View --!>
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="0 0 60"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="100">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out.ppm" />
+
+</pinhole>
+
+<!-- Side View --!>
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="-60 0 0"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="100">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out1.ppm" />
+
+</pinhole>
+
+<!-- Top View --!>
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    eye="0 -60 0"
+    up="0 0 -1"
+    look_at="0 0 0"
+    view_distance="100">
+
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="out2.ppm" />
+</pinhole>
+
+<colors>
+    <color name="red" value="1 0 0" />
+    <color name="green" value="0 1 0" />
+    <color name="blue" value="0 0 1" />
+    <color name="white" value="1 1 1" />
+    <color name="black" value="0 0 0" />
+</colors>
+
+<lights>
+    <ambient color="white" />
+    <point color="white" point="0 -50 0" />
+</lights>
+
+<materials>
+    <matte name="white" color="white" />
+    <matte name="red" color="red" />
+    <matte name="blue" color="blue" />
+</materials>
+    
+<naive_index>
+    <triangle
+        p1="-45 30 -85"
+        p0="-45 30 45"
+        p2="45 30 45"
+        material="blue" />
+    <triangle
+        p0="-45 30 -85"
+        p1="45 30 -85"
+        p2="45 30 45"
+        material="blue" />
+    <sphere
+        point="20 5 -15"
+        radius="10"
+        material="red" />
+    <sphere 
+        point="0 0 0"
+        radius="13"
+        material="white" />
+</naive_index>
