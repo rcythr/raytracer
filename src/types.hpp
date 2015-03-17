@@ -1,7 +1,5 @@
 #pragma once
 
-#include "brdf/brdf.hpp"
-
 #include "camera/camera.hpp"
 #include "camera/pinhole.hpp"
 
@@ -11,7 +9,7 @@
 #include "light/point.hpp"
 
 #include "material/material.hpp"
-#include "material/matte.hpp"
+#include "material/phong.hpp"
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"

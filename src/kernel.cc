@@ -94,11 +94,11 @@ Kernel::Kernel() {
         } },
 
         // Materials
-        { "matte", [this](ParamMap& params) {
+        { "phong", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
             materials.insert(std::make_pair(
                 std::move(name),
-                std::make_shared<Matte>(
+                std::make_shared<Phong>(
                     extractFloat(params, "ka", 0.30f),
                     extractFloat(params, "kd", 0.50f),
                     extractFloat(params, "ks", 0.20f),

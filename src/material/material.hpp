@@ -3,7 +3,11 @@
 #include <memory>
 #include <glm/glm.hpp>
 
+#include "hit_result.hpp"
+
 namespace raytracer {
+
+struct Kernel;
 
 struct Material {
     virtual ~Material() {}
@@ -12,10 +16,7 @@ struct Material {
 
     virtual glm::vec3 get_raw_color() = 0;
 
-    virtual float ka() = 0;
-    virtual float kd() = 0;
-    virtual float ks() = 0;
-    virtual float ke() = 0;
+    virtual glm::vec3 get_color(Kernel* kernel, HitResult& hit) = 0;
 };
 
 typedef std::shared_ptr<Material> MaterialPtr;

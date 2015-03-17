@@ -1,5 +1,11 @@
 #pragma once
 
+#include <memory>
+
+#include <glm/glm.hpp>
+
+#include "ray.hpp"
+
 namespace raytracer {
 
 struct Shape;
