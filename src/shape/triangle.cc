@@ -40,6 +40,12 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
     }
 
     float t = glm::dot(Q, e2) / p_dot_e1;
+    if(t < 0.0f)
+    {
+        result.miss();
+        return;
+    }
+
     float u = glm::dot(P, T) / p_dot_e1;
     float v = glm::dot(Q, ray.direction) / p_dot_e1;
 

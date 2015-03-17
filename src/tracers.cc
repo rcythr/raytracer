@@ -55,6 +55,12 @@ glm::vec3 brdf(Kernel* kernel, HitResult& hit){
 
             auto S = glm::normalize(light->point - hit.intersection_point);
 
+            auto sphereptr = dynamic_cast<Sphere*>(hit.shape.get());
+            if(sphereptr != nullptr)
+            {
+                std::cout << S << std::endl;
+            }
+
             Ray shadow_ray{hit.intersection_point, S};
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
