@@ -116,6 +116,13 @@ Kernel::Kernel() {
             last_material->sampler = std::make_shared<SolidSampler>(lookup_color(extractString(params, "color", "")));
         } },
 
+        { "checkered", [this](ParamMap& params) {
+            last_material->sampler = std::make_shared<CheckerboardSampler>(
+                extractFloat(params, "size", 5.0f),
+                lookup_color(extractString(params, "color1", "")),
+                lookup_color(extractString(params, "color2", "")));
+        } },
+
         // Shapes
         { "sphere", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
@@ -140,8 +147,11 @@ Kernel::Kernel() {
 
             spatial_index->insert(std::make_shared<Triangle>(
                 extractVec3(params, "p0", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec2(params, "uv0", glm::vec2(0.0f, 0.0f)),
                 extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec2(params, "uv1", glm::vec2(0.0f, 0.0f)),
                 extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
+                extractVec2(params, "uv2", glm::vec2(0.0f, 0.0f)),
                 material));
         } },
 

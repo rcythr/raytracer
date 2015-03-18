@@ -13,6 +13,7 @@
 
 #include "sampler/sampler.hpp"
 #include "sampler/solid.hpp"
+#include "sampler/checkerboard.hpp"
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"

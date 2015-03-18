@@ -21,6 +21,8 @@ std::string Triangle::toString(size_t depth) {
     return ss.str();
 }
 
+template<typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
+
 void Triangle::test_hit(const Ray& ray, HitResult& result) {
     glm::vec3 e1, e2;
 
@@ -55,12 +57,31 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
         return;
     }
 
+    // Now calculate UV mapping
+    auto intersection_point = ((1.0f - u - v) * p0) + (u * p1) + (v * p2);
+    auto f1 = p0 - intersection_point;
+    auto f2 = p1 - intersection_point;
+    auto f3 = p2 - intersection_point;
+
+    auto va = glm::cross(p0-p1, p0-p2);
+    auto va1 = glm::cross(f2, f3);
+    auto va2 = glm::cross(f3, f1);
+    auto va3 = glm::cross(f1, f2);
+
+    auto a = glm::length(va);
+
+    auto a1 = glm::length(va1)/a * sign(glm::dot(va, va1));
+    auto a2 = glm::length(va2)/a * sign(glm::dot(va, va2));
+    auto a3 = glm::length(va3)/a * sign(glm::dot(va, va3));
+
+    auto uv = uv0 * a1 + uv1 * a2 + uv2 * a3;
+
     result.hit(
         shared_from_this(),
         t,
-        u,
-        v,
-        ((1.0f - u - v) * p0) + (u * p1) + (v * p2),
+        uv.x,
+        uv.y,
+        intersection_point,
         glm::normalize(glm::cross(e1, e2)), 
         ray);
 }

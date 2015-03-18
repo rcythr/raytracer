@@ -64,22 +64,40 @@
 </lights>
 
 <materials>
-    <phong name="white" color="white" />
-    <phong name="red" color="red" />
-    <phong name="blue" color="blue" />
+    <phong name="white" >
+        <solid color="white" />
+    </phong>
+    <phong name="red">
+        <solid color="red" />
+    </phong>
+    <phong name="blue">
+        <solid color="blue" />
+    </phong>
+    <phong name="checker">
+        <checkered
+            color1="red"
+            color2="blue"
+            size="0.1" />
+    </phong>
 </materials>
     
 <naive_index>
     <triangle
         p1="-45 30 -85"
+        uv1="0 1"
         p0="-45 30 45"
+        uv0="0 0"
         p2="45 30 45"
-        material="red" />
+        uv2="1 0"
+        material="checker" />
     <triangle
         p0="-45 30 -85"
+        uv0="0 1"
         p1="45 30 -85"
+        uv1="1 1"
         p2="45 30 45"
-        material="red" />
+        uv2="1 0"
+        material="checker" />
     <sphere
         point="20 5 -15"
         radius="10"

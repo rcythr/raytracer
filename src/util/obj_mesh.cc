@@ -45,8 +45,10 @@ void raytracer::loadObj(std::string filename,
                 points.push_back(glm::vec3(pt.x / pt.w, pt.y / pt.w, pt.z / pt.w));
             } else if (parts[0] == "f") {
                 index->insert(std::make_shared<Triangle>(
-                    points[std::stoi(parts[1])-1], points[std::stoi(parts[2])-1],
-                    points[std::stoi(parts[3])-1], material));
+                    points[std::stoi(parts[1])-1], glm::vec2(0.0f, 0.0f),
+                    points[std::stoi(parts[2])-1], glm::vec2(0.0f, 1.0f),
+                    points[std::stoi(parts[3])-1], glm::vec2(1.0f, 1.0f),
+                    material));
             }
         }
     }

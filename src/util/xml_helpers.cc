@@ -63,3 +63,15 @@ glm::vec3 raytracer::extractVec3(ParamMap& params, const char* key,
     }
     return default_value;
 }
+
+glm::vec2 raytracer::extractVec2(ParamMap& params, const char* key,
+                                 glm::vec2 default_value) {
+    auto find_itr = params.find(key);
+    if (find_itr != params.end()) {
+        auto val = split(find_itr->second, ' ');
+        if (val.size() == 2) {
+            return glm::vec2(std::stof(val[0]), std::stof(val[1]));
+        }
+    }
+    return default_value;
+}
