@@ -8,8 +8,6 @@
 
 using namespace raytracer;
 
-glm::vec3 Phong::get_raw_color() { return color; }
-
 std::string Phong::toString(size_t depth) {
     std::string tabdepth = std::string("\t") * depth;
 
@@ -19,8 +17,6 @@ std::string Phong::toString(size_t depth) {
     ss << tabdepth << "KD: " << kd << "\n";
     ss << tabdepth << "KS: " << ks << "\n";
     ss << tabdepth << "KE: " << ke << "\n";
-    ss << tabdepth << "COLOR: (" << color.r << ',' << color.g << ',' << color.b
-       << ")\n";
 
     return ss.str();
 }
@@ -36,6 +32,8 @@ glm::vec3 reflect(glm::vec3 L, glm::vec3 N)
 
 glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) 
 {
+    auto color = sampler->get_color(hit.u, hit.v);
+    
     glm::vec3 result; 
 
     //Calculate Diffuse and Specular Component

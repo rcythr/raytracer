@@ -17,6 +17,8 @@ struct Kernel {
     glm::vec3 lookup_color(std::string name);
     MaterialPtr lookup_material(std::string name);
 
+    MaterialPtr last_material;
+
   public:
     bool verbose;
     size_t num_threads;

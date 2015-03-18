@@ -96,14 +96,24 @@ Kernel::Kernel() {
         // Materials
         { "phong", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
-            materials.insert(std::make_pair(
-                std::move(name),
-                std::make_shared<Phong>(
+
+            auto material = std::make_shared<Phong>(
                     extractFloat(params, "ka", 0.30f),
                     extractFloat(params, "kd", 0.50f),
                     extractFloat(params, "ks", 0.20f),
-                    extractFloat(params, "ke", 50.00f),
-                    lookup_color(extractString(params, "color", "")))));
+                    extractFloat(params, "ke", 50.00f));
+        
+            last_material = material;
+
+            materials.insert(std::make_pair(
+                std::move(name),
+                material
+            ));
+        } },
+
+        // Samplers
+        { "solid", [this](ParamMap& params) {
+            last_material->sampler = std::make_shared<SolidSampler>(lookup_color(extractString(params, "color", "")));
         } },
 
         // Shapes

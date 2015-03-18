@@ -58,6 +58,8 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
     result.hit(
         shared_from_this(),
         t,
+        u,
+        v,
         ((1.0f - u - v) * p0) + (u * p1) + (v * p2),
         glm::normalize(glm::cross(e1, e2)), 
         ray);

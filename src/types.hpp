@@ -11,6 +11,9 @@
 #include "material/material.hpp"
 #include "material/phong.hpp"
 
+#include "sampler/sampler.hpp"
+#include "sampler/solid.hpp"
+
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"
 #include "shape/triangle.hpp"

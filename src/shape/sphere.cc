@@ -26,8 +26,13 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
         if(tval >= 0.0f) {
             auto intersection_point = ray.origin + ray.direction * tval;
 
+            // Calculate U-V coordinates.
+            auto d_hat = glm::normalize(intersection_point - point);
+            auto u = 0.5 + atan2(d_hat.z, d_hat.x) / (2 * M_PI);
+            auto v = 0.5 - atan(d_hat.y) / M_PI;
+
             // First intersection
-            result.hit(shared_from_this(), tval, intersection_point,
+            result.hit(shared_from_this(), tval, u, v, intersection_point,
                        glm::normalize(intersection_point - point), ray);
         return;
         }
@@ -53,7 +58,12 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
 
         auto intersection_point = ray.origin + ray.direction * tval;
 
-        result.hit(shared_from_this(), tval, intersection_point,
+        // Calculate U-V coordinates.
+        auto d_hat = glm::normalize(intersection_point - point);
+        auto u = 0.5 + atan2(d_hat.z, d_hat.x) / (2 * M_PI);
+        auto v = 0.5 - atan(d_hat.y) / M_PI
+        ;
+        result.hit(shared_from_this(), tval, u, v, intersection_point,
                    glm::normalize(intersection_point - point), ray);
         return;
     }

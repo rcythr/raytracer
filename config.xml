@@ -64,9 +64,9 @@
 </lights>
 
 <materials>
-    <matte name="white" color="white" />
-    <matte name="red" color="red" />
-    <matte name="blue" color="blue" />
+    <phong name="white" color="white" />
+    <phong name="red" color="red" />
+    <phong name="blue" color="blue" />
 </materials>
     
 <naive_index>
