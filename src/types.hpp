@@ -14,6 +14,8 @@
 #include "sampler/sampler.hpp"
 #include "sampler/solid.hpp"
 #include "sampler/checkerboard.hpp"
+#include "sampler/rainbow.hpp"
+#include "sampler/circles.hpp"
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"

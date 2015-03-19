@@ -123,6 +123,19 @@ Kernel::Kernel() {
                 lookup_color(extractString(params, "color2", "")));
         } },
 
+        { "circles", [this](ParamMap& params) {
+            last_material->sampler = std::make_shared<CirclesSampler>(
+                extractFloat(params, "ring_size", 0.1f),
+                lookup_color(extractString(params, "color1", "")),
+                lookup_color(extractString(params, "color2", "")));
+        }},
+
+        { "rainbow", [this](ParamMap& params) {
+            last_material->sampler = std::make_shared<RainbowSampler>(
+                lookup_color(extractString(params, "color1", "")),
+                lookup_color(extractString(params, "color2", "")));
+        } },
+
         // Shapes
         { "sphere", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
