@@ -54,6 +54,9 @@
     <color name="red" value="1 0 0" />
     <color name="green" value="0 1 0" />
     <color name="blue" value="0 0 1" />
+
+    <color name="yellow" value="1 1 0" />
+
     <color name="white" value="1 1 1" />
     <color name="black" value="0 0 0" />
 </colors>
@@ -76,28 +79,31 @@
     <phong name="checker">
         <checkered
             color1="red"
-            color2="blue"
+            color2="yellow"
             size="0.1" />
+    </phong>
+    <phong name="texture">
+        <png filename="thatsme.png" />
     </phong>
 </materials>
     
 <naive_index>
     <triangle
         p1="-45 30 -85"
-        uv1="0 1"
+        uv1="0 0"
         p0="-45 30 45"
-        uv0="0 0"
+        uv0="1 0"
         p2="45 30 45"
-        uv2="1 0"
-        material="checker" />
+        uv2="1 1"
+        material="texture" />
     <triangle
         p0="-45 30 -85"
-        uv0="0 1"
+        uv0="0 0"
         p1="45 30 -85"
-        uv1="1 1"
+        uv1="0 1"
         p2="45 30 45"
-        uv2="1 0"
-        material="checker" />
+        uv2="1 1"
+        material="texture" />
     <sphere
         point="20 5 -15"
         radius="10"

@@ -16,6 +16,7 @@
 #include "sampler/checkerboard.hpp"
 #include "sampler/rainbow.hpp"
 #include "sampler/circles.hpp"
+#include "sampler/png_texture.hpp"
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"

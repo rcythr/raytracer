@@ -136,6 +136,13 @@ Kernel::Kernel() {
                 lookup_color(extractString(params, "color2", "")));
         } },
 
+        { "png", [this](ParamMap& params) {
+            auto texture = std::unique_ptr<PNGTexture>(new PNGTexture());
+            texture->load(extractString(params, "filename", ""));
+
+            last_material->sampler = std::make_shared<PNGTextureSampler>( std::move(texture) );
+        }},
+
         // Shapes
         { "sphere", [this](ParamMap& params) {
             auto materialName = extractString(params, "material", "");
