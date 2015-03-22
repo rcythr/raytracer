@@ -124,10 +124,10 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
         auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy>>(node);
 
         float left_t;
-        bool left_hit = inner->right->bounds.test_hit(ray, left_t);
+        bool left_hit = inner->left->bounds.test_hit(ray, left_t);
 
         float right_t;
-        bool right_hit = inner->left->bounds.test_hit(ray, right_t);
+        bool right_hit = inner->right->bounds.test_hit(ray, right_t);
 
         if(left_hit && right_hit)
         {

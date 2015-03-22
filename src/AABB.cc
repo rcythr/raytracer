@@ -7,63 +7,35 @@ using namespace raytracer;
 enum class Quadrant { Left, Right, Middle };
 
 bool AABB::test_hit(const Ray& ray, float& tval) {
-    bool inside = true;
-    Quadrant quadrant[3];
-    float candidatePlane[3];
+    glm::vec3 parameters[2];
+    parameters[0] = min;
+    parameters[1] = max;
 
-    for (int i = 0; i < 3; ++i) {
-        if (ray.origin[i] < min[i]) {
-            quadrant[i] = Quadrant::Left;
-            candidatePlane[i] = min[i];
-            inside = false;
-        } else if (ray.origin[i] > max[i]) {
-            quadrant[i] = Quadrant::Right;
-            candidatePlane[i] = max[i];
-            inside = false;
-        } else {
-            quadrant[i] = Quadrant::Middle;
-        }
-    }
+    float txmin, txmax, tymin, tymax, tzmin, tzmax;
+    txmin = (parameters[ray.x_sign].x - ray.origin.x) * ray.inv_direction.x;
+    txmax = (parameters[1-ray.x_sign].x - ray.origin.x) * ray.inv_direction.x;
+    tymin = (parameters[ray.y_sign].y - ray.origin.y) * ray.inv_direction.y;
+    tymax = (parameters[1-ray.y_sign].y - ray.origin.y) * ray.inv_direction.y;
 
-    if (inside) {
-        return true;
-    }
-
-    // Find the maximum intersection
-    int whichPlane;
-    bool minSet = false;
-    for (int i = 0; i < 3; ++i) {
-        float calcVal;
-        if (quadrant[i] != Quadrant::Middle && ray.direction[i] != 0.0f) {
-            calcVal = (candidatePlane[i] - ray.origin[i]) / ray.direction[i];
-        } else {
-            calcVal = -1.0f;
-        }
-
-        if (!minSet || calcVal < tval) {
-            if(tval > 0.0f)
-            {
-                tval = calcVal;
-                whichPlane = i;
-                minSet = true;
-            }
-        }
-    }
-
-    // If the intersection is behind the ray's origin, no intersection
-    if (!minSet)
+    if( (txmin > tymax) || (tymin > txmax) )
         return false;
+    if(tymin > txmin)
+        txmin = tymin;
+    if(tymax < txmax)
+        txmax = tymax;
 
-    // Perform the final check of the condidate.
-    for (int i = 0; i < 3; ++i) {
-        if (whichPlane != i) {
-            float coord = ray.origin[i] + tval * ray.direction[i];
-            if (coord < min[i] || coord > max[i])
-                return false;
-        }
-    }
+    tzmin = (parameters[ray.z_sign].z - ray.origin.z) * ray.inv_direction.z;
+    tzmax = (parameters[1-ray.z_sign].z - ray.origin.z) * ray.inv_direction.z;
 
-    return true;
+    if( (txmin > tzmax) || (tzmin > txmax) )
+        return false;
+    if(tzmin > txmin)
+        txmin = tzmin;
+    if(tzmax < txmax)
+        txmax = tzmax;
+
+    tval = txmax;
+    return (txmax > 0.0f);
 }
 
 glm::vec3 AABB::center() const

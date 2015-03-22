@@ -10,8 +10,7 @@ using namespace raytracer;
 void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
-    node = kdtree::create(shapes,
-                          kdtree::policies::CutInHalf<ShapePtr, AABB>(3, 20));
+    node = kdtree::create(shapes, kdtree::policies::CutInHalf<ShapePtr, AABB>(3, 20));
 
     std::vector<glm::vec3> points;
     kdtree::dump<ShapePtr, AABB>(node, [&](size_t depth, AABB& aabb, size_t dim, float split_val) {
@@ -62,8 +61,7 @@ void KDTreeSpatialIndex::find_closest_hit(
                 result.found_hit = false;
                 obj->test_hit(ray, result);
                 if (result.found_hit) {
-                    if (best_result.found_hit == false ||
-                        result.tval < best_result.tval) {
+                    if (best_result.found_hit == false || result.tval < best_result.tval) {
                         best_result = result;
                     }
                 }

@@ -65,6 +65,8 @@ void PinholeCamera::spawn_rays(
                     glm::normalize(inverseTransform * glm::vec4(pixelPt + glm::vec3(dis(gen), dis(gen), 0.0f), 0.0f))
                 );
 
+                r.update();
+
                 // Call the callback with the ray we found
                 spawn_callback(row, col, r);
             }

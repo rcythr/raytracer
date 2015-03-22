@@ -48,6 +48,8 @@ glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit)
 
             Ray shadow_ray{hit.intersection_point, S};
 
+            shadow_ray.update();
+
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
                 auto R = reflect(S, hit.intersection_normal);
@@ -64,6 +66,7 @@ glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit)
             auto S = glm::normalize(light->point - hit.intersection_point);
 
             Ray shadow_ray{hit.intersection_point, S};
+            shadow_ray.update();
             if(!kernel->spatial_index->has_hit(shadow_ray, hit.shape))
             {
                 auto R = reflect(S, hit.intersection_normal);
