@@ -2,8 +2,7 @@
 
 namespace point_kdtree {
 
-template <typename PointTy>
-struct KDNode {
+template <typename PointTy> struct KDNode {
     typedef PointTy point_type;
 
     PointTy data;
@@ -12,9 +11,10 @@ struct KDNode {
     KDNode() : left(nullptr), right(nullptr) {}
 
     ~KDNode() {
-        if (left != nullptr) delete left;
-        if (right != nullptr) delete right;
+        if (left != nullptr)
+            delete left;
+        if (right != nullptr)
+            delete right;
     }
 };
-
 }

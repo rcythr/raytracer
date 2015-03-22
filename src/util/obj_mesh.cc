@@ -7,19 +7,14 @@
 
 #include <fstream>
 
-void raytracer::loadObj(std::string filename, 
-                        glm::vec3 point, 
-                        glm::vec3 rotate,
-                        float scale,
-                        MaterialPtr material,
+void raytracer::loadObj(std::string filename, glm::vec3 point, glm::vec3 rotate,
+                        float scale, MaterialPtr material,
                         SpatialIndexPtr index) {
 
     // First construct the matrix to transform things into world space.
-    auto trans =  buildRotationZ(rotate.z) 
-                * buildRotationY(rotate.y) 
-                * buildRotationX(rotate.x) 
-                * buildTranslation(point)
-                * buildScale(scale);
+    auto trans = buildRotationZ(rotate.z) * buildRotationY(rotate.y) *
+                 buildRotationX(rotate.x) * buildTranslation(point) *
+                 buildScale(scale);
 
     std::ifstream strm(filename.c_str());
     std::vector<glm::vec3> points;
@@ -42,12 +37,13 @@ void raytracer::loadObj(std::string filename,
                         break;
                 }
                 auto pt = trans * glm::vec4(x, y, z, w);
-                points.push_back(glm::vec3(pt.x / pt.w, pt.y / pt.w, pt.z / pt.w));
+                points.push_back(
+                    glm::vec3(pt.x / pt.w, pt.y / pt.w, pt.z / pt.w));
             } else if (parts[0] == "f") {
                 index->insert(std::make_shared<Triangle>(
-                    points[std::stoi(parts[1])-1], glm::vec2(0.0f, 0.0f),
-                    points[std::stoi(parts[2])-1], glm::vec2(0.0f, 1.0f),
-                    points[std::stoi(parts[3])-1], glm::vec2(1.0f, 1.0f),
+                    points[std::stoi(parts[1]) - 1], glm::vec2(0.0f, 0.0f),
+                    points[std::stoi(parts[2]) - 1], glm::vec2(0.0f, 1.0f),
+                    points[std::stoi(parts[3]) - 1], glm::vec2(1.0f, 1.0f),
                     material));
             }
         }

@@ -10,43 +10,56 @@ using namespace raytracer;
 void KDTreeSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void KDTreeSpatialIndex::optimize() {
-    node = kdtree::create(shapes, kdtree::policies::CutInHalf<ShapePtr, AABB>(3, 20));
+    node = kdtree::create(shapes,
+                          kdtree::policies::CutInHalf<ShapePtr, AABB>(3, 20));
 
     std::vector<glm::vec3> points;
-    kdtree::dump<ShapePtr, AABB>(node, [&](size_t depth, AABB& aabb, size_t dim, float split_val) {
-        switch(dim)
-        {
-        case 0:
-            points.push_back(glm::vec3(split_val, aabb.min[1], aabb.min[2]));
-            points.push_back(glm::vec3(split_val, aabb.min[1], aabb.max[2]));
-            points.push_back(glm::vec3(split_val, aabb.max[1], aabb.max[2]));
-            points.push_back(glm::vec3(split_val, aabb.max[1], aabb.min[2]));
-            break;
-        case 1:
-            points.push_back(glm::vec3(aabb.min[0], split_val, aabb.min[2]));
-            points.push_back(glm::vec3(aabb.min[0], split_val, aabb.max[2]));
-            points.push_back(glm::vec3(aabb.max[0], split_val, aabb.max[2]));
-            points.push_back(glm::vec3(aabb.max[0], split_val, aabb.min[2]));
-            break;
-        case 2:
-            points.push_back(glm::vec3(aabb.min[0], aabb.min[1], split_val));
-            points.push_back(glm::vec3(aabb.min[0], aabb.max[1], split_val));
-            points.push_back(glm::vec3(aabb.max[0], aabb.max[1], split_val));
-            points.push_back(glm::vec3(aabb.max[0], aabb.min[1], split_val));
-            break;
-        }
-    });
+    kdtree::dump<ShapePtr, AABB>(
+        node, [&](size_t depth, AABB& aabb, size_t dim, float split_val) {
+            switch (dim) {
+                case 0:
+                    points.push_back(
+                        glm::vec3(split_val, aabb.min[1], aabb.min[2]));
+                    points.push_back(
+                        glm::vec3(split_val, aabb.min[1], aabb.max[2]));
+                    points.push_back(
+                        glm::vec3(split_val, aabb.max[1], aabb.max[2]));
+                    points.push_back(
+                        glm::vec3(split_val, aabb.max[1], aabb.min[2]));
+                    break;
+                case 1:
+                    points.push_back(
+                        glm::vec3(aabb.min[0], split_val, aabb.min[2]));
+                    points.push_back(
+                        glm::vec3(aabb.min[0], split_val, aabb.max[2]));
+                    points.push_back(
+                        glm::vec3(aabb.max[0], split_val, aabb.max[2]));
+                    points.push_back(
+                        glm::vec3(aabb.max[0], split_val, aabb.min[2]));
+                    break;
+                case 2:
+                    points.push_back(
+                        glm::vec3(aabb.min[0], aabb.min[1], split_val));
+                    points.push_back(
+                        glm::vec3(aabb.min[0], aabb.max[1], split_val));
+                    points.push_back(
+                        glm::vec3(aabb.max[0], aabb.max[1], split_val));
+                    points.push_back(
+                        glm::vec3(aabb.max[0], aabb.min[1], split_val));
+                    break;
+            }
+        });
 
     std::ofstream ss("kdout.obj");
     size_t o = 0;
-    for(size_t i=0; i < points.size(); i += 4, ++o)
-    {
+    for (size_t i = 0; i < points.size(); i += 4, ++o) {
         ss << "o obj" << o << '\n';
-        for(size_t j=0; j < 4; ++j)
-        {
-            ss << "v " << points[i+j].x << " " << points[i+j].y << " " << points[i+j].z << "\n";
+        for (size_t j = 0; j < 4; ++j) {
+            ss << "v " << points[i + j].x << " " << points[i + j].y << " "
+               << points[i + j].z << "\n";
         }
-        ss << "f " << (i+1) << ' ' << (i+2) << ' ' << (i+3) << ' ' << (i+4) << '\n';
+        ss << "f " << (i + 1) << ' ' << (i + 2) << ' ' << (i + 3) << ' '
+           << (i + 4) << '\n';
     }
     ss.close();
 }
@@ -61,7 +74,8 @@ void KDTreeSpatialIndex::find_closest_hit(
                 result.found_hit = false;
                 obj->test_hit(ray, result);
                 if (result.found_hit) {
-                    if (best_result.found_hit == false || result.tval < best_result.tval) {
+                    if (best_result.found_hit == false ||
+                        result.tval < best_result.tval) {
                         best_result = result;
                     }
                 }
@@ -75,19 +89,15 @@ void KDTreeSpatialIndex::find_closest_hit(
         });
 }
 
-bool KDTreeSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape)
-{
+bool KDTreeSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape) {
     bool result = false;
     kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
-        node, ray, [&] (std::vector<ShapePtr> possible_hits) -> bool {
+        node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
             HitResult hit;
-            for(auto obj : possible_hits)
-            {
-                if(obj != omit_shape)
-                {
+            for (auto obj : possible_hits) {
+                if (obj != omit_shape) {
                     obj->test_hit(ray, hit);
-                    if(hit.found_hit)
-                    {
+                    if (hit.found_hit) {
                         result = true;
                         return true;
                     }

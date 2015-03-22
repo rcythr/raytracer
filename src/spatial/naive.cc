@@ -27,20 +27,17 @@ void NaiveSpatialIndex::find_closest_hit(
     }
 }
 
-bool NaiveSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape)
-{
+bool NaiveSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape) {
     HitResult result;
-    for(auto obj : objects) {
-        if(obj != omit_shape)
-        {
+    for (auto obj : objects) {
+        if (obj != omit_shape) {
             obj->test_hit(ray, result);
-            if(result.found_hit)
+            if (result.found_hit)
                 return true;
         }
     }
     return false;
 }
-
 
 void NaiveSpatialIndex::view_all_objects(
     std::function<void(ShapePtr&)> functor) {

@@ -14,19 +14,18 @@
 
 namespace point_kdtree {
 
-template <typename PointTy, size_t K>
-struct PointKDTree {
+template <typename PointTy, size_t K> struct PointKDTree {
     KDNode<PointTy> *root;
 
     PointKDTree(std::vector<PointTy> &lst)
         : root(detail::construct<PointTy, K>(lst, 0)) {}
 
     ~PointKDTree() {
-        if (root) delete root;
+        if (root)
+            delete root;
     }
 
-    bool nearestNeighbor(PointTy p, PointTy& result) 
-    {
+    bool nearestNeighbor(PointTy p, PointTy &result) {
         return detail::nearestNeighbor<PointTy, K>(root, p, result);
     }
 
@@ -37,12 +36,13 @@ struct PointKDTree {
     }
 
     std::vector<PointTy> findAllInRange(PointTy pt, float range) {
-       std::vector<PointTy> result;
-       detail::findInRange<PointTy, K>(root, pt, range, result);
-       return result;
+        std::vector<PointTy> result;
+        detail::findInRange<PointTy, K>(root, pt, range, result);
+        return result;
     }
 
-    void iterate(IterationOrder order, std::function<void(PointTy &, size_t)> func) {
+    void iterate(IterationOrder order,
+                 std::function<void(PointTy &, size_t)> func) {
         detail::iterate<PointTy, K>(root, func, order, 0);
     }
 };

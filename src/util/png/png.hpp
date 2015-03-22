@@ -6,18 +6,15 @@
 
 namespace raytracer {
 
-enum class TextureFormat {
-    RGB,
-    RGBA
-};
+enum class TextureFormat { RGB, RGBA };
 
 struct PNGTexture {
-    
+
     PNGTexture() : data(nullptr) {}
 
-    ~PNGTexture() { 
-        if(data != nullptr)
-            delete data; 
+    ~PNGTexture() {
+        if (data != nullptr)
+            delete data;
     }
 
     void load(std::string filename);
@@ -30,5 +27,4 @@ struct PNGTexture {
     glm::vec3 get_rgb(size_t row, size_t col);
     glm::vec4 get_rgba(size_t row, size_t col);
 };
-
 }

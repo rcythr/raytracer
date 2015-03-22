@@ -3,9 +3,7 @@
 namespace point_kdtree {
 namespace detail {
 
-template<typename PointTy, size_t K>
-struct NNConfig
-{
+template <typename PointTy, size_t K> struct NNConfig {
     NNConfig(PointTy& test) : test(test), has_guess(false) {}
 
     PointTy& test;
@@ -16,8 +14,7 @@ struct NNConfig
 
     float distance(PointTy& val) {
         float d = 0;
-        for(size_t i=0; i < K; ++i)
-        {
+        for (size_t i = 0; i < K; ++i) {
             d += pow(val[i] - test[i], 2);
         }
         return sqrt(d);
@@ -25,7 +22,7 @@ struct NNConfig
 
     void consider(PointTy& val) {
         float ptDist = distance(val);
-        if(!has_guess || ptDist < bestDist) {
+        if (!has_guess || ptDist < bestDist) {
             guess = val;
             bestDist = ptDist;
             has_guess = true;
@@ -33,44 +30,42 @@ struct NNConfig
     }
 };
 
-template<typename PointTy, size_t K>
-void nearestNeighborRec(NNConfig<PointTy, K>& cfg, KDNode<PointTy>* node, size_t dim=0) {
-    if(node == nullptr)
+template <typename PointTy, size_t K>
+void nearestNeighborRec(NNConfig<PointTy, K>& cfg, KDNode<PointTy>* node,
+                        size_t dim = 0) {
+    if (node == nullptr)
         return;
 
-    if(dim == K)
+    if (dim == K)
         dim = 0;
 
     // Consider the current point
     cfg.consider(node->data);
 
     // Now check the children, as needed.
-    if(cfg.test[dim] < node->data[dim]) {
+    if (cfg.test[dim] < node->data[dim]) {
         nearestNeighborRec(cfg, node->left, dim + 1);
-        if(abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist)
-        {
+        if (abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
             nearestNeighborRec(cfg, node->right, dim + 1);
         }
     } else {
         nearestNeighborRec(cfg, node->right, dim + 1);
-        if(abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist)
-        {
+        if (abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
             nearestNeighborRec(cfg, node->left, dim + 1);
         }
     }
 }
 
-template<typename PointTy, size_t K>
+template <typename PointTy, size_t K>
 bool nearestNeighbor(KDNode<PointTy>* node, PointTy test, PointTy& result) {
     NNConfig<PointTy, K> cfg(test);
     nearestNeighborRec(cfg, node);
-    if(cfg.has_guess) {
+    if (cfg.has_guess) {
         result = cfg.guess;
         return true;
     } else {
         return false;
     }
 }
-
 }
 }

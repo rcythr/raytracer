@@ -22,7 +22,8 @@ Kernel::Kernel() {
         // General
         { "general", [this](ParamMap& params) {
             verbose = extractBool(params, "verbose", true);
-            background_color = extractVec3(params, "background_color", glm::vec3(0, 0, 0));
+            background_color =
+                extractVec3(params, "background_color", glm::vec3(0, 0, 0));
             num_threads =
                 extractInt(params, "num_threads",
                            std::max(std::thread::hardware_concurrency(), 1u));
@@ -74,15 +75,15 @@ Kernel::Kernel() {
 
         { "directional", [this](ParamMap& params) {
             lights.push_back(std::make_shared<DirectionalLight>(
-                glm::normalize(extractVec3(params, "direction", glm::vec3(1.0f, 1.0f, 1.f))),
+                glm::normalize(extractVec3(params, "direction",
+                                           glm::vec3(1.0f, 1.0f, 1.f))),
                 lookup_color(extractString(params, "color", ""))));
         } },
 
-        { "point", [this] (ParamMap& params) {
+        { "point", [this](ParamMap& params) {
             lights.push_back(std::make_shared<PointLight>(
                 extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f)),
-                lookup_color(extractString(params, "color", ""))
-            ));
+                lookup_color(extractString(params, "color", ""))));
         } },
 
         // Color
@@ -97,23 +98,21 @@ Kernel::Kernel() {
         { "phong", [this](ParamMap& params) {
             std::string name = extractString(params, "name", "");
 
-            auto material = std::make_shared<Phong>(
-                    extractFloat(params, "ka", 0.30f),
-                    extractFloat(params, "kd", 0.50f),
-                    extractFloat(params, "ks", 0.20f),
-                    extractFloat(params, "ke", 50.00f));
-        
+            auto material =
+                std::make_shared<Phong>(extractFloat(params, "ka", 0.30f),
+                                        extractFloat(params, "kd", 0.50f),
+                                        extractFloat(params, "ks", 0.20f),
+                                        extractFloat(params, "ke", 50.00f));
+
             last_material = material;
 
-            materials.insert(std::make_pair(
-                std::move(name),
-                material
-            ));
+            materials.insert(std::make_pair(std::move(name), material));
         } },
 
         // Samplers
         { "solid", [this](ParamMap& params) {
-            last_material->sampler = std::make_shared<SolidSampler>(lookup_color(extractString(params, "color", "")));
+            last_material->sampler = std::make_shared<SolidSampler>(
+                lookup_color(extractString(params, "color", "")));
         } },
 
         { "checkered", [this](ParamMap& params) {
@@ -128,7 +127,7 @@ Kernel::Kernel() {
                 extractFloat(params, "ring_size", 0.1f),
                 lookup_color(extractString(params, "color1", "")),
                 lookup_color(extractString(params, "color2", "")));
-        }},
+        } },
 
         { "rainbow", [this](ParamMap& params) {
             last_material->sampler = std::make_shared<RainbowSampler>(
@@ -140,8 +139,9 @@ Kernel::Kernel() {
             auto texture = std::unique_ptr<PNGTexture>(new PNGTexture());
             texture->load(extractString(params, "filename", ""));
 
-            last_material->sampler = std::make_shared<PNGTextureSampler>( std::move(texture) );
-        }},
+            last_material->sampler =
+                std::make_shared<PNGTextureSampler>(std::move(texture));
+        } },
 
         // Shapes
         { "sphere", [this](ParamMap& params) {
@@ -171,14 +171,15 @@ Kernel::Kernel() {
                 extractVec3(params, "p1", glm::vec3(0.0f, 0.0f, 0.0f)),
                 extractVec2(params, "uv1", glm::vec2(0.0f, 0.0f)),
                 extractVec3(params, "p2", glm::vec3(0.0f, 0.0f, 0.0f)),
-                extractVec2(params, "uv2", glm::vec2(0.0f, 0.0f)),
-                material));
+                extractVec2(params, "uv2", glm::vec2(0.0f, 0.0f)), material));
         } },
 
         { "obj_mesh", [this](ParamMap& params) {
 
-            auto point = extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f));
-            auto rotate = extractVec3(params, "rotate", glm::vec3(0.0f, 0.0f, 0.0f));
+            auto point =
+                extractVec3(params, "point", glm::vec3(0.0f, 0.0f, 0.0f));
+            auto rotate =
+                extractVec3(params, "rotate", glm::vec3(0.0f, 0.0f, 0.0f));
             auto scale = extractFloat(params, "scale", 1.0f);
 
             auto materialName = extractString(params, "material", "");
@@ -188,8 +189,8 @@ Kernel::Kernel() {
                           << "' not found!" << std::endl;
             }
 
-            loadObj(extractString(params, "filename", ""), point, rotate, scale, material,
-                    spatial_index);
+            loadObj(extractString(params, "filename", ""), point, rotate, scale,
+                    material, spatial_index);
         } }
     };
 }

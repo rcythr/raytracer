@@ -12,7 +12,7 @@ PointTy select(std::vector<PointTy> &lst, size_t dim, size_t indx) {
     for (auto &pt : lst) {
         if (pt[dim] < pivot[dim])
             smaller.push_back(pt);
-        else if(pivot[dim] < pt[dim])
+        else if (pivot[dim] < pt[dim])
             larger.push_back(pt);
     }
 
@@ -31,7 +31,7 @@ PointTy findMedian(std::vector<PointTy> &lst, size_t dim) {
 }
 
 template <typename PointTy, size_t K>
-KDNode<PointTy>* construct(std::vector<PointTy> lst, size_t dim = 0) {
+KDNode<PointTy> *construct(std::vector<PointTy> lst, size_t dim = 0) {
     auto result = new KDNode<PointTy>();
 
     // Base case: If we have exactly 1 item we're done.
@@ -39,13 +39,14 @@ KDNode<PointTy>* construct(std::vector<PointTy> lst, size_t dim = 0) {
         result->data = lst[0];
     } else {
         // Adjust the dim. This avoids modulo division.
-        if (dim == K) dim = 0;
+        if (dim == K)
+            dim = 0;
 
         auto median = detail::findMedian<PointTy>(lst, dim);
 
         std::vector<PointTy> left, right;
         for (auto &ele : lst) {
-            if(ele == median)
+            if (ele == median)
                 continue;
 
             if (ele[dim] < median[dim]) {
@@ -66,6 +67,5 @@ KDNode<PointTy>* construct(std::vector<PointTy> lst, size_t dim = 0) {
     }
     return result;
 }
-
 }
 }

@@ -29,9 +29,8 @@ struct HitResult {
         this->shape = nullptr;
     }
 
-    void hit(std::shared_ptr<Shape> shape, float tval,
-             float u, float v,
-             glm::vec3 intersection_point, glm::vec3 intersection_normal, 
+    void hit(std::shared_ptr<Shape> shape, float tval, float u, float v,
+             glm::vec3 intersection_point, glm::vec3 intersection_normal,
              Ray incoming_ray) {
         this->found_hit = true;
         this->shape = shape;

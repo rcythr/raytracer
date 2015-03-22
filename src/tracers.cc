@@ -17,21 +17,23 @@ void raytracer::checkpoint1(Kernel* kernel, CameraPtr camera) {
     ThreadPool tp(kernel->num_threads);
 
     // Give the camera a function to call on each ray it generates.
-    camera->spawn_rays([&](size_t row, size_t col, Ray& ray) { 
+    camera->spawn_rays([&](size_t row, size_t col, Ray& ray) {
         tp.enqueue([=]() {
             bool hit_found = false;
 
-            kernel->spatial_index->find_closest_hit(ray, [=,&hit_found](HitResult& hit) {
-                camera->view_plane->set_pixel(row, col, hit.shape->material->get_color(kernel, hit));
-                hit_found = true;
-            });
+            kernel->spatial_index->find_closest_hit(
+                ray, [=, &hit_found](HitResult& hit) {
+                    camera->view_plane->set_pixel(
+                        row, col, hit.shape->material->get_color(kernel, hit));
+                    hit_found = true;
+                });
 
-            if(!hit_found) {
-                camera->view_plane->set_pixel(row, col, kernel->background_color);
+            if (!hit_found) {
+                camera->view_plane->set_pixel(row, col,
+                                              kernel->background_color);
             }
 
-            if(col == 0)
-            {
+            if (col == 0) {
                 std::cout << "\rCurrent Row = " << row << "            ";
             }
         });

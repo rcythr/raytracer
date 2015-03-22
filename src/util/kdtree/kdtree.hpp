@@ -44,10 +44,10 @@ struct KDNodeLeaf : public KDNode<T, AABBTy> {
 };
 
 template <typename PolicyTy>
-KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create_rec(
-    std::vector<typename PolicyTy::value_type> shapes,
-    typename PolicyTy::aabb_type bounds, PolicyTy policy, size_t dim = 0,
-    size_t depth = 0) {
+KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type>
+create_rec(std::vector<typename PolicyTy::value_type> shapes,
+           typename PolicyTy::aabb_type bounds, PolicyTy policy, size_t dim = 0,
+           size_t depth = 0) {
     typedef typename PolicyTy::value_type T;
     typedef typename PolicyTy::aabb_type AABBTy;
 
@@ -74,12 +74,10 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create_re
     // Separate our objects into left and right sides.
     std::vector<T> lhs, rhs;
     for (auto& shape : shapes) {
-        if(shape->test_hit(lhs_bound))
-        {
+        if (shape->test_hit(lhs_bound)) {
             lhs.push_back(shape);
         }
-        if(shape->test_hit(rhs_bound))
-        {
+        if (shape->test_hit(rhs_bound)) {
             rhs.push_back(shape);
         }
     }
@@ -88,7 +86,8 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create_re
     auto right = create_rec(rhs, rhs_bound, policy, split_dim, depth + 1);
 
     // Create the node recursively
-    return std::make_shared<KDNodeInner<T, AABBTy> >( bounds, split_dim, split_val, left, right);
+    return std::make_shared<KDNodeInner<T, AABBTy> >(bounds, split_dim,
+                                                     split_val, left, right);
 }
 
 template <typename PolicyTy>
@@ -103,13 +102,14 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
             acc = acc + shapes[i]->get_aabb();
         }
 
-        // Adjust the bounding box to contain a little extra space than the actual object extents.
+        // Adjust the bounding box to contain a little extra space than the
+        // actual object extents.
         acc.min.x -= 2.5f;
         acc.min.y -= 2.5f;
         acc.min.z -= 2.5f;
-        acc.max.x += 2.5f; 
-        acc.max.y += 2.5f; 
-        acc.max.z += 2.5f; 
+        acc.max.x += 2.5f;
+        acc.max.y += 2.5f;
+        acc.max.z += 2.5f;
 
         return create_rec(shapes, acc, policy);
     }
@@ -119,9 +119,8 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
 template <typename T, typename AABBTy, typename RayTy>
 bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
                       std::function<bool(std::vector<T>)> confirm_hit) {
-    if(node->type == Type::INNER)
-    {
-        auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy>>(node);
+    if (node->type == Type::INNER) {
+        auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy> >(node);
 
         float left_t;
         bool left_hit = inner->left->bounds.test_hit(ray, left_t);
@@ -129,51 +128,42 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
         float right_t;
         bool right_hit = inner->right->bounds.test_hit(ray, right_t);
 
-        if(left_hit && right_hit)
-        {
-            if(left_t < right_t)
-            {
-                if(find_closest_hit(inner->left, ray, confirm_hit))
+        if (left_hit && right_hit) {
+            if (left_t < right_t) {
+                if (find_closest_hit(inner->left, ray, confirm_hit))
                     return true;
-                if(find_closest_hit(inner->right, ray, confirm_hit))
+                if (find_closest_hit(inner->right, ray, confirm_hit))
+                    return true;
+            } else {
+                if (find_closest_hit(inner->right, ray, confirm_hit))
+                    return true;
+                if (find_closest_hit(inner->left, ray, confirm_hit))
                     return true;
             }
-            else
-            {
-                if(find_closest_hit(inner->right, ray, confirm_hit))
-                    return true;
-                if(find_closest_hit(inner->left, ray, confirm_hit))
-                    return true;
-                
-            }
-        }
-        else if(left_hit)
-        {
+        } else if (left_hit) {
             return find_closest_hit(inner->left, ray, confirm_hit);
-        }
-        else if(right_hit)
-        {
+        } else if (right_hit) {
             return find_closest_hit(inner->right, ray, confirm_hit);
         }
         return false;
-    }
-    else //Type::LEAF
+    } else // Type::LEAF
     {
-        // Simply determine if a hit appears in this objectlist. If it does, we're done.
-        auto leaf = std::static_pointer_cast<KDNodeLeaf<T, AABBTy>>(node);
+        // Simply determine if a hit appears in this objectlist. If it does,
+        // we're done.
+        auto leaf = std::static_pointer_cast<KDNodeLeaf<T, AABBTy> >(node);
         return confirm_hit(leaf->objects);
     }
 }
 
-template<typename T, typename AABBTy>
-void dump(KDNodePtr<T, AABBTy>& node, std::function<void(size_t,AABBTy&,size_t, float)> dump_fun, size_t depth=0)
-{
-    if(node->type == Type::INNER)
-    {
-        auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy>>(node);
+template <typename T, typename AABBTy>
+void dump(KDNodePtr<T, AABBTy>& node,
+          std::function<void(size_t, AABBTy&, size_t, float)> dump_fun,
+          size_t depth = 0) {
+    if (node->type == Type::INNER) {
+        auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy> >(node);
         dump_fun(depth, inner->bounds, inner->dim, inner->split_val);
-        dump(inner->left, dump_fun, depth+1);
-        dump(inner->right, dump_fun, depth+1);
+        dump(inner->left, dump_fun, depth + 1);
+        dump(inner->right, dump_fun, depth + 1);
     }
 }
 
@@ -206,7 +196,7 @@ template <typename T, typename AABBTy> struct CutInHalf {
     size_t max_depth;
 };
 
-template<typename T, typename AABBTy> struct BestSplit {
+template <typename T, typename AABBTy> struct BestSplit {
     enum class TokenType { Open, Close };
 
     struct Token {
@@ -215,11 +205,11 @@ template<typename T, typename AABBTy> struct BestSplit {
         float cost;
         float value;
 
-        float get_cost() const { return (type == TokenType::Open) ? cost : -cost; }
-
-        bool operator<(const Token& other) const {
-            return value < other.value;
+        float get_cost() const {
+            return (type == TokenType::Open) ? cost : -cost;
         }
+
+        bool operator<(const Token& other) const { return value < other.value; }
     };
 
     typedef T value_type;
@@ -234,19 +224,19 @@ template<typename T, typename AABBTy> struct BestSplit {
 
     std::tuple<size_t, float> partition(std::vector<T>& shapes, AABBTy& bounds,
                                         size_t dim) {
-        // First we need to break the shapes into start and end 'tokens' for each dim.
+        // First we need to break the shapes into start and end 'tokens' for
+        // each dim.
         std::vector<Token> x_tokens, y_tokens, z_tokens;
 
         size_t num_shapes = shapes.size();
-        for(size_t i=0; i < num_shapes; ++i)
-        {
+        for (size_t i = 0; i < num_shapes; ++i) {
             auto& aabb = shapes[i]->get_aabb();
-            x_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.x});
-            x_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.x});
-            y_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.y});
-            y_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.y});
-            z_tokens.push_back(Token{TokenType::Open , i, 1.0f, aabb.min.z});
-            z_tokens.push_back(Token{TokenType::Close, i, 1.0f, aabb.max.z});
+            x_tokens.push_back(Token{ TokenType::Open, i, 1.0f, aabb.min.x });
+            x_tokens.push_back(Token{ TokenType::Close, i, 1.0f, aabb.max.x });
+            y_tokens.push_back(Token{ TokenType::Open, i, 1.0f, aabb.min.y });
+            y_tokens.push_back(Token{ TokenType::Close, i, 1.0f, aabb.max.y });
+            z_tokens.push_back(Token{ TokenType::Open, i, 1.0f, aabb.min.z });
+            z_tokens.push_back(Token{ TokenType::Close, i, 1.0f, aabb.max.z });
         }
 
         // Now we want to find the best candidate for each dim.
@@ -255,29 +245,24 @@ template<typename T, typename AABBTy> struct BestSplit {
 
         float best_y_loc, y_abs_diff;
         std::tie(best_y_loc, y_abs_diff) = find_best_candidate(y_tokens);
-        
+
         float best_z_loc, z_abs_diff;
         std::tie(best_z_loc, z_abs_diff) = find_best_candidate(z_tokens);
 
         // Now we have to compare the 3 abs_diffs to find the smallest.
-        if(x_abs_diff <= y_abs_diff)
-        {
-            if(x_abs_diff <= z_abs_diff)
-            {
+        if (x_abs_diff <= y_abs_diff) {
+            if (x_abs_diff <= z_abs_diff) {
                 return std::tuple<size_t, float>(0, best_x_loc);
             }
-        }
-        else
-        {
-            if(y_abs_diff <= z_abs_diff)
-            {
+        } else {
+            if (y_abs_diff <= z_abs_diff) {
                 return std::tuple<size_t, float>(1, best_y_loc);
             }
         }
         return std::tuple<size_t, float>(2, best_z_loc);
     }
 
-private:
+  private:
     size_t max_per_leaf;
     size_t max_depth;
 
@@ -291,49 +276,49 @@ private:
         std::sort(tokens.begin(), tokens.end());
 
         // Calculate our prefix and postfix sums of cost.
-        std::vector<float> prefix_cost(num_tokens+1);
+        std::vector<float> prefix_cost(num_tokens + 1);
         prefix_cost[0] = 0.0f;
-        for(size_t i=0; i < num_tokens; ++i)
-            prefix_cost[i+1] = prefix_cost[i] + tokens[i].get_cost();
+        for (size_t i = 0; i < num_tokens; ++i)
+            prefix_cost[i + 1] = prefix_cost[i] + tokens[i].get_cost();
 
-        std::vector<float> postfix_cost(num_tokens+1);
+        std::vector<float> postfix_cost(num_tokens + 1);
         postfix_cost[num_tokens] = 0.0f;
-        for(size_t i=num_tokens; i > 0; --i)
-            postfix_cost[i-1] = postfix_cost[i] + tokens[i-1].get_cost();
+        for (size_t i = num_tokens; i > 0; --i)
+            postfix_cost[i - 1] = postfix_cost[i] + tokens[i - 1].get_cost();
 
-        // If token's size is N then there are N+1 **distinct** partition planes.
-        for(size_t i=0; i < num_tokens+1; ++i)
-        {
+        // If token's size is N then there are N+1 **distinct** partition
+        // planes.
+        for (size_t i = 0; i < num_tokens + 1; ++i) {
             float location, abs_cost;
-            if(i == 0) // First Plane
+            if (i == 0) // First Plane
             {
-                location = tokens[i].value - 0.0001f; // Just a little bit left of the first object.
-            }
-            else if(i == num_tokens-1) //Last Plane
+                location =
+                    tokens[i].value -
+                    0.0001f; // Just a little bit left of the first object.
+            } else if (i == num_tokens - 1) // Last Plane
             {
-                location = tokens[i].value + 0.0001f; // Just a little bit right of the first object.
-            }
-            else // General Case
+                location =
+                    tokens[i].value +
+                    0.0001f; // Just a little bit right of the first object.
+            } else           // General Case
             {
-                location = (tokens[i].value + tokens[i-1].value) / 2.0f;
+                location = (tokens[i].value + tokens[i - 1].value) / 2.0f;
             }
 
             // Calculate the cost difference between left and right sides.
             abs_cost = std::abs(prefix_cost[i] - postfix_cost[i]);
-            
+
             // We want the lowest difference.
-            if(!found_best || abs_cost < best_abs_cost)
-            {
+            if (!found_best || abs_cost < best_abs_cost) {
                 best_location = location;
                 best_abs_cost = abs_cost;
                 found_best = true;
             }
         }
-        
+
         // Return what we found.
         return std::tuple<float, float>(best_location, best_abs_cost);
     }
-
 };
 }
 }

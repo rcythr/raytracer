@@ -9,7 +9,8 @@ namespace detail {
 template <typename PointTy, size_t K>
 void iterate(KDNode<PointTy> *node, std::function<void(PointTy &, size_t)> func,
              IterationOrder order, int depth = 0) {
-    if (node == nullptr) return;
+    if (node == nullptr)
+        return;
 
     switch (order) {
         case IterationOrder::PRE_ORDER:
@@ -29,6 +30,5 @@ void iterate(KDNode<PointTy> *node, std::function<void(PointTy &, size_t)> func,
             break;
     }
 }
-
 }
 }

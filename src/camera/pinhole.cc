@@ -59,11 +59,11 @@ void PinholeCamera::spawn_rays(
         for (size_t col = 0; col < num_cols; ++col) {
             // Calculate the direction of the ray
 
-            for(size_t i=0; i < num_samples; ++i)
-            {
-                r.direction = glm::vec3(
-                    glm::normalize(inverseTransform * glm::vec4(pixelPt + glm::vec3(dis(gen), dis(gen), 0.0f), 0.0f))
-                );
+            for (size_t i = 0; i < num_samples; ++i) {
+                r.direction = glm::vec3(glm::normalize(
+                    inverseTransform *
+                    glm::vec4(pixelPt + glm::vec3(dis(gen), dis(gen), 0.0f),
+                              0.0f)));
 
                 r.update();
 

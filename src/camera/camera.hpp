@@ -16,14 +16,15 @@ struct Light;
 struct ViewPlane;
 
 struct Camera {
-    
+
     /**
      * Virtual destructor
      */
     virtual ~Camera() {}
 
     /**
-     * Constructs a matrix to transform points and vectors from world space into camera space.
+     * Constructs a matrix to transform points and vectors from world space into
+     * camera space.
      */
     virtual glm::mat4 build_transform_mat() = 0;
 
@@ -33,9 +34,11 @@ struct Camera {
     virtual std::string toString(size_t depth = 0) = 0;
 
     /**
-     * Spawns rays according to the camera's location and calls the given function
+     * Spawns rays according to the camera's location and calls the given
+     * function
      *   for each ray with (row, col, ray) information.
-     * @param spawn_callback the function to call for each ray with row, col, and the ray.
+     * @param spawn_callback the function to call for each ray with row, col,
+     * and the ray.
      */
     virtual void spawn_rays(
         std::function<void(size_t, size_t, Ray&)> spawn_callback) = 0;

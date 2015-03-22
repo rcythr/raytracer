@@ -5,11 +5,7 @@
 namespace raytracer {
 
 struct PointLight : public Light {
-    PointLight(glm::vec3 point, glm::vec3 color)
-        : Light(color)
-        , point(point)
-    {
-    }
+    PointLight(glm::vec3 point, glm::vec3 color) : Light(color), point(point) {}
 
     virtual std::string toString(size_t depth = 0) override;
 
@@ -17,6 +13,4 @@ struct PointLight : public Light {
 
     glm::vec3 point;
 };
-
 }
-
