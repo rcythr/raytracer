@@ -36,7 +36,11 @@ struct PointKDTree {
         return result;
     }
 
-    //std::vector<PointTy> findAllInRange(PointTy pt, PointTy range) {}
+    std::vector<PointTy> findAllInRange(PointTy pt, float range) {
+       std::vector<PointTy> result;
+       detail::findInRange<PointTy, K>(root, pt, range, result);
+       return result;
+    }
 
     void iterate(IterationOrder order, std::function<void(PointTy &, size_t)> func) {
         detail::iterate<PointTy, K>(root, func, order, 0);

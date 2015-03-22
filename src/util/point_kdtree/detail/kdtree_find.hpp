@@ -5,7 +5,7 @@ namespace point_kdtree {
 namespace detail {
 
 template<typename PointTy, size_t K>
-void findInRange(KDNode<PointTy> *node, PointTy test, float range, std::vector<std::tuple<PointTy, float>> & result, size_t dim=0) {
+void findInRange(KDNode<PointTy> *node, PointTy& test, float range, std::vector<PointTy> & result, size_t dim=0) {
     if(node == nullptr)
         return;
 
@@ -16,13 +16,13 @@ void findInRange(KDNode<PointTy> *node, PointTy test, float range, std::vector<s
 
     if(abs(distance) <= range) {
         // Check both + Add Point
-        result.push_back(std::tuple<PointTy, float>(node->data, distance));
-        findInRange(node->left, test, range, result, dim + 1);
-        findInRange(node->right, test, range, result, dim + 1);
+        result.push_back(node->data);
+        findInRange<PointTy, K>(node->left, test, range, result, dim + 1);
+        findInRange<PointTy, K>(node->right, test, range, result, dim + 1);
     } else if(distance > 0) {
-        findInRange(node->left, test, range, result, dim + 1);
+        findInRange<PointTy, K>(node->left, test, range, result, dim + 1);
     } else if(distance < 0) {
-        findInRange(node->right, test, range, result, dim + 1);
+        findInRange<PointTy, K>(node->right, test, range, result, dim + 1);
     }
 }
 
