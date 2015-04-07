@@ -7,7 +7,7 @@
 namespace raytracer {
 
 struct AmbientLight : public Light {
-    AmbientLight(glm::vec3 color) : Light(color) {}
+    AmbientLight(float intensity, glm::vec3 color) : Light(intensity, color) {}
 
     ~AmbientLight() override {}
 

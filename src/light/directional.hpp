@@ -7,8 +7,8 @@
 namespace raytracer {
 
 struct DirectionalLight : public Light {
-    DirectionalLight(glm::vec3 direction, glm::vec3 color)
-        : Light(color), direction(direction) {}
+    DirectionalLight(float intensity, glm::vec3 direction, glm::vec3 color)
+        : Light(intensity, color), direction(direction) {}
 
     ~DirectionalLight() override {}
 

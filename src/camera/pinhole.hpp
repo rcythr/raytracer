@@ -19,9 +19,10 @@ struct PinholeCamera : public Camera {
      * @param view_distance the distance between the camera point and the
      * viewplane.
      */
-    PinholeCamera(float pixel_size, int num_samples, glm::vec3 point,
+    PinholeCamera(float pixel_size, int num_samples, int num_bounces, glm::vec3 point,
                   glm::vec3 up, glm::vec3 look_at, float view_distance)
         : num_samples(num_samples),
+          num_bounces(num_bounces),
           pixel_size(pixel_size),
           view_distance(view_distance),
           point(point),
@@ -37,8 +38,10 @@ struct PinholeCamera : public Camera {
 
     std::string toString(size_t depth) override;
 
+    size_t get_num_bounces() override { return num_bounces; }
+    
   private:
-    int num_samples;
+    int num_samples, num_bounces;
     float pixel_size, view_distance;
     glm::vec3 point, up, look_at;
 };

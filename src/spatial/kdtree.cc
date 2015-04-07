@@ -65,12 +65,15 @@ void KDTreeSpatialIndex::optimize() {
 }
 
 void KDTreeSpatialIndex::find_closest_hit(
-    const Ray& ray, std::function<void(HitResult&)> hit_callback) {
+    const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape) {
     kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
         node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
             HitResult best_result;
             HitResult result;
             for (auto obj : possible_hits) {
+                if(obj == omit_shape)
+                    continue;
+
                 result.found_hit = false;
                 obj->test_hit(ray, result);
                 if (result.found_hit) {

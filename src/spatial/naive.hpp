@@ -11,8 +11,7 @@ struct NaiveSpatialIndex : public SpatialIndex {
   public:
     void insert(ShapePtr ptr) override;
 
-    void find_closest_hit(
-        const Ray& ray, std::function<void(HitResult&)> hit_callback) override;
+    void find_closest_hit(const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape = nullptr) override;
 
     bool has_hit(Ray& ray, ShapePtr omit_shape) override;
 

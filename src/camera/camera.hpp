@@ -44,6 +44,11 @@ struct Camera {
         std::function<void(size_t, size_t, Ray&)> spawn_callback) = 0;
 
     /**
+     * Returns the number of bounces that should be used before stopping.
+     */
+    virtual size_t get_num_bounces() = 0;
+
+    /**
      * The view plane object that this camera should render to.
      */
     std::shared_ptr<ViewPlane> view_plane;

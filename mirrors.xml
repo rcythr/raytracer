@@ -1,0 +1,125 @@
+<general
+    background_color="0.0 0.0 0.0"
+    verbose="false" />
+
+<!-- Front View --!>
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    num_bounces="1"
+    eye="30 -5 39"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="100">
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="mirror.ppm" />
+</pinhole>
+
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    num_bounces="2"
+    eye="30 -5 39"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="100">
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="mirror1.ppm" />
+</pinhole>
+
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    num_bounces="3"
+    eye="30 -5 39"
+    up="0 1 0"
+    look_at="0 0 0"
+    view_distance="100">
+    <ppm_viewplane
+        hres="800"
+        vres="600"
+        filename="mirror2.ppm" />
+</pinhole>
+
+<colors>
+    <color name="red" value="1 0 0" />
+    <color name="yellow" value="1 1 0" />
+    <color name="black" value="0 0 0" />
+    <color name="white" value="1 1 1" />
+</colors>
+
+<lights>
+    <point intensity="1000.0" color="white" point="0 0 39" />
+</lights>
+
+<materials>
+    <phong 
+        name="ball_material"
+        ka="0.2"
+        kd="0.8"
+        ks="0.2" ke="50.0"
+        kr="0"
+        kt="0" ki="0">
+        <checkered
+            color1="red"
+            color2="yellow"
+            size="0.1" />
+    </phong>
+
+    <phong 
+        name="mirror_material" 
+        ka="0.1"
+        kd="0.2" 
+        ks="0.1" ke="100"
+        kr="0.5"
+        kt="0.0" ki="0.0">
+        <solid color="white" />
+    </phong>
+</materials>
+    
+<kdtree_index>
+    <triangle
+        p0="38 -38 -40" uv0="0 0"
+        p1="-38 38 -40" uv1="1 0"
+        p2="-38 -38 -40" uv2="1 1"
+        material="mirror_material" />
+
+    <triangle
+        p0="38 -38 -40" uv0="0 0"
+        p1="38 38 -40" uv1="0 1"
+        p2="-38 38 -40" uv2="1 1"
+        material="mirror_material" />
+    
+    <triangle
+        p0="38 40 -38" uv0="0 0"
+        p1="38 40 38" uv1="1 0"
+        p2="-38 40 38" uv2="1 1"
+        material="mirror_material" />
+
+    <triangle
+        p0="38 40 -38" uv0="0 0"
+        p1="-38 40 38" uv1="0 1"
+        p2="-38 40 -38" uv2="1 1"
+        material="mirror_material" />
+
+    <triangle
+        p0="-40 38 -38" uv0="0 0"
+        p1="-40 38 38" uv1="1 0"
+        p2="-40 -38 38" uv2="1 1"
+        material="mirror_material" />
+
+    <triangle
+        p0="-40 38 -38" uv0="0 0"
+        p1="-40 -38 38" uv1="0 1"
+        p2="-40 -38 -38" uv2="1 1"
+        material="mirror_material" />
+
+    <sphere
+        point="0 0 0"
+        radius="10"
+        material="ball_material" />
+</kdtree_index>

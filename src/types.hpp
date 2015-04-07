@@ -28,5 +28,3 @@
 
 #include "view_plane/view_plane.hpp"
 #include "view_plane/ppm.hpp"
-
-#include "tracers.hpp"

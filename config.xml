@@ -1,12 +1,13 @@
 <general
-    num_threads="1"
+    background_color0="0 0 0"
     background_color="0.675 0.843 0.898"
     verbose="false" />
 
 <!-- Front View --!>
 <pinhole
     pixel_size="0.30"
-    num_samples="1"
+    num_samples="5"
+    num_bounces="5"
     eye="0 0 60"
     up="0 1 0"
     look_at="0 0 0"
@@ -22,7 +23,8 @@
 <!-- Side View --!>
 <pinhole
     pixel_size="0.30"
-    num_samples="1"
+    num_samples="5"
+    num_bounces="5"
     eye="-60 0 0"
     up="0 1 0"
     look_at="0 0 0"
@@ -38,7 +40,8 @@
 <!-- Top View --!>
 <pinhole
     pixel_size="0.30"
-    num_samples="1"
+    num_samples="5"
+    num_bounces="5"
     eye="0 -60 0"
     up="0 0 -1"
     look_at="0 0 0"
@@ -62,32 +65,44 @@
 </colors>
 
 <lights>
-    <ambient color="white" />
-    <point color="white" point="0 -50 0" />
+    <point intensity="1000.0" color="white" point="0 -50 0" />
+    <ambient intensity="1000.0" color="white" />
 </lights>
 
 <materials>
-    <phong name="white" >
+    <phong 
+        name="white_r0.8"
+        ka="0.3" 
+        kd="0.2" 
+        ks="0.2" ke="100.0"
+        kr="0.8"
+        kt="0.0" ki="1.0">
+        <solid color="black" />
+    </phong>
+    <phong
+        name="white"
+        ka="0.3" 
+        kd="0.8" 
+        ks="0.2" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="0.0">
         <solid color="white" />
     </phong>
-    <phong name="red">
-        <solid color="red" />
-    </phong>
-    <phong name="blue">
-        <solid color="blue" />
-    </phong>
-    <phong name="checker">
+    <phong 
+        name="checker"
+        ka="0.3" 
+        kd="0.8" 
+        ks="0.2" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
         <checkered
             color1="red"
             color2="yellow"
             size="0.1" />
     </phong>
-    <phong name="texture">
-        <png filename="thatsme.png" />
-    </phong>
 </materials>
     
-<naive_index>
+<kdtree_index>
     <triangle
         p1="-45 30 -85"
         uv1="0 0"
@@ -95,7 +110,7 @@
         uv0="1 0"
         p2="45 30 45"
         uv2="1 1"
-        material="texture" />
+        material="checker" />
     <triangle
         p0="-45 30 -85"
         uv0="0 0"
@@ -103,13 +118,13 @@
         uv1="0 1"
         p2="45 30 45"
         uv2="1 1"
-        material="texture" />
+        material="checker" />
     <sphere
-        point="20 5 -15"
+        point="20 10 -15"
         radius="10"
-        material="white" />
+        material="white_r0.8" />
     <sphere 
-        point="0 0 0"
+        point="0 3 0"
         radius="13"
         material="white" />
-</naive_index>
+</kdtree_index>
