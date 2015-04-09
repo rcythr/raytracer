@@ -24,7 +24,7 @@ std::string Phong::toString(size_t depth) {
     return ss.str();
 }
 
-glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit, size_t num_bounces, size_t max_bounces) {
+glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) {
     auto color = sampler->get_color(hit.u, hit.v);
 
     glm::vec3 result;
@@ -78,17 +78,6 @@ glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit, size_t num_bounces, s
             // Add in ambient component.
             result += ka * light->color * color;
         }
-    }
-
-    if(num_bounces != max_bounces)
-    {
-        Ray refl{hit.intersection_point, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
-        refl.update();
-        result += kr * kernel->get_color_rec(refl, num_bounces + 1, max_bounces, hit.shape);
-
-        Ray trans{hit.intersection_point, hit.incoming_ray.direction}; 
-        trans.update();
-        result += kt * kernel->get_color_rec(trans, num_bounces + 1, max_bounces, nullptr);
     }
 
     return result;

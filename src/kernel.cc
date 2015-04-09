@@ -281,7 +281,33 @@ glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_b
     glm::vec3 result;
 
     spatial_index->find_closest_hit(ray, [=, &hit_found, &result] (HitResult& hit) {
-        result = hit.shape->material->get_color(this, hit, num_bounces, max_bounces);
+
+        // Get Direct Illumination
+        result = hit.shape->material->get_color(this, hit);
+
+        float kr = hit.shape->material->kr;
+        float kt = hit.shape->material->kt;
+        float ki = hit.shape->material->ki;
+
+        if(num_bounces < max_bounces)
+        {
+            // Get Reflected Illumination
+            if(kr > 0.0)
+            {
+                Ray refl{hit.intersection_point, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
+                refl.update();
+                result += kr * get_color_rec(refl, num_bounces + 1, max_bounces, hit.shape);
+            }
+
+            // Get Transmitted Illumination
+            if(kt > 0.0)
+            {
+                Ray trans{hit.intersection_point, hit.incoming_ray.direction}; 
+                trans.update();
+                result += kt * get_color_rec(trans, num_bounces + 1, max_bounces, nullptr);
+            }
+        }
+
         hit_found = true;
     }, omit_shape);
 

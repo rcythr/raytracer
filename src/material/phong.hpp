@@ -15,7 +15,7 @@ struct Phong : public Material {
 
     std::string toString(size_t depth = 0) override;
 
-    glm::vec3 get_color(Kernel* kernel, HitResult& hit, size_t num_bounces, size_t max_bounces) override;
+    glm::vec3 get_color(Kernel* kernel, HitResult& hit) override;
 
     float ka, kd, ks, ke, ki;
 };

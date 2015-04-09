@@ -18,7 +18,7 @@ struct Material {
 
     virtual std::string toString(size_t depth = 0) = 0;
 
-    virtual glm::vec3 get_color(Kernel* kernel, HitResult& hit, size_t num_bounces, size_t max_bounces) = 0;
+    virtual glm::vec3 get_color(Kernel* kernel, HitResult& hit) = 0;
 
     float kr; // Reflectance coefficient.
     float kt; // Transmission coefficient.
