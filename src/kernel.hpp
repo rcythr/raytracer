@@ -23,6 +23,7 @@ struct Kernel {
     bool verbose;
     size_t num_threads;
     glm::vec3 background_color;
+    float world_ki;
 
     std::vector<CameraPtr> cameras;
     std::vector<LightPtr> lights;
@@ -46,6 +47,6 @@ struct Kernel {
 
     void render();
 
-    glm::vec3 get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces, ShapePtr omit_shape=nullptr);
+    glm::vec3 get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces);
 };
 }
