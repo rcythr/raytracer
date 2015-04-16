@@ -13,4 +13,3 @@ std::ostream& raytracer::operator<<(std::ostream& os, glm::vec4 vector) {
        << vector.w << ')';
     return os;
 }
-

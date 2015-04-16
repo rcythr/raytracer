@@ -11,18 +11,15 @@
 namespace raytracer {
 
 class ThreadPool {
-    
+
     std::atomic<bool> shutdown_flag;
     std::vector<std::thread> threads;
-    std::queue<std::function<void()>> queue;
+    std::queue<std::function<void()> > queue;
     std::mutex mutex;
     std::condition_variable cv;
 
   public:
-
-    ThreadPool(size_t num_threads)
-        : shutdown_flag(false)
-    {
+    ThreadPool(size_t num_threads) : shutdown_flag(false) {
         for (size_t i = 0; i < num_threads; ++i) {
             threads.push_back(std::thread([=]() {
                 while (true) {
@@ -31,8 +28,7 @@ class ThreadPool {
                     {
                         std::unique_lock<std::mutex> ul(mutex);
                         while (queue.empty()) {
-                            if(shutdown_flag.load())
-                            {
+                            if (shutdown_flag.load()) {
                                 return;
                             }
                             cv.wait(ul);
@@ -51,7 +47,7 @@ class ThreadPool {
     void enqueue(std::function<void()>&& task) {
         {
             std::lock_guard<std::mutex> lg(mutex);
-            queue.push(std::forward<std::function<void()>>(task));
+            queue.push(std::forward<std::function<void()> >(task));
         }
         cv.notify_one();
     }

@@ -9,14 +9,26 @@
 
 namespace raytracer {
 
+int extractInt(ParamMap& params, const char* key);
 int extractInt(ParamMap& params, const char* key, int default_value);
+
+float extractFloat(ParamMap& params, const char* key);
 float extractFloat(ParamMap& params, const char* key, float default_value);
+
+double extractDouble(ParamMap& params, const char* key);
 double extractDouble(ParamMap& params, const char* key, double default_value);
-std::string extractString(ParamMap& params, const char* key,
-                          std::string default_value);
+
+std::string extractString(ParamMap& params, const char* key);
+std::string extractString(ParamMap& params, const char* key, std::string default_value);
+
+bool extractBool(ParamMap& params, const char* key);
 bool extractBool(ParamMap& params, const char* key, bool default_value);
-glm::vec3 extractVec3(ParamMap& params, const char* key,
-                      glm::vec3 default_value);
+
+glm::vec3 extractVec3(ParamMap& params, const char* key);
+glm::vec3 extractVec3(ParamMap& params, const char* key, glm::vec3 default_value);
+
+glm::vec2 extractVec2(ParamMap& params, const char* key);
+glm::vec2 extractVec2(ParamMap& params, const char* key, glm::vec2 default_value);
 
 template <typename T> void loadXML(const std::string filename, T& handler) {
     std::ifstream input(filename);

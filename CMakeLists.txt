@@ -18,7 +18,11 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIR})
 
+# Include LibPNG
+find_package(PNG REQUIRED)
+include_directories(${PNG_INCLUDE_DIR})
+
 # Build the lib using the cc files found above.
 add_executable(raytrace ${SOURCES})
 target_link_libraries(raytrace pthread)
-
+target_link_libraries(raytrace ${PNG_LIBRARY})

@@ -19,18 +19,15 @@ glm::vec3 PPMViewPlane::get_pixel(size_t row, size_t col) {
 void PPMViewPlane::set_pixel(size_t row, size_t col, glm::vec3 color) {
     std::lock_guard<std::mutex> lg(mut);
     glm::vec3 cur_color = ppm.get_pixel(row, col);
-    if(cur_color == glm::vec3(0.0f, 0.0f, 0.0f))
-    {
+    if (cur_color == glm::vec3(0.0f, 0.0f, 0.0f)) {
         ppm.set_pixel(row, col, color);
-    }
-    else
-    {
+    } else {
         ppm.set_pixel(row, col, (cur_color + color) / 2.0f);
     }
 }
 
-void PPMViewPlane::finish() { 
+void PPMViewPlane::finish() {
     std::lock_guard<std::mutex> lg(mut);
     ppm.apply_guassian();
-    ppm.save(filename); 
+    ppm.save(filename);
 }

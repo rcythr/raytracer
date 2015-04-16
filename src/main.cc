@@ -22,12 +22,11 @@ int main(int argc, char* argv[]) {
         std::cout << kernel.toString();
     }
 
-    
     typedef std::chrono::high_resolution_clock Clock;
     auto start = Clock::now();
     kernel.spatial_index->optimize();
     auto end = Clock::now();
-    std::cout << "KD-Tree Build Time: " 
+    std::cout << "KD-Tree Build Time: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(
                      end - start).count() << " miliseconds" << std::endl;
 

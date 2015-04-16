@@ -17,7 +17,8 @@ struct SpatialIndex {
 
     virtual void optimize() {}
 
-    virtual void find_closest_hit(const Ray& ray, std::function<void(HitResult&)> hit_callback) = 0;
+    virtual void find_closest_hit(
+        const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape = nullptr) = 0;
 
     virtual bool has_hit(Ray& ray, ShapePtr omit_shape) = 0;
 

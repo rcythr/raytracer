@@ -1,7 +1,5 @@
 #pragma once
 
-#include "brdf/brdf.hpp"
-
 #include "camera/camera.hpp"
 #include "camera/pinhole.hpp"
 
@@ -11,7 +9,14 @@
 #include "light/point.hpp"
 
 #include "material/material.hpp"
-#include "material/matte.hpp"
+#include "material/phong.hpp"
+
+#include "sampler/sampler.hpp"
+#include "sampler/solid.hpp"
+#include "sampler/checkerboard.hpp"
+#include "sampler/rainbow.hpp"
+#include "sampler/circles.hpp"
+#include "sampler/png_texture.hpp"
 
 #include "shape/shape.hpp"
 #include "shape/sphere.hpp"
@@ -23,5 +28,3 @@
 
 #include "view_plane/view_plane.hpp"
 #include "view_plane/ppm.hpp"
-
-#include "tracers.hpp"
