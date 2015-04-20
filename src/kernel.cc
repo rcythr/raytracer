@@ -303,28 +303,65 @@ glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_b
             // Get Transmitted Illumination
             if(kt > 0.0)
             {
-                float dir = glm::dot(hit.incoming_ray.direction, hit.intersection_normal);
+                float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
 
-                if(dir < 0.0f)
+                auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+
+                auto refract1 = glm::refract( hit.incoming_ray.direction, normal, world_ki / ki );
+                if(refract1 != glm::vec3(0.0f))
+                {
+                    auto refract2 = glm::refract( refract1, -normal, ki / world_ki );
+                    if(refract2 != glm::vec3(0.0f))
+                    {
+                        Ray trans{ hit.intersection_point + refract2 * 0.05f, refract2 };
+                        trans.update();
+                        result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
+                    }
+                    else
+                    {
+                        Ray refl{hit.intersection_point - refract1 * 0.05f, glm::reflect(refract1, -normal)};
+                        refl.update();
+                        result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
+                    }
+                }
+                else
+                {
+                    Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, normal)};
+                    refl.update();
+                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
+                }
+
+                /* First perform the transmission 
+                auto refracted_dir = glm::refract( -hit.incoming_ray.direction, hit.intersection_normal, world_ki / ki );
+                if(refracted_dir != glm::vec3(0.0f))
                 {
                     // We're entering the object.
-                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::refract(-hit.incoming_ray.direction, hit.intersection_normal, world_ki / ki ) }; 
-                    trans.update();
-                    result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
-                }
-                else if(dir > 0.0f)
-                {
-                    // We're leaving the object.
-                    // Pop our object's ki
-                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::refract(-hit.incoming_ray.direction, -hit.intersection_normal, ki / world_ki) }; 
+                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, refracted_dir}; 
                     trans.update();
                     result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
                 }
                 else
                 {
-                    // We're hitting the object tangentially - no transmission
+                    Ray refl{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
+                    refl.update();
+                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
                 }
-
+                
+                auto refracted_dir = glm::refract( -hit.incoming_ray.direction, -hit.intersection_normal, ki / world_ki );
+                if(refracted_dir != glm::vec3(0.0f))
+                {
+                    // We're leaving the object.
+                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, refracted_dir}; 
+                    trans.update();
+                    result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
+                }
+                else
+                {
+                    Ray refl{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, -hit.intersection_normal)};
+                    refl.update();
+                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
+                }
+                */
             }
         }
 
