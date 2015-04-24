@@ -30,14 +30,7 @@ glm::mat4 PinholeCamera::build_transform_mat() {
     return result;
 }
 
-void PinholeCamera::spawn_rays(
-    std::function<void(size_t, size_t, Ray&)> spawn_callback) {
-
-    // Prepare random device
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, pixel_size);
-
+void PinholeCamera::spawn_rays( std::function<void(size_t, size_t, Ray&)> spawn_callback) {
     auto inverseTransform = glm::inverse(build_transform_mat());
 
     size_t num_rows = view_plane->get_height();
@@ -46,35 +39,29 @@ void PinholeCamera::spawn_rays(
     float half_width = 0.5 * pixel_size * num_cols;
     float half_height = 0.5 * pixel_size * num_rows;
 
+    float sub_pixel_size = pixel_size / (1 + num_samples );
+
     // First calculate the location of the top left pixel
-    glm::vec3 pixelPt;
-    pixelPt.z = -view_distance;
-    pixelPt.y = half_height;
+    glm::vec4 pixelPt(-half_width, half_height, -view_distance, 0.0f);
 
     // Build the ray located at the pinhole.
     Ray r;
     r.origin = glm::vec3(inverseTransform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     for (size_t row = 0; row < num_rows; ++row) {
-        pixelPt.x = -half_width;
-        for (size_t col = 0; col < num_cols; ++col) {
-            // Calculate the direction of the ray
-
-            for (size_t i = 0; i < num_samples; ++i) {
-                r.direction = glm::vec3(glm::normalize(
-                    inverseTransform *
-                    glm::vec4(pixelPt + glm::vec3(dis(gen), dis(gen), 0.0f),
-                              0.0f)));
-
-                r.update();
-
-                // Call the callback with the ray we found
-                spawn_callback(row, col, r);
+        pixelPt.y -= sub_pixel_size;
+        for (size_t srow = 0; srow < num_samples; ++srow) {
+            pixelPt.x = -half_width;
+            for(size_t col = 0; col < num_cols; ++ col) {
+                pixelPt.x += sub_pixel_size;
+                for(size_t scol = 0; scol < num_samples; ++scol) {
+                    r.direction = glm::vec3(glm::normalize(inverseTransform * pixelPt));
+                    r.update();
+                    spawn_callback(row, col, r);
+                    pixelPt.x += sub_pixel_size;
+                }
             }
-
-            // advance to the next pixel.
-            pixelPt.x += pixel_size;
+            pixelPt.y -= sub_pixel_size;
         }
-        pixelPt.y -= pixel_size;
     }
 }
 
