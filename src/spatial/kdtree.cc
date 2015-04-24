@@ -64,57 +64,74 @@ void KDTreeSpatialIndex::optimize() {
     ss.close();
 }
 
-void KDTreeSpatialIndex::find_closest_hit(
-    const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape) {
-    kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
-        node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
-            HitResult best_result;
-            HitResult result;
-            for (auto obj : possible_hits) {
-                if(obj == omit_shape)
-                    continue;
+struct CheckHitContext {
+    const Ray& ray;
+    HitCallback hit_callback;
+    void* ctx;
+    ShapePtr omit_shape;
+};
 
-                result.found_hit = false;
-                obj->test_hit(ray, result);
-                if (result.found_hit) {
-                    if (best_result.found_hit == false ||
-                        result.tval < best_result.tval) {
-                        best_result = result;
-                    }
-                }
+bool check_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
+    CheckHitContext* ctx = (CheckHitContext*)ct;
+    HitResult best_result;
+    HitResult result;
+    for (auto obj : possible_hits) {
+        if(obj == ctx->omit_shape)
+            continue;
+
+        result.found_hit = false;
+        obj->test_hit(ctx->ray, result);
+        if (result.found_hit) {
+            if (best_result.found_hit == false ||
+                result.tval < best_result.tval) {
+                best_result = result;
             }
+        }
+    }
 
-            if (best_result.found_hit) {
-                hit_callback(best_result);
+    if (best_result.found_hit) {
+        ctx->hit_callback(ctx->ctx, best_result);
+        return true;
+    }
+    return false;
+}
+
+void KDTreeSpatialIndex::find_closest_hit(const Ray& ray, HitCallback hit_callback, void* ctx, ShapePtr omit_shape) {
+    CheckHitContext sub_ctx{ray, hit_callback, ctx, omit_shape};
+    kdtree::find_closest_hit<ShapePtr, AABB, Ray>(node, ray, check_hit_callback, &sub_ctx);
+}
+
+struct HasHitContext {
+    bool& result;
+    Ray& ray;
+    ShapePtr omit_shape;
+};
+
+bool has_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
+    HasHitContext* ctx = (HasHitContext*)ct;
+    HitResult hit;
+    for (auto obj : possible_hits) {
+        if (obj != ctx->omit_shape) {
+            obj->test_hit(ctx->ray, hit);
+            if (hit.found_hit) {
+                ctx->result = true;
                 return true;
             }
-            return false;
-        });
+        }
+    }
+    return false;
 }
 
 bool KDTreeSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape) {
     bool result = false;
-    kdtree::find_closest_hit<ShapePtr, AABB, Ray>(
-        node, ray, [&](std::vector<ShapePtr> possible_hits) -> bool {
-            HitResult hit;
-            for (auto obj : possible_hits) {
-                if (obj != omit_shape) {
-                    obj->test_hit(ray, hit);
-                    if (hit.found_hit) {
-                        result = true;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        });
+    HasHitContext ctx{result, ray, omit_shape};
+    kdtree::find_closest_hit<ShapePtr, AABB, Ray>( node, ray, has_hit_callback, &ctx);
     return result;
 }
 
-void KDTreeSpatialIndex::view_all_objects(
-    std::function<void(ShapePtr&)> functor) {
+void KDTreeSpatialIndex::view_all_objects(ViewAllCallback functor, void* ctx) {
     for (auto& s : shapes) {
-        functor(s);
+        functor(ctx, s);
     }
 }
 

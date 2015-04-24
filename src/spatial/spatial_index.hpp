@@ -10,6 +10,9 @@
 
 namespace raytracer {
 
+typedef void (*HitCallback)(void* ctx, HitResult&);
+typedef void (*ViewAllCallback)(void* ctx, ShapePtr&);
+
 struct SpatialIndex {
     virtual ~SpatialIndex() {}
 
@@ -18,11 +21,11 @@ struct SpatialIndex {
     virtual void optimize() {}
 
     virtual void find_closest_hit(
-        const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape = nullptr) = 0;
+        const Ray& ray, HitCallback hit_callback, void* ctx = nullptr, ShapePtr omit_shape = nullptr) = 0;
 
     virtual bool has_hit(Ray& ray, ShapePtr omit_shape) = 0;
 
-    virtual void view_all_objects(std::function<void(ShapePtr&)> functor) = 0;
+    virtual void view_all_objects(ViewAllCallback functor, void* ctx = nullptr) = 0;
 
     virtual std::string toString(size_t depth = 0) = 0;
 };

@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <vector>
-#include <functional>
 
 #include <glm/glm.hpp>
 
@@ -14,6 +13,8 @@ struct SpatialIndex;
 struct Light;
 
 struct ViewPlane;
+
+typedef void (*SpawnRaysCallback)(void*, size_t, size_t, Ray&);
 
 struct Camera {
 
@@ -40,8 +41,7 @@ struct Camera {
      * @param spawn_callback the function to call for each ray with row, col,
      * and the ray.
      */
-    virtual void spawn_rays(
-        std::function<void(size_t, size_t, Ray&)> spawn_callback) = 0;
+    virtual void spawn_rays(void* ctx, SpawnRaysCallback spawn_callback) = 0;
 
     /**
      * Returns the number of bounces that should be used before stopping.

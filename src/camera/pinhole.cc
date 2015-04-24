@@ -30,7 +30,7 @@ glm::mat4 PinholeCamera::build_transform_mat() {
     return result;
 }
 
-void PinholeCamera::spawn_rays( std::function<void(size_t, size_t, Ray&)> spawn_callback) {
+void PinholeCamera::spawn_rays(void* ctx, SpawnRaysCallback spawn_callback) {
     auto inverseTransform = glm::inverse(build_transform_mat());
 
     size_t num_rows = view_plane->get_height();
@@ -56,7 +56,7 @@ void PinholeCamera::spawn_rays( std::function<void(size_t, size_t, Ray&)> spawn_
                 for(size_t scol = 0; scol < num_samples; ++scol) {
                     r.direction = glm::vec3(glm::normalize(inverseTransform * pixelPt));
                     r.update();
-                    spawn_callback(row, col, r);
+                    spawn_callback(ctx, row, col, r);
                     pixelPt.x += sub_pixel_size;
                 }
             }

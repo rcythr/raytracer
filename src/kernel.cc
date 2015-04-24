@@ -30,10 +30,6 @@ Kernel::Kernel() {
         } },
 
         // Spatial Indecies
-        { "naive_index", [this](ParamMap& params) {
-            spatial_index = std::make_shared<NaiveSpatialIndex>();
-        } },
-
         { "kdtree_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<KDTreeSpatialIndex>();
         } },
@@ -241,6 +237,17 @@ std::string Kernel::toString(size_t depth) {
     return ss.str();
 }
 
+struct SpawnRaysContext {
+    Kernel* kernel;
+    CameraPtr camera;
+    size_t num_bounces;
+};
+
+void spawn_rays_cb(void* ct, size_t row, size_t col, Ray& ray) {
+    SpawnRaysContext* ctx = (SpawnRaysContext*)ct;
+    ctx->camera->view_plane->set_pixel(row, col, ctx->kernel->get_color_rec(ray, 1, ctx->num_bounces));
+}
+
 void Kernel::render() {
     typedef std::chrono::high_resolution_clock Clock;
 
@@ -248,20 +255,9 @@ void Kernel::render() {
     for (CameraPtr& camera : cameras) {
         auto start = Clock::now();
         
-        // Now fire up a thread pool that does hit calculations and tone
-        // reproduction.
-        ThreadPool tp(num_threads);
-
         // Give the camera a function to call on each ray it generates.
-        camera->spawn_rays([&](size_t row, size_t col, Ray& ray) {
-            tp.enqueue([=]() {
-                camera->view_plane->set_pixel(row, col, get_color_rec(ray, 1, camera->get_num_bounces()));
-            });
-        });
-
-        // Now we wait for everyone to finish up.
-        tp.stop();
-        tp.join();
+        SpawnRaysContext ctx{this, camera, camera->get_num_bounces()};
+        camera->spawn_rays(&ctx, spawn_rays_cb);
 
         // Signal to the view plane that we are finished writing.
         camera->view_plane->finish();
@@ -276,97 +272,77 @@ void Kernel::render() {
     }
 }
 
+struct ColorRecContext {
+    Kernel* kernel;
+    const Ray& ray;
+    size_t num_bounces;
+    size_t max_bounces;
+    bool& hit_found;
+    glm::vec3& result;
+};
+
+void color_rec_callback(void* ct, HitResult& hit) {
+    ColorRecContext* ctx = (ColorRecContext*)ct;
+    // Get Direct Illumination
+    ctx->result = hit.shape->material->get_color(ctx->kernel, hit);
+
+    float kr = hit.shape->material->kr;
+    float kt = hit.shape->material->kt;
+    float ki = hit.shape->material->ki;
+
+    if(ctx->num_bounces < ctx->max_bounces)
+    {
+        // Get Reflected Illumination
+        if(kr > 0.0)
+        {
+            Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
+            refl.update();
+            ctx->result += kr * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+        }
+
+        // Get Transmitted Illumination
+        if(kt > 0.0)
+        {
+            float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
+
+            auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+
+            auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / ki );
+            if(refract1 != glm::vec3(0.0f))
+            {
+                auto refract2 = glm::refract( refract1, -normal, ki / ctx->kernel->world_ki );
+                if(refract2 != glm::vec3(0.0f))
+                {
+                    Ray trans{ hit.intersection_point + refract2 * 0.05f, refract2 };
+                    trans.update();
+                    ctx->result += kt * ctx->kernel->get_color_rec(trans, ctx->num_bounces + 1, ctx->max_bounces);
+                }
+                else
+                {
+                    Ray refl{hit.intersection_point - refract1 * 0.05f, glm::reflect(refract1, -normal)};
+                    refl.update();
+                    ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+                }
+            }
+            else
+            {
+                Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, normal)};
+                refl.update();
+                ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+            }
+        }
+    }
+    ctx->hit_found = true;
+}
+
 glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces)
 {
     bool hit_found = false;
     glm::vec3 result;
 
-    spatial_index->find_closest_hit(ray, [=, &hit_found, &result] (HitResult& hit) {
+    ColorRecContext ctx{this, ray, num_bounces, max_bounces, hit_found, result};
 
-        // Get Direct Illumination
-        result = hit.shape->material->get_color(this, hit);
-
-        float kr = hit.shape->material->kr;
-        float kt = hit.shape->material->kt;
-        float ki = hit.shape->material->ki;
-
-        if(num_bounces < max_bounces)
-        {
-            // Get Reflected Illumination
-            if(kr > 0.0)
-            {
-                Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
-                refl.update();
-                result += kr * get_color_rec(refl, num_bounces + 1, max_bounces);
-            }
-
-            // Get Transmitted Illumination
-            if(kt > 0.0)
-            {
-                float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
-
-                auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
-
-                auto refract1 = glm::refract( hit.incoming_ray.direction, normal, world_ki / ki );
-                if(refract1 != glm::vec3(0.0f))
-                {
-                    auto refract2 = glm::refract( refract1, -normal, ki / world_ki );
-                    if(refract2 != glm::vec3(0.0f))
-                    {
-                        Ray trans{ hit.intersection_point + refract2 * 0.05f, refract2 };
-                        trans.update();
-                        result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
-                    }
-                    else
-                    {
-                        Ray refl{hit.intersection_point - refract1 * 0.05f, glm::reflect(refract1, -normal)};
-                        refl.update();
-                        result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
-                    }
-                }
-                else
-                {
-                    Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, normal)};
-                    refl.update();
-                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
-                }
-
-                /* First perform the transmission 
-                auto refracted_dir = glm::refract( -hit.incoming_ray.direction, hit.intersection_normal, world_ki / ki );
-                if(refracted_dir != glm::vec3(0.0f))
-                {
-                    // We're entering the object.
-                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, refracted_dir}; 
-                    trans.update();
-                    result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
-                }
-                else
-                {
-                    Ray refl{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
-                    refl.update();
-                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
-                }
-                
-                auto refracted_dir = glm::refract( -hit.incoming_ray.direction, -hit.intersection_normal, ki / world_ki );
-                if(refracted_dir != glm::vec3(0.0f))
-                {
-                    // We're leaving the object.
-                    Ray trans{hit.intersection_point + hit.incoming_ray.direction * 0.05f, refracted_dir}; 
-                    trans.update();
-                    result += kt * get_color_rec(trans, num_bounces + 1, max_bounces);
-                }
-                else
-                {
-                    Ray refl{hit.intersection_point + hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, -hit.intersection_normal)};
-                    refl.update();
-                    result += kt * get_color_rec(refl, num_bounces + 1, max_bounces);
-                }
-                */
-            }
-        }
-
-        hit_found = true;
-    });
+    spatial_index->find_closest_hit(ray, color_rec_callback, &ctx);
 
     // Determine if we need the background color.
     if(!hit_found) {
