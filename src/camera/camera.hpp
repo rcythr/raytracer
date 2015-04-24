@@ -14,7 +14,10 @@ struct Light;
 
 struct ViewPlane;
 
-typedef void (*SpawnRaysCallback)(void*, size_t, size_t, Ray&);
+struct RayContext {
+    size_t row, col;
+    Ray ray;
+};
 
 struct Camera {
 
@@ -41,7 +44,9 @@ struct Camera {
      * @param spawn_callback the function to call for each ray with row, col,
      * and the ray.
      */
-    virtual void spawn_rays(void* ctx, SpawnRaysCallback spawn_callback) = 0;
+    virtual std::vector<std::vector<RayContext>*> spawn_rays() = 0;
+
+    virtual size_t get_num_samples() = 0;
 
     /**
      * Returns the number of bounces that should be used before stopping.

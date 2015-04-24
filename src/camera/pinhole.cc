@@ -30,7 +30,10 @@ glm::mat4 PinholeCamera::build_transform_mat() {
     return result;
 }
 
-void PinholeCamera::spawn_rays(void* ctx, SpawnRaysCallback spawn_callback) {
+std::vector<std::vector<RayContext>*>
+PinholeCamera::spawn_rays() {
+    std::vector<std::vector<RayContext>*> result;
+
     auto inverseTransform = glm::inverse(build_transform_mat());
 
     size_t num_rows = view_plane->get_height();
@@ -45,24 +48,30 @@ void PinholeCamera::spawn_rays(void* ctx, SpawnRaysCallback spawn_callback) {
     glm::vec4 pixelPt(-half_width, half_height, -view_distance, 0.0f);
 
     // Build the ray located at the pinhole.
-    Ray r;
-    r.origin = glm::vec3(inverseTransform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    glm::vec3 origin = glm::vec3(inverseTransform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     for (size_t row = 0; row < num_rows; ++row) {
+        auto rowContext = new std::vector<RayContext>();
         pixelPt.y -= sub_pixel_size;
         for (size_t srow = 0; srow < num_samples; ++srow) {
             pixelPt.x = -half_width;
             for(size_t col = 0; col < num_cols; ++ col) {
                 pixelPt.x += sub_pixel_size;
                 for(size_t scol = 0; scol < num_samples; ++scol) {
+                    Ray r;
+                    r.origin = origin;
                     r.direction = glm::vec3(glm::normalize(inverseTransform * pixelPt));
                     r.update();
-                    spawn_callback(ctx, row, col, r);
+
+                    rowContext->push_back(RayContext{row, col, r});
+
                     pixelPt.x += sub_pixel_size;
                 }
             }
             pixelPt.y -= sub_pixel_size;
         }
+        result.push_back(rowContext);
     }
+    return result;
 }
 
 std::string PinholeCamera::toString(size_t depth) {

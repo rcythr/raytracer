@@ -10,21 +10,29 @@
 
 namespace raytracer {
 
+template<typename T>
 class ThreadPool {
+
+    typedef void (*THandler)(void* ctx, T);
 
     std::atomic<bool> shutdown_flag;
     std::vector<std::thread> threads;
-    std::queue<std::function<void()> > queue;
+    std::queue<std::pair<void*, T>> queue;
+    THandler handler;
+
     std::mutex mutex;
     std::condition_variable cv;
 
   public:
-    ThreadPool(size_t num_threads) : shutdown_flag(false) {
+    ThreadPool(size_t num_threads, THandler handler) 
+        : shutdown_flag(false) 
+        , handler(handler)
+    {
         for (size_t i = 0; i < num_threads; ++i) {
             threads.push_back(std::thread([=]() {
                 while (true) {
                     // Retrieve an element from the queue
-                    std::function<void()> event;
+                    std::pair<void*, T> event;
                     {
                         std::unique_lock<std::mutex> ul(mutex);
                         while (queue.empty()) {
@@ -38,16 +46,16 @@ class ThreadPool {
                         queue.pop();
                     }
 
-                    event();
+                    handler(event.first, event.second);
                 }
             }));
         }
     }
 
-    void enqueue(std::function<void()>&& task) {
+    void enqueue(void* ctx, T val) {
         {
             std::lock_guard<std::mutex> lg(mutex);
-            queue.push(std::forward<std::function<void()> >(task));
+            queue.push(std::make_pair(ctx, val));
         }
         cv.notify_one();
     }

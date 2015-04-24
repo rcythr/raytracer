@@ -243,9 +243,17 @@ struct SpawnRaysContext {
     size_t num_bounces;
 };
 
-void spawn_rays_cb(void* ct, size_t row, size_t col, Ray& ray) {
+void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
     SpawnRaysContext* ctx = (SpawnRaysContext*)ct;
-    ctx->camera->view_plane->set_pixel(row, col, ctx->kernel->get_color_rec(ray, 1, ctx->num_bounces));
+
+    size_t len = row->size();
+    for(size_t i=0; i < len; ++i)
+    {
+        auto& ray_ctx = (*row)[i];
+        ctx->camera->view_plane->set_pixel(ray_ctx.row, ray_ctx.col, ctx->kernel->get_color_rec(ray_ctx.ray, 1, ctx->num_bounces));
+    }
+
+    delete row;
 }
 
 void Kernel::render() {
@@ -255,12 +263,22 @@ void Kernel::render() {
     for (CameraPtr& camera : cameras) {
         auto start = Clock::now();
         
-        // Give the camera a function to call on each ray it generates.
         SpawnRaysContext ctx{this, camera, camera->get_num_bounces()};
-        camera->spawn_rays(&ctx, spawn_rays_cb);
+
+        ThreadPool<std::vector<RayContext>*> tp(num_threads, spawn_rays_cb);
+
+        // Give the camera a function to call on each ray it generates.
+        auto rays = camera->spawn_rays();
+        for(size_t i=0; i < rays.size(); ++i)
+        {
+            tp.enqueue(&ctx, rays[i]);
+        }
+
+        tp.stop();
+        tp.join();
 
         // Signal to the view plane that we are finished writing.
-        camera->view_plane->finish();
+        camera->view_plane->finish(pow(camera->get_num_samples(), 2));
 
         auto end = Clock::now();
 

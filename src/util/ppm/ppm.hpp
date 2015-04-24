@@ -15,6 +15,8 @@ struct PPM {
 
     glm::vec3 get_pixel(int64_t row, int64_t col) { return data[row][col]; }
 
+    void add_pixel(int64_t row, int64_t col, glm::vec3 color) { data[row][col] += color; }
+
     void set_pixel(int64_t row, int64_t col, glm::vec3 color) {
         data[row][col] = color;
     }

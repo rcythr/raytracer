@@ -25,6 +25,6 @@ struct PPMViewPlane : public ViewPlane {
 
     void set_pixel(size_t row, size_t col, glm::vec3 color) override;
 
-    void finish() override;
+    void finish(size_t num_samples) override;
 };
 }
