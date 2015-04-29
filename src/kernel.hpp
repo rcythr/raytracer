@@ -20,9 +20,9 @@ struct Kernel {
     MaterialPtr last_material;
 
   public:
-    bool verbose;
     size_t num_threads;
     glm::vec3 background_color;
+    float world_ki;
 
     std::vector<CameraPtr> cameras;
     std::vector<LightPtr> lights;
@@ -41,11 +41,8 @@ struct Kernel {
     // Called by XML library for the closing of a tag.
     void close(std::string& tag) {}
 
-    // Usual to string function
-    std::string toString(size_t depth = 0);
-
     void render();
 
-    glm::vec3 get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces, ShapePtr omit_shape=nullptr);
+    glm::vec3 get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces);
 };
 }

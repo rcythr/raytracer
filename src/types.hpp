@@ -23,7 +23,6 @@
 #include "shape/triangle.hpp"
 
 #include "spatial/spatial_index.hpp"
-#include "spatial/naive.hpp"
 #include "spatial/kdtree.hpp"
 
 #include "view_plane/view_plane.hpp"

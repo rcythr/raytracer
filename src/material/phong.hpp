@@ -13,8 +13,6 @@ struct Phong : public Material {
 
     virtual ~Phong() override {}
 
-    std::string toString(size_t depth = 0) override;
-
     glm::vec3 get_color(Kernel* kernel, HitResult& hit) override;
 
     float ka, kd, ks, ke, ki;

@@ -85,9 +85,9 @@ bool PPM::save(std::string filename) {
     std::fwrite(header.c_str(), sizeof(char), header.size(), fd);
 
     // Write out all of the pixel data.
-    for (int64_t i = height; i > 0; --i) {
+    for (int64_t i = 0; i < height; ++i) {
         for (int64_t j = 0; j < width; ++j) {
-            auto& pix = data[i - 1][j];
+            auto& pix = data[i][j];
 
             int32_t r = std::min(std::max((int32_t)(pix.r * 255), 0), 255);
             int32_t g = std::min(std::max((int32_t)(pix.g * 255), 0), 255);

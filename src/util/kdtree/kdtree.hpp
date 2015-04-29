@@ -116,9 +116,12 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
     return std::make_shared<KDNodeLeaf<T, AABBTy> >(AABBTy(), shapes);
 }
 
+template<typename T>
+using ConfirmHitCallback = bool (*)(void* ctx, std::vector<T>&);
+
 template <typename T, typename AABBTy, typename RayTy>
 bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
-                      std::function<bool(std::vector<T>)> confirm_hit) {
+                      ConfirmHitCallback<T> confirm_hit, void* ctx) {
     if (node->type == Type::INNER) {
         auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy> >(node);
 
@@ -130,20 +133,20 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
 
         if (left_hit && right_hit) {
             if (left_t < right_t) {
-                if (find_closest_hit(inner->left, ray, confirm_hit))
+                if (find_closest_hit(inner->left, ray, confirm_hit, ctx))
                     return true;
-                if (find_closest_hit(inner->right, ray, confirm_hit))
+                if (find_closest_hit(inner->right, ray, confirm_hit, ctx))
                     return true;
             } else {
-                if (find_closest_hit(inner->right, ray, confirm_hit))
+                if (find_closest_hit(inner->right, ray, confirm_hit, ctx))
                     return true;
-                if (find_closest_hit(inner->left, ray, confirm_hit))
+                if (find_closest_hit(inner->left, ray, confirm_hit, ctx))
                     return true;
             }
         } else if (left_hit) {
-            return find_closest_hit(inner->left, ray, confirm_hit);
+            return find_closest_hit(inner->left, ray, confirm_hit, ctx);
         } else if (right_hit) {
-            return find_closest_hit(inner->right, ray, confirm_hit);
+            return find_closest_hit(inner->right, ray, confirm_hit, ctx);
         }
         return false;
     } else // Type::LEAF
@@ -151,7 +154,7 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
         // Simply determine if a hit appears in this objectlist. If it does,
         // we're done.
         auto leaf = std::static_pointer_cast<KDNodeLeaf<T, AABBTy> >(node);
-        return confirm_hit(leaf->objects);
+        return confirm_hit(ctx, leaf->objects);
     }
 }
 

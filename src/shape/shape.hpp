@@ -15,8 +15,6 @@ struct Shape : std::enable_shared_from_this<Shape> {
 
     virtual ~Shape() {}
 
-    virtual std::string toString(size_t depth = 0) = 0;
-
     virtual void test_hit(const Ray& ray, HitResult& result) = 0;
     virtual bool test_hit(const AABB& aabb) = 0;
 

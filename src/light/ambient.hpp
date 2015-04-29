@@ -11,8 +11,6 @@ struct AmbientLight : public Light {
 
     ~AmbientLight() override {}
 
-    std::string toString(size_t depth = 0) override;
-
     LightType get_type() { return LightType::AMBIENT; }
 };
 }

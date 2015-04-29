@@ -2,7 +2,6 @@
 
 #include "util/split.hpp"
 #include "util/xml_helpers.hpp"
-#include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
 #include "util/obj_mesh.hpp"
 
@@ -17,22 +16,16 @@
 using namespace raytracer;
 
 Kernel::Kernel() {
-    verbose = true;
-
     handlers = {
 
         // General
         { "general", [this](ParamMap& params) {
-            verbose = extractBool(params, "verbose");
             background_color = extractVec3(params, "background_color");
             num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
+            world_ki = extractFloat(params, "world_ki", 1.000293);
         } },
 
         // Spatial Indecies
-        { "naive_index", [this](ParamMap& params) {
-            spatial_index = std::make_shared<NaiveSpatialIndex>();
-        } },
-
         { "kdtree_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<KDTreeSpatialIndex>();
         } },
@@ -206,38 +199,23 @@ void Kernel::open(std::string& tag, ParamMap& params) {
     }
 }
 
-std::string Kernel::toString(size_t depth) {
-    std::string tabdepth = std::string("\t") * depth;
+struct SpawnRaysContext {
+    Kernel* kernel;
+    CameraPtr camera;
+    size_t num_bounces;
+};
 
-    std::stringstream ss;
+void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
+    SpawnRaysContext* ctx = (SpawnRaysContext*)ct;
 
-    // Now we'll print out the pieces.
-    ss << tabdepth << "CAMERAS: \n";
-    for (CameraPtr& camera : cameras) {
-        ss << camera->toString(depth + 1);
+    size_t len = row->size();
+    for(size_t i=0; i < len; ++i)
+    {
+        auto& ray_ctx = (*row)[i];
+        ctx->camera->view_plane->set_pixel(ray_ctx.row, ray_ctx.col, ctx->kernel->get_color_rec(ray_ctx.ray, 1, ctx->num_bounces));
     }
 
-    ss << tabdepth << "LIGHTS: \n";
-    for (auto& light : lights) {
-        ss << tabdepth << light->toString(depth + 1);
-    }
-
-    ss << tabdepth << "COLORS: \n";
-    for (auto& color : colors) {
-        ss << tabdepth << '\t' << color.first << ":\n";
-        ss << tabdepth << "\t\t" << color.second << "\n";
-    }
-
-    ss << tabdepth << "MATERIALS: \n";
-    for (auto& material : materials) {
-        ss << tabdepth << '\t' << material.first << ":\n";
-        ss << material.second->toString(depth + 2);
-    }
-
-    ss << tabdepth << "SPATIAL INDEX: \n";
-    ss << spatial_index->toString(depth + 1);
-
-    return ss.str();
+    delete row;
 }
 
 void Kernel::render() {
@@ -247,23 +225,22 @@ void Kernel::render() {
     for (CameraPtr& camera : cameras) {
         auto start = Clock::now();
         
-        // Now fire up a thread pool that does hit calculations and tone
-        // reproduction.
-        ThreadPool tp(num_threads);
+        SpawnRaysContext ctx{this, camera, camera->get_num_bounces()};
+
+        ThreadPool<std::vector<RayContext>*> tp(num_threads, spawn_rays_cb);
 
         // Give the camera a function to call on each ray it generates.
-        camera->spawn_rays([&](size_t row, size_t col, Ray& ray) {
-            tp.enqueue([=]() {
-                camera->view_plane->set_pixel(row, col, get_color_rec(ray, 1, camera->get_num_bounces(), nullptr));
-            });
-        });
+        auto rays = camera->spawn_rays();
+        for(size_t i=0; i < rays.size(); ++i)
+        {
+            tp.enqueue(&ctx, rays[i]);
+        }
 
-        // Now we wait for everyone to finish up.
         tp.stop();
         tp.join();
 
         // Signal to the view plane that we are finished writing.
-        camera->view_plane->finish();
+        camera->view_plane->finish(pow(camera->get_num_samples(), 2));
 
         auto end = Clock::now();
 
@@ -275,41 +252,81 @@ void Kernel::render() {
     }
 }
 
-glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces, ShapePtr omit_shape)
+struct ColorRecContext {
+    Kernel* kernel;
+    const Ray& ray;
+    size_t num_bounces;
+    size_t max_bounces;
+    bool& hit_found;
+    glm::vec3& result;
+};
+
+void color_rec_callback(void* ct, HitResult& hit) {
+    ColorRecContext* ctx = (ColorRecContext*)ct;
+    // Get Direct Illumination
+    ctx->result = hit.shape->material->get_color(ctx->kernel, hit);
+
+    float kr = hit.shape->material->kr;
+    float kt = hit.shape->material->kt;
+    float ki = hit.shape->material->ki;
+
+    if(ctx->num_bounces < ctx->max_bounces)
+    {
+        // Get Reflected Illumination
+        if(kr > 0.0)
+        {
+            Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
+            refl.update();
+            ctx->result += kr * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+        }
+
+        // Get Transmitted Illumination
+        if(kt > 0.0)
+        {
+            float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
+
+            auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+
+            auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / ki );
+            if(refract1 != glm::vec3(0.0f))
+            {
+                refract1 = glm::normalize(refract1);
+
+                auto refract2 = glm::refract( refract1, -normal, ki / ctx->kernel->world_ki );
+                if(refract2 != glm::vec3(0.0f))
+                {
+                    refract2 = glm::normalize(refract2);
+
+                    Ray trans{ hit.intersection_point + refract2 * 0.05f, refract2 };
+                    trans.update();
+                    ctx->result += kt * ctx->kernel->get_color_rec(trans, ctx->num_bounces + 1, ctx->max_bounces);
+                }
+                else
+                {
+                    Ray refl{hit.intersection_point - refract1 * 0.05f, glm::normalize(glm::reflect(-refract1, -normal))};
+                    refl.update();
+                    ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+                }
+            }
+            else
+            {
+                Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::normalize(glm::reflect(-hit.incoming_ray.direction, normal))};
+                refl.update();
+                ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+            }
+        }
+    }
+    ctx->hit_found = true;
+}
+
+glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces)
 {
     bool hit_found = false;
     glm::vec3 result;
 
-    spatial_index->find_closest_hit(ray, [=, &hit_found, &result] (HitResult& hit) {
+    ColorRecContext ctx{this, ray, num_bounces, max_bounces, hit_found, result};
 
-        // Get Direct Illumination
-        result = hit.shape->material->get_color(this, hit);
-
-        float kr = hit.shape->material->kr;
-        float kt = hit.shape->material->kt;
-        float ki = hit.shape->material->ki;
-
-        if(num_bounces < max_bounces)
-        {
-            // Get Reflected Illumination
-            if(kr > 0.0)
-            {
-                Ray refl{hit.intersection_point, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
-                refl.update();
-                result += kr * get_color_rec(refl, num_bounces + 1, max_bounces, hit.shape);
-            }
-
-            // Get Transmitted Illumination
-            if(kt > 0.0)
-            {
-                Ray trans{hit.intersection_point, hit.incoming_ray.direction}; 
-                trans.update();
-                result += kt * get_color_rec(trans, num_bounces + 1, max_bounces, nullptr);
-            }
-        }
-
-        hit_found = true;
-    }, omit_shape);
+    spatial_index->find_closest_hit(ray, color_rec_callback, &ctx);
 
     // Determine if we need the background color.
     if(!hit_found) {
