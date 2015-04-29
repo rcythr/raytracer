@@ -22,7 +22,11 @@ std::vector<Ray> TriangularLight::get_photons(int n){
         glm::vec3 randPoint = ((float)(1.0-sqrt(r1))) * triangle->p0 + ((float)(sqrt(r1)*(1.0-r2))) * triangle->p1 + ((float)(sqrt(r1) * r2)) * triangle->p2;
         //Generate normal
         glm::vec3 normal = glm::normalize(glm::cross((triangle->p1 - triangle->p0), (triangle->p2 - triangle->p0)));
-        glm::vec3 direction = randPoint + normal;
+
+		auto avg = (glm::distance(triangle->p0, triangle->p1) + glm::distance(triangle->p1, triangle->p2) + glm::distance(triangle->p2, triangle->p0))/3;
+
+
+        glm::vec3 direction = randPoint + normal*avg;
 
         //Set the direction
         r.direction = glm::normalize(direction - r.origin);
