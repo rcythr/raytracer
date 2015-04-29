@@ -7,9 +7,12 @@
 #include "light/ambient.hpp"
 #include "light/directional.hpp"
 #include "light/point.hpp"
+#include "light/triangular.hpp"
+#include "light/spherical.hpp"
 
 #include "material/material.hpp"
 #include "material/phong.hpp"
+#include "material/lambertian.hpp"
 
 #include "sampler/sampler.hpp"
 #include "sampler/solid.hpp"

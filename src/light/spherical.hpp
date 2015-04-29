@@ -11,8 +11,6 @@ namespace raytracer {
             , sphere(sphere)
         {}
 
-        virtual std::string toString(size_t depth = 0) override;
-
         virtual LightType get_type() override { return LightType::SPHERICAL; }
 
         std::shared_ptr<Sphere> sphere;

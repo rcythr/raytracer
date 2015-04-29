@@ -72,6 +72,24 @@ Kernel::Kernel() {
                 lookup_color(extractString(params, "color"))));
         } },
 
+        { "triangular", [this](ParamMap& params) {
+            auto color = lookup_color(extractString(params, "color"));
+            auto lightMat = std::make_shared<Lambertian>(color);
+            auto shape = std::make_shared<Triangle>(
+                extractVec3(params, "p0"), glm::vec2(0.0f),
+                extractVec3(params, "p1"), glm::vec2(0.0f),
+                extractVec3(params, "p2"), glm::vec2(0.0f),
+                lightMat);
+            lights.push_back(std::make_shared<TriangularLight>(extractFloat(params, "intensity"), shape, color));
+        } },
+
+        { "spherical", [this](ParamMap& params) {
+            auto color = lookup_color(extractString(params, "color"));
+            auto lightMat = std::make_shared<Lambertian>(color);
+            auto shape = std::make_shared<Sphere>(extractVec3(params, "point"), extractFloat(params, "radius"), lightMat);
+            lights.push_back(std::make_shared<SphericalLight>(extractFloat(params, "intensity"), shape, color));
+        } },
+
         // Color
         { "color", [this](ParamMap& params) {
             std::string name = extractString(params, "name");

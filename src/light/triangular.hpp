@@ -10,8 +10,6 @@ namespace raytracer {
             , triangle(triangle)
         {}
 
-        virtual std::string toString(size_t depth = 0) override;
-
         virtual LightType get_type() override { return LightType::TRIANGULAR; }
 
         std::shared_ptr<Triangle> triangle;
