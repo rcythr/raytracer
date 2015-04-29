@@ -1,6 +1,5 @@
 
 #include "spatial/kdtree.hpp"
-#include "util/string_mult.hpp"
 #include "util/kdtree/kdtree.hpp"
 #include <sstream>
 #include <fstream>
@@ -135,16 +134,3 @@ void KDTreeSpatialIndex::view_all_objects(ViewAllCallback functor, void* ctx) {
     }
 }
 
-std::string KDTreeSpatialIndex::toString(size_t depth) {
-    std::string tabdepth = std::string("\t") * depth;
-
-    std::stringstream ss;
-
-    ss << tabdepth << "TYPE: KDTREE\n";
-    ss << tabdepth << "OBJECTS:\n";
-    for (auto& obj : shapes) {
-        ss << obj->toString(depth + 1);
-    }
-
-    return ss.str();
-}

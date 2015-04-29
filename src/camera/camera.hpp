@@ -33,11 +33,6 @@ struct Camera {
     virtual glm::mat4 build_transform_mat() = 0;
 
     /**
-     * Returns a string representation of this object.
-     */
-    virtual std::string toString(size_t depth = 0) = 0;
-
-    /**
      * Spawns rays according to the camera's location and calls the given
      * function
      *   for each ray with (row, col, ray) information.

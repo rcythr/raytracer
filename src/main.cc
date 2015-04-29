@@ -18,10 +18,6 @@ int main(int argc, char* argv[]) {
     Kernel kernel;
     loadXML(argv[1], kernel);
 
-    if (kernel.verbose) {
-        std::cout << kernel.toString();
-    }
-
     typedef std::chrono::high_resolution_clock Clock;
     auto start = Clock::now();
     kernel.spatial_index->optimize();

@@ -20,7 +20,6 @@ struct Kernel {
     MaterialPtr last_material;
 
   public:
-    bool verbose;
     size_t num_threads;
     glm::vec3 background_color;
     float world_ki;
@@ -41,9 +40,6 @@ struct Kernel {
 
     // Called by XML library for the closing of a tag.
     void close(std::string& tag) {}
-
-    // Usual to string function
-    std::string toString(size_t depth = 0);
 
     void render();
 

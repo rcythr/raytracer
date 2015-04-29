@@ -2,7 +2,6 @@
 
 #include "util/split.hpp"
 #include "util/xml_helpers.hpp"
-#include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
 #include "util/obj_mesh.hpp"
 
@@ -17,13 +16,10 @@
 using namespace raytracer;
 
 Kernel::Kernel() {
-    verbose = true;
-
     handlers = {
 
         // General
         { "general", [this](ParamMap& params) {
-            verbose = extractBool(params, "verbose");
             background_color = extractVec3(params, "background_color");
             num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
             world_ki = extractFloat(params, "world_ki", 1.000293);
@@ -203,40 +199,6 @@ void Kernel::open(std::string& tag, ParamMap& params) {
     }
 }
 
-std::string Kernel::toString(size_t depth) {
-    std::string tabdepth = std::string("\t") * depth;
-
-    std::stringstream ss;
-
-    // Now we'll print out the pieces.
-    ss << tabdepth << "CAMERAS: \n";
-    for (CameraPtr& camera : cameras) {
-        ss << camera->toString(depth + 1);
-    }
-
-    ss << tabdepth << "LIGHTS: \n";
-    for (auto& light : lights) {
-        ss << tabdepth << light->toString(depth + 1);
-    }
-
-    ss << tabdepth << "COLORS: \n";
-    for (auto& color : colors) {
-        ss << tabdepth << '\t' << color.first << ":\n";
-        ss << tabdepth << "\t\t" << color.second << "\n";
-    }
-
-    ss << tabdepth << "MATERIALS: \n";
-    for (auto& material : materials) {
-        ss << tabdepth << '\t' << material.first << ":\n";
-        ss << material.second->toString(depth + 2);
-    }
-
-    ss << tabdepth << "SPATIAL INDEX: \n";
-    ss << spatial_index->toString(depth + 1);
-
-    return ss.str();
-}
-
 struct SpawnRaysContext {
     Kernel* kernel;
     CameraPtr camera;
@@ -328,23 +290,27 @@ void color_rec_callback(void* ct, HitResult& hit) {
             auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / ki );
             if(refract1 != glm::vec3(0.0f))
             {
+                refract1 = glm::normalize(refract1);
+
                 auto refract2 = glm::refract( refract1, -normal, ki / ctx->kernel->world_ki );
                 if(refract2 != glm::vec3(0.0f))
                 {
+                    refract2 = glm::normalize(refract2);
+
                     Ray trans{ hit.intersection_point + refract2 * 0.05f, refract2 };
                     trans.update();
                     ctx->result += kt * ctx->kernel->get_color_rec(trans, ctx->num_bounces + 1, ctx->max_bounces);
                 }
                 else
                 {
-                    Ray refl{hit.intersection_point - refract1 * 0.05f, glm::reflect(refract1, -normal)};
+                    Ray refl{hit.intersection_point - refract1 * 0.05f, glm::normalize(glm::reflect(-refract1, -normal))};
                     refl.update();
                     ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
                 }
             }
             else
             {
-                Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, normal)};
+                Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::normalize(glm::reflect(-hit.incoming_ray.direction, normal))};
                 refl.update();
                 ctx->result += kt * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
             }

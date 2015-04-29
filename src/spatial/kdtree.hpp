@@ -19,8 +19,6 @@ struct KDTreeSpatialIndex : public SpatialIndex {
 
     void view_all_objects(ViewAllCallback functor, void* ctx = nullptr) override;
 
-    std::string toString(size_t depth = 0) override;
-
     std::vector<ShapePtr> shapes;
     std::shared_ptr<kdtree::KDNode<ShapePtr, AABB> > node;
 };

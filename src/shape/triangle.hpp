@@ -19,8 +19,6 @@ struct Triangle : public Shape {
                              std::max(std::max(p0.z, p1.z), p2.z));
     }
 
-    std::string toString(size_t depth = 0) override;
-
     void test_hit(const Ray& ray, HitResult& result) override;
 
     bool test_hit(const AABB& aabb) override;

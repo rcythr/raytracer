@@ -2,24 +2,9 @@
 #include "shape/triangle.hpp"
 #include "material/material.hpp"
 
-#include <sstream>
-#include "util/string_mult.hpp"
 #include "util/vec3_helpers.hpp"
 
 using namespace raytracer;
-
-std::string Triangle::toString(size_t depth) {
-    std::string tabdepth = std::string("\t") * depth;
-
-    std::stringstream ss;
-    ss << tabdepth << "TYPE: TRIANGLE" << std::endl;
-    ss << tabdepth << "P_0: " << p0 << std::endl;
-    ss << tabdepth << "P_1: " << p1 << std::endl;
-    ss << tabdepth << "P_2: " << p2 << std::endl;
-    ss << tabdepth << "MATERIAL: " << std::endl;
-    ss << material->toString(depth + 1);
-    return ss.str();
-}
 
 template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
 

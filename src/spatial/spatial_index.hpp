@@ -26,8 +26,6 @@ struct SpatialIndex {
     virtual bool has_hit(Ray& ray, ShapePtr omit_shape) = 0;
 
     virtual void view_all_objects(ViewAllCallback functor, void* ctx = nullptr) = 0;
-
-    virtual std::string toString(size_t depth = 0) = 0;
 };
 
 typedef std::shared_ptr<SpatialIndex> SpatialIndexPtr;

@@ -35,8 +35,6 @@ struct PinholeCamera : public Camera {
 
     std::vector<std::vector<RayContext>*> spawn_rays() override;
 
-    std::string toString(size_t depth) override;
-
     size_t get_num_samples() override { return num_samples; }
 
     size_t get_num_bounces() override { return num_bounces; }

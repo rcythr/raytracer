@@ -3,26 +3,7 @@
 
 #include "kernel.hpp"
 
-#include <sstream>
-#include "util/string_mult.hpp"
-
 using namespace raytracer;
-
-std::string Phong::toString(size_t depth) {
-    std::string tabdepth = std::string("\t") * depth;
-
-    std::stringstream ss;
-    ss << tabdepth << "TYPE: MATTE\n";
-    ss << tabdepth << "KA: " << ka << "\n";
-    ss << tabdepth << "KD: " << kd << "\n";
-    ss << tabdepth << "KS: " << ks << "\n";
-    ss << tabdepth << "KE: " << ke << "\n";
-    ss << tabdepth << "KR: " << kr << "\n";
-    ss << tabdepth << "KT: " << kt << "\n";
-    ss << tabdepth << "KI: " << ki << "\n";
-
-    return ss.str();
-}
 
 glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) {
     auto color = sampler->get_color(hit.u, hit.v);

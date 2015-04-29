@@ -23,8 +23,6 @@ struct Sphere : public Shape {
 
     bool test_hit(const AABB& aabb) override;
 
-    std::string toString(size_t depth = 0) override;
-
     AABB& get_aabb() override { return aabb; }
 
     glm::vec3 point;
