@@ -115,7 +115,8 @@ Kernel::Kernel() {
                                         extractFloat(params, "ke"),
                                         extractFloat(params, "kr"),
                                         extractFloat(params, "kt"),
-                                        extractFloat(params, "ki"));
+                                        extractFloat(params, "ki"),
+                                        extractBool(params, "is_hollow", false));
 
             last_material = material;
 
@@ -299,6 +300,7 @@ void color_rec_callback(void* ct, HitResult& hit) {
     float kr = hit.shape->material->kr;
     float kt = hit.shape->material->kt;
     float ki = hit.shape->material->ki;
+    bool is_hollow = hit.shape->material->is_hollow;
 
     if(ctx->num_bounces < ctx->max_bounces)
     {
@@ -322,7 +324,7 @@ void color_rec_callback(void* ct, HitResult& hit) {
             {
                 refract1 = glm::normalize(refract1);
 
-                auto refract2 = glm::refract( refract1, -normal, ki / ctx->kernel->world_ki );
+                auto refract2 = (is_hollow) ? glm::refract( refract1, -normal, ki / ctx->kernel->world_ki ) : refract1;
                 if(refract2 != glm::vec3(0.0f))
                 {
                     refract2 = glm::normalize(refract2);

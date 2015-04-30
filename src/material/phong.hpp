@@ -8,8 +8,8 @@ namespace raytracer {
 
 struct Phong : public Material {
 
-    Phong(float ka, float kd, float ks, float ke, float kr, float kt, float ki)
-        : Material(kr, kt, ki), ka(ka), kd(kd), ks(ks), ke(ke) {}
+    Phong(float ka, float kd, float ks, float ke, float kr, float kt, float ki, bool is_hollow)
+        : Material(kr, kt, ki, is_hollow), ka(ka), kd(kd), ks(ks), ke(ke) {}
 
     virtual ~Phong() override {}
 

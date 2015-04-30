@@ -9,7 +9,7 @@ namespace raytracer {
     struct Lambertian : public Material {
 
         Lambertian(glm::vec3 color)
-            : Material(0.0f, 0.0f, 0.0f)
+            : Material(0.0f, 0.0f, 0.0f, false)
             , color(color)
         {}
 
