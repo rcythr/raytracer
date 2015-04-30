@@ -21,6 +21,8 @@ struct PPM {
         data[row][col] = color;
     }
 
+    void map();
+
     void apply_guassian();
 
     bool save(std::string filename);

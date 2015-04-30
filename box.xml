@@ -1,0 +1,238 @@
+<general
+    background_color0="0 0 0"
+    background_color="0 0 0"
+    verbose="false" />
+
+<!-- Front View --!>
+<pinhole
+    pixel_size="0.30"
+    num_samples="1"
+    num_bounces="3"
+    eye="278 273 -800"
+    up="0 1 0"
+    look_at="278 273 1"
+    view_distance="343">
+
+    <ppm_viewplane
+        hres="800"
+        vres="800"
+        filename="out.ppm" />
+
+</pinhole>
+
+<colors>
+    <color name="red" value="1 0 0" />
+    <color name="green" value="0 1 0" />
+    <color name="blue" value="0 0 1" />
+
+    <color name="yellow" value="1 1 0" />
+
+    <color name="white" value="1 1 1" />
+    <color name="black" value="0 0 0" />
+</colors>
+
+<materials>
+    <phong 
+        name="floor"
+        ka="0.2" 
+        kd="0.5" 
+        ks="0.0" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
+        <solid color="white" />
+    </phong>
+    <phong 
+        name="backwall"
+        ka="0.2" 
+        kd="0.5" 
+        ks="0.0" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
+        <solid color="white" />
+    </phong>
+    <phong 
+        name="ceiling"
+        ka="0.2" 
+        kd="0.5" 
+        ks="0.0" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
+        <solid color="white" />
+    </phong>
+    <phong
+        name="leftwall"
+        ka="0.2"
+        kd="0.5"
+        ks="0.0" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
+        <solid color="red" />
+    </phong>
+    <phong
+        name="rightwall"
+        ka="0.2"
+        kd="0.5"
+        ks="0.0" ke="100.0"
+        kr="0.0"
+        kt="0.0" ki="1.0">
+        <solid color="green" />
+    </phong>
+    <phong
+        name="refl_sphere"
+        ka="0.2"
+        kd="0.0"
+        ks="0.0" ke="1000.0"
+        kr="0.95"
+        kt="0.0" ki="1.0">
+        <solid color="black" />
+    </phong>
+    <phong
+        name="trans_sphere"
+        ka="0.2"
+        kd="0.3"
+        ks="0.3" ke="200"
+        kr="0.05"
+        kt="0.75" ki="0.90">
+        <solid color="white" />
+    </phong>
+</materials>
+    
+<naive_index>
+    <triangle
+        p0="549.6 0.0 559.2"
+        p1="0 0 559.2"
+        p2="0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="backwall" />
+    <triangle
+        p0="549.6 0 559.2"
+        p1="0 548.8 559.2"
+        p2="556.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="backwall" />
+    
+    <triangle
+        p0="552.8 0 0"
+        p1="549.6 0 559.2"
+        p2="556.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="leftwall" />
+    <triangle
+        p0="552.8 0 0"
+        p1="556.0 548.8 559.2"
+        p2="556.0 548.8 0"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="leftwall" />
+    
+    <triangle
+        p0="0.0 0.0 559.2"
+        p1="0.0 0.0 0.0"
+        p2="0.0 548.8 0.0"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="rightwall" />
+    <triangle
+        p0="0.0 0.0 559.2"
+        p1="0.0 548.8 0.0"
+        p2="0.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="rightwall" />
+
+    <triangle
+        p0="0.0 548.8 0.0"
+        p1="343.0 548.8 227.0"
+        p2="213.0 548.8 227.0"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="0.0 548.8 0.0"
+        p1="556.0 548.8 0.0"
+        p2="343.0 548.8 227.0"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="0.0 548.8 0.0"
+        p1="213.0 548.8 227.0"
+        p2="0.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="213.0 548.8 227.0"
+        p1="213.0 548.8 332.0"
+        p2="0.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="0.0 548.8 559.2"
+        p1="213.0 548.8 332.0"
+        p2="556.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="213.0 548.8 332.0"
+        p1="343.0 548.8 332.0"
+        p2="556.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="343.0 548.8 332.0"
+        p1="556.0 548.8 0.0"
+        p2="556.0 548.8 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="343.0 548.8 332.0"
+        p1="343.0 548.8 227.0"
+        p2="556.0 548.8 0.0"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="ceiling" />
+
+    <triangle
+        p0="552.8 0.0 0.0"
+        p1="0.0 0.0 0.0"
+        p2="0.0 0.0 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="floor" />
+    <triangle
+        p0="552.8 0.0 0.0"
+        p1="0.0 0.0 559.2"
+        p2="549.6 0.0 559.2"
+        uv0="0 0" uv1="0 0" uv2="0 0"
+        material="floor" />
+
+    <sphere
+        point="425.0 85.0 394"
+        radius="85.0"
+        material="refl_sphere"
+        />
+
+    <sphere
+        point="120.0 85.0 194"
+        radius="85.0"
+        material="trans_sphere"
+        />
+
+</naive_index>
+
+<lights>
+    <triangular
+        p0="343.0 548.7 227.0"
+        p1="343.0 548.7 332.0"
+        p2="213.0 548.7 332.0"
+        color="white"
+        intensity="100000.0" />
+
+    <triangular
+        p0="343.0 548.8 227.0"
+        p1="213.0 548.8 332.0"
+        p2="213.0 548.8 227.0"
+        color="white"
+        intensity="100000.0" />
+</lights>
+

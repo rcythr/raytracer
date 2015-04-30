@@ -41,7 +41,9 @@ struct Kernel {
     // Called by XML library for the closing of a tag.
     void close(std::string& tag) {}
 
-    void render();
+    void lightPass();
+
+    void renderPass();
 
     glm::vec3 get_color_rec(const Ray& ray, size_t num_bounces, size_t max_bounces);
 };

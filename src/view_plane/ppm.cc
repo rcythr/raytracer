@@ -32,6 +32,7 @@ void PPMViewPlane::finish(size_t num_samples) {
         }
     }
 
+    ppm.map();
     ppm.apply_guassian();
     ppm.save(filename);
 }

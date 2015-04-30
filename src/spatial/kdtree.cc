@@ -113,7 +113,7 @@ bool has_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
         if (obj != ctx->omit_shape) {
             obj->test_hit(ctx->ray, hit);
             if (hit.found_hit) {
-                ctx->result = true;
+                ctx->result = hit.shape->is_light == false;
                 return true;
             }
         }

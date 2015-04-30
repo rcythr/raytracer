@@ -11,7 +11,9 @@ namespace raytracer {
 struct Material;
 
 struct Shape : std::enable_shared_from_this<Shape> {
-    Shape(std::shared_ptr<Material> material) : material(material) {}
+    Shape(std::shared_ptr<Material> material) 
+        : is_light(false) 
+        , material(material) {}
 
     virtual ~Shape() {}
 
@@ -20,6 +22,7 @@ struct Shape : std::enable_shared_from_this<Shape> {
 
     virtual AABB& get_aabb() = 0;
 
+    bool is_light;
     std::shared_ptr<Material> material;
 };
 

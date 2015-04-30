@@ -83,7 +83,7 @@ inline bool plane_box_overlap(glm::vec3 normal, const glm::vec3 vert,
             vmax[i] = -maxbox[i] - v;
         }
     }
-    if (glm::dot(normal, vmin) > 0.0f)
+    if (glm::dot(normal, vmin) >= 0.0f)
         return false;
 
     if (glm::dot(normal, vmax) >= 0.0f)

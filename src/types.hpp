@@ -27,6 +27,7 @@
 
 #include "spatial/spatial_index.hpp"
 #include "spatial/kdtree.hpp"
+#include "spatial/naive.hpp"
 
 #include "view_plane/view_plane.hpp"
 #include "view_plane/ppm.hpp"

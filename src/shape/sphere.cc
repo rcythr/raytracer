@@ -67,8 +67,9 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
 }
 
 inline float squared(float v) { return v * v; }
+
 bool Sphere::test_hit(const AABB& aabb) {
-    float dist_squared = radius * radius;
+/*    float dist_squared = radius * radius;
 
     if (point.x < aabb.min[0])
         dist_squared -= squared(point.x - aabb.min[0]);
@@ -86,4 +87,16 @@ bool Sphere::test_hit(const AABB& aabb) {
         dist_squared -= squared(point.z - aabb.max[2]);
 
     return dist_squared > 0;
+    */
+
+    float r2 = radius * radius;
+    float dmin = 0;
+    for(size_t i=0; i < 3; ++i)
+    {
+        if(point[i] < aabb.min[i])
+            dmin += squared(point[i] - aabb.min[i]);
+        else if(point[i] > aabb.max[i])
+            dmin += squared(point[i] - aabb.max[i]);
+    }
+    return dmin <= r2;
 }

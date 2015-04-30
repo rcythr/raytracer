@@ -26,6 +26,10 @@ Kernel::Kernel() {
         } },
 
         // Spatial Indecies
+        {"naive_index", [this](ParamMap& params) {
+            spatial_index = std::make_shared<NaiveSpatialIndex>();    
+        } },
+
         { "kdtree_index", [this](ParamMap& params) {
             spatial_index = std::make_shared<KDTreeSpatialIndex>();
         } },
@@ -80,14 +84,18 @@ Kernel::Kernel() {
                 extractVec3(params, "p1"), glm::vec2(0.0f),
                 extractVec3(params, "p2"), glm::vec2(0.0f),
                 lightMat);
+            shape->is_light = true;
             lights.push_back(std::make_shared<TriangularLight>(extractFloat(params, "intensity"), shape, color));
+            spatial_index->insert(shape);
         } },
 
         { "spherical", [this](ParamMap& params) {
             auto color = lookup_color(extractString(params, "color"));
             auto lightMat = std::make_shared<Lambertian>(color);
             auto shape = std::make_shared<Sphere>(extractVec3(params, "point"), extractFloat(params, "radius"), lightMat);
+            shape->is_light = true;
             lights.push_back(std::make_shared<SphericalLight>(extractFloat(params, "intensity"), shape, color));
+            spatial_index->insert(shape);
         } },
 
         // Color
@@ -236,7 +244,11 @@ void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
     delete row;
 }
 
-void Kernel::render() {
+void Kernel::lightPass() {
+
+}
+
+void Kernel::renderPass() {
     typedef std::chrono::high_resolution_clock Clock;
 
     size_t i = 1;

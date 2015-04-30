@@ -1,5 +1,6 @@
 #include "util/ppm/ppm.hpp"
 
+#include <iostream>
 #include <sstream>
 #include <cstdio>
 
@@ -21,6 +22,49 @@ PPM::~PPM() {
     }
 }
 
+void PPM::map()
+{
+    glm::vec3 min = data[0][0];
+    glm::vec3 max = data[0][0];
+
+    // First determine our range.
+    for(int64_t i=0; i < (int64_t)height; ++i) {
+        for(int64_t j=0; j < (int64_t)width; ++j) {
+            auto& v = data[i][j];
+
+            if(v.r < 0.0f) v.r = 0.0f;
+            if(v.g < 0.0f) v.g = 0.0f;
+            if(v.b < 0.0f) v.b = 0.0f;
+            
+            if(v.r > 1.0f) v.r = 1.0f;
+            if(v.g > 1.0f) v.g = 1.0f;
+            if(v.b > 1.0f) v.b = 1.0f;
+
+            if(v.r < min.r) min.r = v.r;
+            if(v.r > max.r) max.r = v.r;
+
+            if(v.g < min.g) min.g = v.g;
+            if(v.g > max.g) max.g = v.g;
+            
+            if(v.b < min.b) min.b = v.b;
+            if(v.b > max.b) max.b = v.b;
+        }
+    }
+
+    std::cout << '(' << min.r << ',' <<  min.g << ',' << min.b  << ')' << std::endl;
+    std::cout << '(' << max.r << ',' <<  max.g << ',' << max.b  << ')' << std::endl;
+
+    // Now calculate the linear equation for each color and scale
+    for(int64_t i=0; i < (int64_t)height; ++i) {
+        for(int64_t j=0; j < (int64_t)width; ++j) {
+            auto& v = data[i][j];
+            v.r /= max.r;
+            v.g /= max.g;
+            v.b /= max.b;
+        }
+    }
+}
+
 void PPM::apply_guassian() {
     glm::vec3 v11, v12, v13, v21, v22, v23, v31, v32, v33;
 
@@ -28,7 +72,7 @@ void PPM::apply_guassian() {
 
     // Create temporary storage for the output data.
     glm::vec3** out_data = new glm::vec3* [height];
-    for (int64_t i = 0; i < height; ++i) {
+    for (int64_t i = 0; i < (int64_t)height; ++i) {
         out_data[i] = new glm::vec3[width];
     }
 
@@ -58,7 +102,7 @@ void PPM::apply_guassian() {
     }
 
     // Delete the old data array.
-    for (int64_t i = 0; i < height; ++i) {
+    for (int64_t i = 0; i < (int64_t)height; ++i) {
         delete[] data[i];
     }
     delete[] data;
@@ -85,8 +129,8 @@ bool PPM::save(std::string filename) {
     std::fwrite(header.c_str(), sizeof(char), header.size(), fd);
 
     // Write out all of the pixel data.
-    for (int64_t i = 0; i < height; ++i) {
-        for (int64_t j = 0; j < width; ++j) {
+    for (int64_t i = 0; i < (int64_t)height; ++i) {
+        for (int64_t j = 0; j < (int64_t)width; ++j) {
             auto& pix = data[i][j];
 
             int32_t r = std::min(std::max((int32_t)(pix.r * 255), 0), 255);
