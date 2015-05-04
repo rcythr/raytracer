@@ -13,6 +13,7 @@
 #include "material/material.hpp"
 #include "material/phong.hpp"
 #include "material/lambertian.hpp"
+#include "material/photon_mapped.hpp"
 
 #include "sampler/sampler.hpp"
 #include "sampler/solid.hpp"

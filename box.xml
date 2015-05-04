@@ -1,6 +1,7 @@
 <general
-    background_color0="0 0 0"
     background_color="0 0 0"
+    num_photons="100000"
+    k_nearest="15"
     verbose="false" />
 
 <!-- Front View --!>
@@ -32,69 +33,56 @@
 </colors>
 
 <materials>
-    <phong 
+    <photon_mapped 
         name="floor"
-        ka="0.2" 
-        kd="0.5" 
+        kd="0.75" 
         ks="0.0" ke="100.0"
-        kr="0.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
-    </phong>
-    <phong 
+    </photon_mapped>
+    <photon_mapped 
         name="backwall"
-        ka="0.2" 
-        kd="0.5" 
+        kd="0.70" 
         ks="0.0" ke="100.0"
-        kr="0.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
-    </phong>
-    <phong 
+    </photon_mapped>
+    <photon_mapped 
         name="ceiling"
-        ka="0.2" 
-        kd="0.5" 
+        kd="0.70" 
         ks="0.0" ke="100.0"
-        kr="0.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
-    </phong>
-    <phong
+    </photon_mapped>
+    <photon_mapped
         name="leftwall"
-        ka="0.2"
-        kd="0.5"
+        kd="0.60"
         ks="0.0" ke="100.0"
-        kr="0.0"
         kt="0.0" ki="1.0">
         <solid color="red" />
-    </phong>
-    <phong
+    </photon_mapped>
+    <photon_mapped
         name="rightwall"
-        ka="0.2"
-        kd="0.5"
+        kd="0.40"
         ks="0.0" ke="100.0"
-        kr="0.0"
         kt="0.0" ki="1.0">
         <solid color="green" />
-    </phong>
-    <phong
+    </photon_mapped>
+    <photon_mapped
         name="refl_sphere"
-        ka="0.2"
         kd="0.0"
-        ks="0.0" ke="1000.0"
-        kr="0.95"
-        kt="0.0" ki="1.0">
+        ks="1.0" ke="1000.0"
+        kt="0.9" ki="1.0">
         <solid color="black" />
-    </phong>
-    <phong
+    </photon_mapped>
+    <photon_mapped
         name="trans_sphere"
-        ka="0.2"
-        kd="0.3"
-        ks="0.3" ke="200"
-        kr="0.05"
-        kt="0.75" ki="0.90">
+        kd="0.0"
+        ks="0.0" ke="200"
+        kt="1.0" ki="3.9"
+        is_hollow="false">
         <solid color="white" />
-    </phong>
+    </photon_mapped>
 </materials>
     
 <naive_index>
@@ -205,7 +193,7 @@
         p2="549.6 0.0 559.2"
         uv0="0 0" uv1="0 0" uv2="0 0"
         material="floor" />
-
+    
     <sphere
         point="425.0 85.0 394"
         radius="85.0"
@@ -217,7 +205,6 @@
         radius="85.0"
         material="trans_sphere"
         />
-
 </naive_index>
 
 <lights>
@@ -226,13 +213,13 @@
         p1="343.0 548.7 332.0"
         p2="213.0 548.7 332.0"
         color="white"
-        intensity="100000.0" />
+        intensity="25000.0" />
 
     <triangular
         p0="343.0 548.8 227.0"
         p1="213.0 548.8 332.0"
         p2="213.0 548.8 227.0"
         color="white"
-        intensity="100000.0" />
+        intensity="25000.0" />
 </lights>
 

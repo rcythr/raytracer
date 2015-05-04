@@ -5,6 +5,7 @@
 #include "util/vec3_helpers.hpp"
 #include "util/obj_mesh.hpp"
 
+#include "util/sample_hemisphere.hpp"
 #include "util/thread_pool.hpp"
 
 #include <algorithm>
@@ -22,6 +23,8 @@ Kernel::Kernel() {
         { "general", [this](ParamMap& params) {
             background_color = extractVec3(params, "background_color");
             num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
+            num_photons = extractInt(params, "num_photons", 0);
+            k_nearest = extractInt(params, "k_nearest", 5);
             world_ki = extractFloat(params, "world_ki", 1.000293);
         } },
 
@@ -109,14 +112,29 @@ Kernel::Kernel() {
             std::string name = extractString(params, "name");
 
             auto material =
-                std::make_shared<Phong>(extractFloat(params, "ka"),
+                std::make_shared<Phong>(extractFloat(params, "ka", 0.0f),
                                         extractFloat(params, "kd"),
                                         extractFloat(params, "ks"),
                                         extractFloat(params, "ke"),
-                                        extractFloat(params, "kr"),
                                         extractFloat(params, "kt"),
                                         extractFloat(params, "ki"),
                                         extractBool(params, "is_hollow", false));
+
+            last_material = material;
+
+            materials.insert(std::make_pair(std::move(name), material));
+        } },
+
+        {"photon_mapped", [this](ParamMap& params) {
+            std::string name = extractString(params, "name");
+
+            auto material = std::make_shared<PhotonMapped>(extractFloat(params, "ka", 0.0f),
+                                                           extractFloat(params, "kd"),
+                                                           extractFloat(params, "ks"),
+                                                           extractFloat(params, "ke"),
+                                                           extractFloat(params, "kt"),
+                                                           extractFloat(params, "ki"),
+                                                           extractBool(params, "is_hollow", false));
 
             last_material = material;
 
@@ -245,8 +263,155 @@ void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
     delete row;
 }
 
-void Kernel::lightPass() {
+static thread_local std::random_device rd;
+static thread_local std::mt19937 gen(rd());
+static thread_local std::uniform_real_distribution<> dis(0, 1);
 
+struct LPHitContext {
+    std::vector<Photon>& global_raw_photons;
+    std::vector<Photon>& caustic_raw_photons;
+
+    Kernel* kernel;
+    bool first_diffuse_hit;
+    glm::vec3 power;
+    Ray* r;
+
+    size_t TTL;
+    bool destroyed;
+};
+
+void light_pass_hit(void* ct, HitResult& hit) {
+    if(hit.shape->is_light)
+        return;
+
+    LPHitContext* ctx = (LPHitContext*)ct;
+    if(ctx->TTL == 0)
+        return;
+
+    ctx->TTL -= 1;
+
+    auto& mat = hit.shape->material;
+
+    float Pd = mat->kd;
+    float Ps = mat->ks;
+    float Pt = mat->kt;
+
+    float r1 = dis(gen);
+    if(r1 < Pd) {
+        // Diffuse Reflection
+       
+        if(ctx->first_diffuse_hit)
+        {
+            Photon p{hit.intersection_point,
+                     hit.incoming_ray.direction,
+                     ctx->power};
+
+            ctx->global_raw_photons.push_back(p);
+            ctx->caustic_raw_photons.push_back(p);
+        }
+
+        ctx->r->origin = hit.intersection_point - hit.incoming_ray.direction * 0.05f;
+        ctx->r->direction = glm::normalize(sampleHemisphereUniform(hit.intersection_normal, dis(gen), dis(gen)));
+        ctx->r->update();
+
+        ctx->destroyed = false;
+    } else if(r1 < (Pd + Ps)) {
+        // Specular Reflection
+        // Update the ray and continue bouncing.
+        ctx->r->origin = hit.intersection_point - hit.incoming_ray.direction * 0.05f;
+        ctx->r->direction = glm::normalize(glm::reflect(hit.incoming_ray.direction, hit.intersection_normal));
+        ctx->r->update();
+        ctx->destroyed = false;
+    } else if(r1 < (Pd + Ps + Pt)) {
+        // Specular Transmission
+        // Update the ray and continue bouncing.
+
+        float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
+
+        auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+
+        auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / mat->ki );
+        if(refract1 != glm::vec3(0.0f))
+        {
+            refract1 = glm::normalize(refract1);
+
+            auto refract2 = (mat->is_hollow) ? glm::refract( refract1, -normal, mat->ki / ctx->kernel->world_ki ) : refract1;
+            if(refract2 != glm::vec3(0.0f))
+            {
+                refract2 = glm::normalize(refract2);
+                ctx->r->origin = hit.intersection_point + refract2 * 0.05f;
+                ctx->r->direction = refract2;
+                ctx->r->update();
+            }
+            else
+            {
+                ctx->r->origin = hit.intersection_point - refract1 * 0.05f;
+                ctx->r->direction = glm::normalize(glm::reflect(-refract1, -normal));
+                ctx->r->update();
+            }
+        }
+        else
+        {
+            ctx->r->origin = hit.intersection_point - hit.incoming_ray.direction * 0.05f;
+            ctx->r->direction = glm::normalize(glm::reflect(-hit.incoming_ray.direction, normal));
+            ctx->r->update();
+        }
+
+        ctx->destroyed = false;
+    } else {
+        // Absorbed
+        Photon p{hit.intersection_point,
+                 hit.incoming_ray.direction,
+                 ctx->power};
+
+        ctx->global_raw_photons.push_back(p);
+
+        // Mark this photon as destroyed
+        ctx->destroyed = true;
+    }
+}
+
+void Kernel::lightPass() {
+    std::vector<Photon> global_raw_photons;
+    std::vector<Photon> caustic_raw_photons;
+
+    std::vector<Ray> photon_rays;
+
+    LPHitContext ctx{global_raw_photons, caustic_raw_photons, this, false, glm::vec3(0.0f), nullptr, false};
+    
+    Ray r;
+    size_t rays_per_light = num_photons / lights.size();
+    size_t num_calcs = 0;
+    size_t max_calcs = num_photons * 10;
+    while(num_calcs < max_calcs && global_raw_photons.size() < num_photons) {
+        for(size_t i=0; i < lights.size(); ++i) {
+            if(lights[i]->gen_photon(r)) {
+
+                ctx.power = glm::vec3(lights[i]->intensity / rays_per_light);
+
+                // Run every ray we fired into the scene to determine the hits
+                ctx.TTL = 10;
+                ctx.first_diffuse_hit = true;
+                ctx.destroyed = false;
+                ctx.r = &r;
+
+                // We want to trace the photon around the scene until it is either lost or absorbed.
+                while(!ctx.destroyed) {
+                    // We mark it as destroyed, and will unmark it in the callback, if necessary.
+                    ctx.destroyed = true;
+                    spatial_index->find_closest_hit(r, light_pass_hit, &ctx, nullptr); 
+                }
+            }
+        }
+    }
+
+    std::cout << global_raw_photons.size() << std::endl;
+
+    if(global_raw_photons.size() != 0)
+        global_photons.construct(global_raw_photons);
+    
+    if(caustic_raw_photons.size() != 0)
+        caustic_photons.construct(caustic_raw_photons);
 }
 
 void Kernel::renderPass() {
@@ -297,7 +462,7 @@ void color_rec_callback(void* ct, HitResult& hit) {
     // Get Direct Illumination
     ctx->result = hit.shape->material->get_color(ctx->kernel, hit);
 
-    float kr = hit.shape->material->kr;
+    float ks = hit.shape->material->ks;
     float kt = hit.shape->material->kt;
     float ki = hit.shape->material->ki;
     bool is_hollow = hit.shape->material->is_hollow;
@@ -305,11 +470,11 @@ void color_rec_callback(void* ct, HitResult& hit) {
     if(ctx->num_bounces < ctx->max_bounces)
     {
         // Get Reflected Illumination
-        if(kr > 0.0)
+        if(ks > 0.0)
         {
             Ray refl{hit.intersection_point - hit.incoming_ray.direction * 0.05f, glm::reflect(hit.incoming_ray.direction, hit.intersection_normal)};
             refl.update();
-            ctx->result += kr * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
+            ctx->result += ks * ctx->kernel->get_color_rec(refl, ctx->num_bounces + 1, ctx->max_bounces);
         }
 
         // Get Transmitted Illumination

@@ -12,9 +12,10 @@ namespace raytracer {
 struct Kernel;
 
 struct Material {
-    Material(float kr, float kt, float ki, bool is_hollow) 
+    Material(float kd, float ks, float kt, float ki, bool is_hollow) 
         : is_hollow(is_hollow)
-        , kr(kr)
+        , kd(kd)
+        , ks(ks)
         , kt(kt)
         , ki(ki) 
     { }
@@ -24,8 +25,9 @@ struct Material {
     virtual glm::vec3 get_color(Kernel* kernel, HitResult& hit) = 0;
 
     bool is_hollow;
-    float kr; // Reflectance coefficient.
-    float kt; // Transmission coefficient.
+    float kd; // Diffuse Reflectance coefficient;
+    float ks; // Specular Reflectance coefficient.
+    float kt; // Specular Transmission coefficient.
     float ki; // Index of refraction
     SamplerPtr sampler;
 };

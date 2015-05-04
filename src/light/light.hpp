@@ -1,7 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <glm/glm.hpp>
+
+#include "ray.hpp"
 
 namespace raytracer {
 
@@ -18,6 +21,8 @@ struct Light {
     virtual ~Light() {}
 
     virtual LightType get_type() = 0;
+
+    virtual bool gen_photon(Ray& r) { return false; }
 
     float intensity;
     glm::vec3 color;

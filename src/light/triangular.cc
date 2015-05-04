@@ -5,24 +5,18 @@
 
 using namespace raytracer;
 
-std::vector<Ray> TriangularLight::get_photons(int n){
-    //Create Ray vector
-    std::vector<Ray> rays;
+static thread_local std::random_device rd;
+static thread_local std::mt19937 gen(rd());
+static thread_local std::uniform_real_distribution<> dis(0, 1);
 
+bool TriangularLight::gen_photon(Ray& result){
     // Calculate the normal vector
     glm::vec3 normal = glm::normalize(glm::cross(triangle->p1 - triangle->p0, triangle->p2 - triangle->p0));
 
     //Create random device for uniform distribution
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, 1);
+    result.origin = sampleTriangle(triangle->p0, triangle->p1, triangle->p2, dis(gen), dis(gen));
+    result.direction = sampleHemisphereCosine(normal, dis(gen), dis(gen));
+    result.update();
 
-    for(int i = 0; i < n; i++){
-        Ray r;
-        r.origin = sampleTriangle(triangle->p0, triangle->p1, triangle->p2, dis(gen), dis(gen));
-        r.direction = sampleHemisphere(normal, dis(gen), dis(gen));
-        r.update();
-        rays.push_back(r);
-    }
-    return rays;
+    return true;
 };

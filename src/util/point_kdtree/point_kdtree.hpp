@@ -17,12 +17,20 @@ namespace point_kdtree {
 template <typename PointTy, size_t K> struct PointKDTree {
     KDNode<PointTy> *root;
 
+    PointKDTree()
+        : root(nullptr)
+    { }
+
     PointKDTree(std::vector<PointTy> &lst)
         : root(detail::construct<PointTy, K>(lst, 0)) {}
 
     ~PointKDTree() {
         if (root)
             delete root;
+    }
+
+    void construct(std::vector<PointTy>& lst) {
+        root = detail::construct<PointTy, K>(lst, 0);
     }
 
     bool nearestNeighbor(PointTy p, PointTy &result) {

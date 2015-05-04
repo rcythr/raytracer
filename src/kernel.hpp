@@ -2,6 +2,9 @@
 
 #include "types.hpp"
 #include "util/xml.hpp"
+
+#include "photon_map.hpp"
+
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <vector>
@@ -20,7 +23,7 @@ struct Kernel {
     MaterialPtr last_material;
 
   public:
-    size_t num_threads;
+    size_t num_threads, num_photons, k_nearest;
     glm::vec3 background_color;
     float world_ki;
 
@@ -29,6 +32,9 @@ struct Kernel {
     std::unordered_map<std::string, glm::vec3> colors;
     std::unordered_map<std::string, MaterialPtr> materials;
     SpatialIndexPtr spatial_index;
+
+    PhotonMap caustic_photons;
+    PhotonMap global_photons;
 
     Kernel();
 

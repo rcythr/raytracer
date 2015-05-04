@@ -15,7 +15,7 @@ void findInRange(KDNode<PointTy>* node, PointTy& test, float range,
 
     float distance = node->data[dim] - test[dim];
 
-    if (abs(distance) <= range) {
+    if (std::abs(distance) <= range) {
         // Check both + Add Point
         result.push_back(node->data);
         findInRange<PointTy, K>(node->left, test, range, result, dim + 1);

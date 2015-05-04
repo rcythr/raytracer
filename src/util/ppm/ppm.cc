@@ -51,9 +51,6 @@ void PPM::map()
         }
     }
 
-    std::cout << '(' << min.r << ',' <<  min.g << ',' << min.b  << ')' << std::endl;
-    std::cout << '(' << max.r << ',' <<  max.g << ',' << max.b  << ')' << std::endl;
-
     // Now calculate the linear equation for each color and scale
     for(int64_t i=0; i < (int64_t)height; ++i) {
         for(int64_t j=0; j < (int64_t)width; ++j) {

@@ -61,13 +61,13 @@ void kNearestNeighborRec(kNNConfig<PointTy, K>& cfg, KDNode<PointTy>* node,
     if (cfg.test[dim] < node->data[dim]) {
         kNearestNeighborRec(cfg, node->left, dim + 1);
         if (!cfg.bpq_full() ||
-            abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
+            std::abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
             kNearestNeighborRec(cfg, node->right, dim + 1);
         }
     } else {
         kNearestNeighborRec(cfg, node->right, dim + 1);
         if (!cfg.bpq_full() ||
-            abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
+            std::abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
             kNearestNeighborRec(cfg, node->left, dim + 1);
         }
     }

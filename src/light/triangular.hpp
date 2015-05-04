@@ -14,7 +14,7 @@ namespace raytracer {
 
         virtual LightType get_type() override { return LightType::TRIANGULAR; }
 
-		virtual std::vector<Ray> get_photons(int n);
+		virtual bool gen_photon(Ray& result) override;
 
         std::shared_ptr<Triangle> triangle;
     };

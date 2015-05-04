@@ -45,12 +45,12 @@ void nearestNeighborRec(NNConfig<PointTy, K>& cfg, KDNode<PointTy>* node,
     // Now check the children, as needed.
     if (cfg.test[dim] < node->data[dim]) {
         nearestNeighborRec(cfg, node->left, dim + 1);
-        if (abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
+        if (std::abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
             nearestNeighborRec(cfg, node->right, dim + 1);
         }
     } else {
         nearestNeighborRec(cfg, node->right, dim + 1);
-        if (abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
+        if (std::abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
             nearestNeighborRec(cfg, node->left, dim + 1);
         }
     }

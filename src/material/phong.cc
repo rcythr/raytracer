@@ -7,10 +7,9 @@
 
 using namespace raytracer;
 
-thread_local std::random_device rd;
-thread_local std::mt19937 gen(rd());
-thread_local std::uniform_real_distribution<> dis(0, 1);
-            
+static thread_local std::random_device rd;
+static thread_local std::mt19937 gen(rd());
+static thread_local std::uniform_real_distribution<> dis(0, 1);
 
 glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) {
     auto color = sampler->get_color(hit.u, hit.v);
