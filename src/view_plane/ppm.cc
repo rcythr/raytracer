@@ -16,9 +16,18 @@ glm::vec3 PPMViewPlane::get_pixel(size_t row, size_t col) {
     return ppm.get_pixel(row, col);
 }
 
-void PPMViewPlane::set_pixel(size_t row, size_t col, glm::vec3 color) {
+void PPMViewPlane::add_pixel(size_t row, size_t col, glm::vec3 color) {
     std::lock_guard<std::mutex> lg(mut);
     ppm.add_pixel(row, col, color);
+}
+
+void PPMViewPlane::set_pixel(size_t row, size_t col, glm::vec3 color) {
+    std::lock_guard<std::mutex> lg(mut);
+    ppm.set_pixel(row, col, color);
+}
+
+void PPMViewPlane::save() {
+    ppm.save(filename);
 }
 
 void PPMViewPlane::finish(size_t num_samples) {
@@ -31,8 +40,4 @@ void PPMViewPlane::finish(size_t num_samples) {
             ppm.set_pixel(row, col, ppm.get_pixel(row, col) / ((float)num_samples));
         }
     }
-
-    ppm.map();
-    ppm.apply_guassian();
-    ppm.save(filename);
 }

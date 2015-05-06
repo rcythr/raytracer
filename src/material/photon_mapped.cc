@@ -19,26 +19,29 @@ glm::vec3 PhotonMapped::get_color(Kernel* kernel, HitResult& hit) {
 
     // Use the Global map to determine the indirect illumination.
     Photon p{ hit.intersection_point, hit.incoming_ray.direction, glm::vec3(0)};
-    auto global_photons = kernel->global_photons.kNearestNeighbors(p, kernel->k_nearest);
+    auto global_photons = kernel->global_photons.kNearestNeighbors(p, kernel->global_knn);
 
     float A = ((float)M_PI * dist_squared(global_photons[0].point, hit.intersection_point));
 
     for(size_t i=0; i < global_photons.size(); ++i)
     {
         auto& photon = global_photons[i];
-        indirect_result += photon.power;
+        if(glm::dot(photon.incident_direction, -hit.intersection_normal) > 0)
+            indirect_result += photon.power;
     }
     indirect_result /= A;
 
     // Use the caustics photon map to determine the additional caustic lighting
-    auto caustic_photons = kernel->caustic_photons.kNearestNeighbors(p, kernel->k_nearest);
+    auto caustic_photons = kernel->caustic_photons.kNearestNeighbors(p, kernel->caustic_knn);
 
     A = ((float)M_PI * dist_squared(caustic_photons[0].point, hit.intersection_point));
 
     for(size_t i=0; i < caustic_photons.size(); ++i)
     {
         auto& photon = caustic_photons[i];
-        caustic_result += photon.power;
+
+        if(glm::dot(photon.incident_direction, -hit.intersection_normal) > 0)
+            caustic_result += photon.power;
     }
 
     caustic_result /= A;

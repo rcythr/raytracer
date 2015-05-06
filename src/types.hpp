@@ -32,3 +32,9 @@
 
 #include "view_plane/view_plane.hpp"
 #include "view_plane/ppm.hpp"
+
+#include "tone_operators/tone_operator.hpp"
+#include "tone_operators/gaussian_operator.hpp"
+#include "tone_operators/ward_operator.hpp"
+#include "tone_operators/reinhard_operator.hpp"
+#include "tone_operators/linear_operator.hpp"

@@ -24,7 +24,8 @@ Kernel::Kernel() {
             background_color = extractVec3(params, "background_color");
             num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
             num_photons = extractInt(params, "num_photons", 0);
-            k_nearest = extractInt(params, "k_nearest", 5);
+            global_knn = extractInt(params, "global_knn", 100);
+            caustic_knn = extractInt(params, "caustic_knn", 10);
             world_ki = extractFloat(params, "world_ki", 1.000293);
         } },
 
@@ -217,6 +218,19 @@ Kernel::Kernel() {
             }
 
             loadObj(extractString(params, "filename"), point, rotate, scale, material, spatial_index);
+        } },
+
+        // Tone Operators
+        {"gaussian", [this](ParamMap& params) { 
+            tone_operators.push_back(std::make_shared<GaussianOperator>()); 
+        } },
+
+        {"ward", [this](ParamMap& params) { 
+            tone_operators.push_back(std::make_shared<WardOperator>(extractFloat(params, "l_max"))); 
+        } },
+       
+        {"reinhard", [this](ParamMap& params) { 
+            tone_operators.push_back(std::make_shared<ReinhardOperator>()); 
         } }
     };
 }
@@ -257,7 +271,7 @@ void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
     for(size_t i=0; i < len; ++i)
     {
         auto& ray_ctx = (*row)[i];
-        ctx->camera->view_plane->set_pixel(ray_ctx.row, ray_ctx.col, ctx->kernel->get_color_rec(ray_ctx.ray, 1, ctx->num_bounces));
+        ctx->camera->view_plane->add_pixel(ray_ctx.row, ray_ctx.col, ctx->kernel->get_color_rec(ray_ctx.ray, 1, ctx->num_bounces));
     }
 
     delete row;
@@ -435,8 +449,16 @@ void Kernel::renderPass() {
         tp.stop();
         tp.join();
 
-        // Signal to the view plane that we are finished writing.
+        // Signal to the view plane that we're finished writing. -  It divide by num_samples.
         camera->view_plane->finish(pow(camera->get_num_samples(), 2));
+        
+        // Apply all specified tone operators
+        for(std::shared_ptr<ToneOperator> to : tone_operators) {
+            to->apply(camera->view_plane);
+        }
+
+        // Save the contents of the view plane to the output file.
+        camera->view_plane->save();
 
         auto end = Clock::now();
 

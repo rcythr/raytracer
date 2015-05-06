@@ -23,7 +23,7 @@ struct Kernel {
     MaterialPtr last_material;
 
   public:
-    size_t num_threads, num_photons, k_nearest;
+    size_t num_threads, num_photons, global_knn, caustic_knn;
     glm::vec3 background_color;
     float world_ki;
 
@@ -35,6 +35,8 @@ struct Kernel {
 
     PhotonMap caustic_photons;
     PhotonMap global_photons;
+
+    std::vector<ToneOperatorPtr> tone_operators;
 
     Kernel();
 

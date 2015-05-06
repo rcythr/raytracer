@@ -17,13 +17,7 @@ struct PPM {
 
     void add_pixel(int64_t row, int64_t col, glm::vec3 color) { data[row][col] += color; }
 
-    void set_pixel(int64_t row, int64_t col, glm::vec3 color) {
-        data[row][col] = color;
-    }
-
-    void map();
-
-    void apply_guassian();
+    void set_pixel(int64_t row, int64_t col, glm::vec3 color) { data[row][col] = color; }
 
     bool save(std::string filename);
 };

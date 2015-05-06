@@ -30,12 +30,16 @@ struct ViewPlane {
      */
     virtual void set_pixel(size_t row, size_t col, glm::vec3 color) = 0;
 
+    virtual void add_pixel(size_t row, size_t col, glm::vec3 color) = 0;
+
     /**
      * Performs an unspecified operation which can be used to store
      *   the result of the computation at this point in time.
      * Ex. The PPMViewPlane writes out the image file when this is called.
      */
     virtual void finish(size_t num_samples) = 0;
+
+    virtual void save() = 0;
 };
 
 typedef std::shared_ptr<ViewPlane> ViewPlanePtr;
