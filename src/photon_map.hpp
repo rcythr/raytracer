@@ -9,6 +9,7 @@ struct Photon {
     glm::vec3 point;
     glm::vec3 incident_direction;
     glm::vec3 power;
+    glm::vec3 color;
 
     bool operator!=(const Photon& other) const { return point != other.point; }
     bool operator==(const Photon& other) const { return point == other.point; }

@@ -6,6 +6,7 @@ template <typename PointTy> struct KDNode {
     typedef PointTy point_type;
 
     PointTy data;
+    size_t dim;
     KDNode<PointTy> *left, *right;
 
     KDNode() : left(nullptr), right(nullptr) {}

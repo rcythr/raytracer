@@ -3,13 +3,10 @@
 
 #include "kernel.hpp"
 
+#include "util/random_utils.hpp"
 #include "util/sample_triangle.hpp"
 
 using namespace raytracer;
-
-static thread_local std::random_device rd;
-static thread_local std::mt19937 gen(rd());
-static thread_local std::uniform_real_distribution<> dis(0, 1);
 
 glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) {
     auto color = sampler->get_color(hit.u, hit.v);
@@ -84,8 +81,8 @@ glm::vec3 Phong::get_color(Kernel* kernel, HitResult& hit) {
                 points.push_back(sampleTriangle(light->triangle->p0,
                                                 light->triangle->p1,
                                                 light->triangle->p2,
-                                                dis(gen),
-                                                dis(gen)));
+                                                uniform_random(),
+                                                uniform_random()));
             }
 
             for(auto& pt : points)

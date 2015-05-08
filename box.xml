@@ -1,8 +1,15 @@
 <general
     background_color="0 0 0"
     num_photons="100000"
-    k_nearest="15"
-    verbose="false" />
+   
+    final_gather_samples="5"
+
+    global_knn="50" 
+    indirect_exposure="80000"
+
+    caustic_knn="1" 
+    caustic_exposure="1000"
+    />
 
 <!-- Front View --!>
 <pinhole
@@ -72,7 +79,7 @@
         name="refl_sphere"
         kd="0.0"
         ks="1.0" ke="1000.0"
-        kt="0.9" ki="1.0">
+        kt="0.0" ki="1.0">
         <solid color="black" />
     </photon_mapped>
     <photon_mapped
@@ -206,6 +213,10 @@
         material="trans_sphere"
         />
 </naive_index>
+
+<tone_operators>
+    <gaussian/>
+</tone_operators>
 
 <lights>
     <triangular

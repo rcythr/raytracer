@@ -22,7 +22,7 @@ template <typename PointTy, size_t K> struct PointKDTree {
     { }
 
     PointKDTree(std::vector<PointTy> &lst)
-        : root(detail::construct<PointTy, K>(lst, 0)) {}
+        : root(detail::construct<PointTy, K>(lst)) {}
 
     ~PointKDTree() {
         if (root)
@@ -30,7 +30,7 @@ template <typename PointTy, size_t K> struct PointKDTree {
     }
 
     void construct(std::vector<PointTy>& lst) {
-        root = detail::construct<PointTy, K>(lst, 0);
+        root = detail::construct<PointTy, K>(lst);
     }
 
     bool nearestNeighbor(PointTy p, PointTy &result) {

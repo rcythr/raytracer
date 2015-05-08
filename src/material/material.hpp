@@ -24,6 +24,10 @@ struct Material {
 
     virtual glm::vec3 get_color(Kernel* kernel, HitResult& hit) = 0;
 
+    virtual glm::vec3 get_raw_color(HitResult& hit) {
+        return sampler->get_color(hit.u, hit.v);
+    }
+
     bool is_hollow;
     float kd; // Diffuse Reflectance coefficient;
     float ks; // Specular Reflectance coefficient.

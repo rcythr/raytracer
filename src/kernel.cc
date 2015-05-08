@@ -1,239 +1,15 @@
 #include "kernel.hpp"
 
-#include "util/split.hpp"
-#include "util/xml_helpers.hpp"
-#include "util/vec3_helpers.hpp"
-#include "util/obj_mesh.hpp"
-
 #include "util/sample_hemisphere.hpp"
+#include "util/random_utils.hpp"
 #include "util/thread_pool.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <sstream>
-#include <thread>
 #include <chrono>
 
 using namespace raytracer;
-
-Kernel::Kernel() {
-    handlers = {
-
-        // General
-        { "general", [this](ParamMap& params) {
-            background_color = extractVec3(params, "background_color");
-            num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
-            num_photons = extractInt(params, "num_photons", 0);
-            global_knn = extractInt(params, "global_knn", 100);
-            caustic_knn = extractInt(params, "caustic_knn", 10);
-            world_ki = extractFloat(params, "world_ki", 1.000293);
-        } },
-
-        // Spatial Indecies
-        {"naive_index", [this](ParamMap& params) {
-            spatial_index = std::make_shared<NaiveSpatialIndex>();    
-        } },
-
-        { "kdtree_index", [this](ParamMap& params) {
-            spatial_index = std::make_shared<KDTreeSpatialIndex>();
-        } },
-
-        // Cameras
-        { "pinhole", [this](ParamMap& params) {
-            cameras.push_back(std::make_shared<PinholeCamera>(
-                extractFloat(params, "pixel_size"),
-                extractInt(params, "num_samples"),
-                extractInt(params, "num_bounces"),
-                extractVec3(params, "eye"),
-                extractVec3(params, "up"),
-                extractVec3(params, "look_at"),
-                extractFloat(params, "view_distance")));
-        } },
-
-        // ViewPlanes
-        { "ppm_viewplane", [this](ParamMap& params) {
-            cameras.at(cameras.size() - 1)->view_plane =
-                std::make_shared<PPMViewPlane>(
-                    extractInt(params, "hres"),
-                    extractInt(params, "vres"),
-                    extractString(params, "filename"));
-        } },
-
-        // Lights
-        { "ambient", [this](ParamMap& params) {
-            lights.push_back(std::make_shared<AmbientLight>(
-                extractFloat(params, "intensity"),
-                lookup_color(extractString(params, "color"))));
-        } },
-
-        { "directional", [this](ParamMap& params) {
-            lights.push_back(std::make_shared<DirectionalLight>(
-                extractFloat(params, "intensity"),
-                glm::normalize(extractVec3(params, "direction")),
-                lookup_color(extractString(params, "color"))));
-        } },
-
-        { "point", [this](ParamMap& params) {
-            lights.push_back(std::make_shared<PointLight>(
-                extractFloat(params, "intensity"),
-                extractVec3(params, "point"),
-                lookup_color(extractString(params, "color"))));
-        } },
-
-        { "triangular", [this](ParamMap& params) {
-            auto color = lookup_color(extractString(params, "color"));
-            auto lightMat = std::make_shared<Lambertian>(color);
-            auto shape = std::make_shared<Triangle>(
-                extractVec3(params, "p0"), glm::vec2(0.0f),
-                extractVec3(params, "p1"), glm::vec2(0.0f),
-                extractVec3(params, "p2"), glm::vec2(0.0f),
-                lightMat);
-            shape->is_light = true;
-            lights.push_back(std::make_shared<TriangularLight>(extractFloat(params, "intensity"), shape, color));
-            spatial_index->insert(shape);
-        } },
-
-        { "spherical", [this](ParamMap& params) {
-            auto color = lookup_color(extractString(params, "color"));
-            auto lightMat = std::make_shared<Lambertian>(color);
-            auto shape = std::make_shared<Sphere>(extractVec3(params, "point"), extractFloat(params, "radius"), lightMat);
-            shape->is_light = true;
-            lights.push_back(std::make_shared<SphericalLight>(extractFloat(params, "intensity"), shape, color));
-            spatial_index->insert(shape);
-        } },
-
-        // Color
-        { "color", [this](ParamMap& params) {
-            std::string name = extractString(params, "name");
-            colors.emplace(extractString(params, "name"), extractVec3(params, "value"));
-        } },
-
-        // Materials
-        { "phong", [this](ParamMap& params) {
-            std::string name = extractString(params, "name");
-
-            auto material =
-                std::make_shared<Phong>(extractFloat(params, "ka", 0.0f),
-                                        extractFloat(params, "kd"),
-                                        extractFloat(params, "ks"),
-                                        extractFloat(params, "ke"),
-                                        extractFloat(params, "kt"),
-                                        extractFloat(params, "ki"),
-                                        extractBool(params, "is_hollow", false));
-
-            last_material = material;
-
-            materials.insert(std::make_pair(std::move(name), material));
-        } },
-
-        {"photon_mapped", [this](ParamMap& params) {
-            std::string name = extractString(params, "name");
-
-            auto material = std::make_shared<PhotonMapped>(extractFloat(params, "ka", 0.0f),
-                                                           extractFloat(params, "kd"),
-                                                           extractFloat(params, "ks"),
-                                                           extractFloat(params, "ke"),
-                                                           extractFloat(params, "kt"),
-                                                           extractFloat(params, "ki"),
-                                                           extractBool(params, "is_hollow", false));
-
-            last_material = material;
-
-            materials.insert(std::make_pair(std::move(name), material));
-        } },
-
-        // Samplers
-        { "solid", [this](ParamMap& params) {
-            last_material->sampler = std::make_shared<SolidSampler>(
-                lookup_color(extractString(params, "color")));
-        } },
-
-        { "checkered", [this](ParamMap& params) {
-            last_material->sampler = std::make_shared<CheckerboardSampler>(
-                extractFloat(params, "size"),
-                lookup_color(extractString(params, "color1")),
-                lookup_color(extractString(params, "color2")));
-        } },
-
-        { "circles", [this](ParamMap& params) {
-            last_material->sampler = std::make_shared<CirclesSampler>(
-                extractFloat(params, "ring_size"),
-                lookup_color(extractString(params, "color1")),
-                lookup_color(extractString(params, "color2")));
-        } },
-
-        { "rainbow", [this](ParamMap& params) {
-            last_material->sampler = std::make_shared<RainbowSampler>(
-                lookup_color(extractString(params, "color1")),
-                lookup_color(extractString(params, "color2")));
-        } },
-
-        { "png", [this](ParamMap& params) {
-            auto texture = std::unique_ptr<PNGTexture>(new PNGTexture());
-            texture->load(extractString(params, "filename"));
-
-            last_material->sampler =
-                std::make_shared<PNGTextureSampler>(std::move(texture));
-        } },
-
-        // Shapes
-        { "sphere", [this](ParamMap& params) {
-            auto materialName = extractString(params, "material");
-            auto material = lookup_material(materialName);
-            if (material == nullptr) {
-                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
-            }
-
-            spatial_index->insert(std::make_shared<Sphere>(
-                extractVec3(params, "point"),
-                extractFloat(params, "radius"), material));
-        } },
-
-        { "triangle", [this](ParamMap& params) {
-            auto materialName = extractString(params, "material");
-            auto material = lookup_material(materialName);
-            if (material == nullptr) {
-                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
-            }
-
-            spatial_index->insert(std::make_shared<Triangle>(
-                extractVec3(params, "p0"),
-                extractVec2(params, "uv0"),
-                extractVec3(params, "p1"),
-                extractVec2(params, "uv1"),
-                extractVec3(params, "p2"),
-                extractVec2(params, "uv2"), material));
-        } },
-
-        { "obj_mesh", [this](ParamMap& params) {
-
-            auto point = extractVec3(params, "point");
-            auto rotate = extractVec3(params, "rotate");
-            auto scale = extractFloat(params, "scale");
-
-            auto materialName = extractString(params, "material");
-            auto material = lookup_material(materialName);
-            if (material == nullptr) {
-                std::cerr << "WARNING: Material '" << materialName << "' not found!" << std::endl;
-            }
-
-            loadObj(extractString(params, "filename"), point, rotate, scale, material, spatial_index);
-        } },
-
-        // Tone Operators
-        {"gaussian", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<GaussianOperator>()); 
-        } },
-
-        {"ward", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<WardOperator>(extractFloat(params, "l_max"))); 
-        } },
-       
-        {"reinhard", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<ReinhardOperator>()); 
-        } }
-    };
-}
 
 glm::vec3 Kernel::lookup_color(std::string name) {
     auto find_itr = colors.find(name);
@@ -277,17 +53,14 @@ void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
     delete row;
 }
 
-static thread_local std::random_device rd;
-static thread_local std::mt19937 gen(rd());
-static thread_local std::uniform_real_distribution<> dis(0, 1);
-
 struct LPHitContext {
     std::vector<Photon>& global_raw_photons;
     std::vector<Photon>& caustic_raw_photons;
 
     Kernel* kernel;
-    bool first_diffuse_hit;
-    glm::vec3 power;
+    size_t num_diffuse_hits;
+    size_t num_specular_hits;
+    glm::vec3 power, color;
     Ray* r;
 
     size_t TTL;
@@ -310,26 +83,29 @@ void light_pass_hit(void* ct, HitResult& hit) {
     float Ps = mat->ks;
     float Pt = mat->kt;
 
-    float r1 = dis(gen);
+    float r1 = uniform_random();
     if(r1 < Pd) {
         // Diffuse Reflection
-       
-        if(ctx->first_diffuse_hit)
-        {
-            Photon p{hit.intersection_point,
-                     hit.incoming_ray.direction,
-                     ctx->power};
+        ctx->num_diffuse_hits += 1;
+            
+        Photon p{hit.intersection_point, hit.incoming_ray.direction, ctx->power, mat->get_raw_color(hit) * ctx->color};
 
+        if(ctx->num_diffuse_hits > 1) {
             ctx->global_raw_photons.push_back(p);
+        }
+
+        if(ctx->num_diffuse_hits == 1 && ctx->num_specular_hits > 0) {
             ctx->caustic_raw_photons.push_back(p);
         }
 
         ctx->r->origin = hit.intersection_point - hit.incoming_ray.direction * 0.05f;
-        ctx->r->direction = glm::normalize(sampleHemisphereUniform(hit.intersection_normal, dis(gen), dis(gen)));
+        ctx->r->direction = glm::normalize(sampleHemisphereUniform(hit.intersection_normal, uniform_random(), uniform_random()));
         ctx->r->update();
 
         ctx->destroyed = false;
     } else if(r1 < (Pd + Ps)) {
+        ctx->num_specular_hits += 1;
+
         // Specular Reflection
         // Update the ray and continue bouncing.
         ctx->r->origin = hit.intersection_point - hit.incoming_ray.direction * 0.05f;
@@ -337,6 +113,8 @@ void light_pass_hit(void* ct, HitResult& hit) {
         ctx->r->update();
         ctx->destroyed = false;
     } else if(r1 < (Pd + Ps + Pt)) {
+        ctx->num_specular_hits += 1;
+
         // Specular Transmission
         // Update the ray and continue bouncing.
 
@@ -376,7 +154,8 @@ void light_pass_hit(void* ct, HitResult& hit) {
         // Absorbed
         Photon p{hit.intersection_point,
                  hit.incoming_ray.direction,
-                 ctx->power};
+                 ctx->power,
+                 mat->get_raw_color(hit) * ctx->color};
 
         ctx->global_raw_photons.push_back(p);
 
@@ -391,7 +170,7 @@ void Kernel::lightPass() {
 
     std::vector<Ray> photon_rays;
 
-    LPHitContext ctx{global_raw_photons, caustic_raw_photons, this, false, glm::vec3(0.0f), nullptr, false};
+    LPHitContext ctx{global_raw_photons, caustic_raw_photons, this, 0, 0, glm::vec3(0.0f), glm::vec3(1.0f), nullptr, false};
     
     Ray r;
     size_t rays_per_light = num_photons / lights.size();
@@ -402,10 +181,12 @@ void Kernel::lightPass() {
             if(lights[i]->gen_photon(r)) {
 
                 ctx.power = glm::vec3(lights[i]->intensity / rays_per_light);
+                ctx.color = glm::vec3(1.0f);
 
                 // Run every ray we fired into the scene to determine the hits
                 ctx.TTL = 10;
-                ctx.first_diffuse_hit = true;
+                ctx.num_diffuse_hits = 0;
+                ctx.num_specular_hits = 0;
                 ctx.destroyed = false;
                 ctx.r = &r;
 
@@ -433,6 +214,7 @@ void Kernel::renderPass() {
 
     size_t i = 1;
     for (CameraPtr& camera : cameras) {
+        // Output the view of the photons from this camera.
         auto start = Clock::now();
         
         SpawnRaysContext ctx{this, camera, camera->get_num_bounces()};

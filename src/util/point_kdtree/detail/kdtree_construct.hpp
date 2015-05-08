@@ -31,16 +31,38 @@ PointTy findMedian(std::vector<PointTy> &lst, size_t dim) {
 }
 
 template <typename PointTy, size_t K>
-KDNode<PointTy> *construct(std::vector<PointTy> lst, size_t dim = 0) {
+KDNode<PointTy> *construct(std::vector<PointTy> lst) {
     auto result = new KDNode<PointTy>();
 
     // Base case: If we have exactly 1 item we're done.
     if (lst.size() == 1) {
+        result->dim = 0;
         result->data = lst[0];
     } else {
-        // Adjust the dim. This avoids modulo division.
-        if (dim == K)
-            dim = 0;
+        glm::vec3 max = glm::vec3(lst[0][0], lst[0][1], lst[0][2]);
+        glm::vec3 min = max;
+
+        for(auto& point : lst) {
+            if(min.x > point[0]) min.x = point[0];
+            if(min.y > point[1]) min.y = point[1];
+            if(min.z > point[2]) min.z = point[2];
+            if(max.x < point[0]) max.x = point[0];
+            if(max.y < point[1]) max.y = point[1];
+            if(max.z < point[2]) max.z = point[2];
+        }
+
+        auto diff = glm::vec3(std::abs(max.x - min.x),
+                              std::abs(max.y - min.y),
+                              std::abs(max.z - min.z));
+
+        size_t dim = 2; // Assume z
+        if(diff.x > diff.y) {
+            if(diff.x > diff.z)
+                dim = 0;
+        } else {
+            if(diff.y > diff.z)
+                dim = 1;
+        }
 
         auto median = detail::findMedian<PointTy>(lst, dim);
 
@@ -58,12 +80,13 @@ KDNode<PointTy> *construct(std::vector<PointTy> lst, size_t dim = 0) {
 
         // Recursive case:
         result->data = median;
+        result->dim = dim;
 
         if (left.size() != 0)
-            result->left = construct<PointTy, K>(left, dim + 1);
+            result->left = construct<PointTy, K>(left);
 
         if (right.size() != 0)
-            result->right = construct<PointTy, K>(right, dim + 1);
+            result->right = construct<PointTy, K>(right);
     }
     return result;
 }

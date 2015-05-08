@@ -48,34 +48,31 @@ template <typename PointTy, size_t K> struct kNNConfig {
 };
 
 template <typename PointTy, size_t K>
-void kNearestNeighborRec(kNNConfig<PointTy, K>& cfg, KDNode<PointTy>* node,
-                         size_t dim = 0) {
+void kNearestNeighborRec(kNNConfig<PointTy, K>& cfg, KDNode<PointTy>* node) {
     if (node == nullptr)
         return;
 
-    if (dim == K)
-        dim = 0;
+    size_t dim = node->dim;
 
     cfg.consider(node->data);
 
     if (cfg.test[dim] < node->data[dim]) {
-        kNearestNeighborRec(cfg, node->left, dim + 1);
+        kNearestNeighborRec(cfg, node->left);
         if (!cfg.bpq_full() ||
             std::abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
-            kNearestNeighborRec(cfg, node->right, dim + 1);
+            kNearestNeighborRec(cfg, node->right);
         }
     } else {
-        kNearestNeighborRec(cfg, node->right, dim + 1);
+        kNearestNeighborRec(cfg, node->right);
         if (!cfg.bpq_full() ||
             std::abs(node->data[dim] - cfg.test[dim]) < cfg.worst_dist()) {
-            kNearestNeighborRec(cfg, node->left, dim + 1);
+            kNearestNeighborRec(cfg, node->left);
         }
     }
 }
 
 template <typename PointTy, size_t K>
-void kNearestNeighbors(KDNode<PointTy>* root, PointTy test, size_t k,
-                       std::vector<PointTy>& results) {
+void kNearestNeighbors(KDNode<PointTy>* root, PointTy test, size_t k, std::vector<PointTy>& results) {
     kNNConfig<PointTy, K> cfg(test, k);
     kNearestNeighborRec<PointTy, K>(cfg, root);
 

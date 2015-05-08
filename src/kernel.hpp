@@ -23,9 +23,9 @@ struct Kernel {
     MaterialPtr last_material;
 
   public:
-    size_t num_threads, num_photons, global_knn, caustic_knn;
+    size_t num_threads, num_photons, global_knn, caustic_knn, final_gather_samples, final_gather_bounces;
     glm::vec3 background_color;
-    float world_ki;
+    float world_ki, global_exposure, caustic_exposure;
 
     std::vector<CameraPtr> cameras;
     std::vector<LightPtr> lights;

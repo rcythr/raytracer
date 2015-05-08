@@ -31,27 +31,25 @@ template <typename PointTy, size_t K> struct NNConfig {
 };
 
 template <typename PointTy, size_t K>
-void nearestNeighborRec(NNConfig<PointTy, K>& cfg, KDNode<PointTy>* node,
-                        size_t dim = 0) {
+void nearestNeighborRec(NNConfig<PointTy, K>& cfg, KDNode<PointTy>* node) {
     if (node == nullptr)
         return;
 
-    if (dim == K)
-        dim = 0;
+    size_t dim = node->dim;
 
     // Consider the current point
     cfg.consider(node->data);
 
     // Now check the children, as needed.
     if (cfg.test[dim] < node->data[dim]) {
-        nearestNeighborRec(cfg, node->left, dim + 1);
+        nearestNeighborRec(cfg, node->left);
         if (std::abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
-            nearestNeighborRec(cfg, node->right, dim + 1);
+            nearestNeighborRec(cfg, node->right);
         }
     } else {
-        nearestNeighborRec(cfg, node->right, dim + 1);
+        nearestNeighborRec(cfg, node->right);
         if (std::abs(node->data[dim] - cfg.test[dim]) < cfg.bestDist) {
-            nearestNeighborRec(cfg, node->left, dim + 1);
+            nearestNeighborRec(cfg, node->left);
         }
     }
 }

@@ -18,6 +18,10 @@ namespace raytracer {
             return color;
         }
 
+        glm::vec3 get_raw_color(HitResult& hit) override {
+            return color;
+        }
+
         glm::vec3 color;
     };
 }
