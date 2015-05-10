@@ -1,9 +1,13 @@
 #pragma once
 
+#include <memory>
+#include <unordered_map>
 #include <glm/glm.hpp>
 #include "util/point_kdtree/point_kdtree.hpp"
 
 namespace raytracer {
+
+struct Shape;
 
 struct Photon {
     glm::vec3 point;
@@ -17,9 +21,11 @@ struct Photon {
     float& operator[](size_t i) { return point[i]; }
 };
 
-typedef std::vector<Photon> RawPhotonMap;
+typedef std::unordered_map<std::shared_ptr<Shape>, std::vector<Photon>> RawPhotonMap;
 typedef point_kdtree::PointKDTree<Photon, 3> PhotonMap;
 
 PhotonMap optimizePhotonMap(RawPhotonMap& raw_map);
+
+void insert_photon(RawPhotonMap& map, std::shared_ptr<Shape> ptr, Photon& p);
 
 }

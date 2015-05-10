@@ -6,6 +6,8 @@
 #include "ray.hpp"
 #include "hit_result.hpp"
 
+#include "photon_map.hpp"
+
 namespace raytracer {
 
 struct Material;
@@ -24,6 +26,8 @@ struct Shape : std::enable_shared_from_this<Shape> {
 
     bool is_light;
     std::shared_ptr<Material> material;
+
+    point_kdtree::PointKDTree<Photon, 3> global_photons;
 };
 
 typedef std::shared_ptr<Shape> ShapePtr;

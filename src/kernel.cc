@@ -54,7 +54,7 @@ void spawn_rays_cb(void* ct, std::vector<RayContext>* row) {
 }
 
 struct LPHitContext {
-    std::vector<Photon>& global_raw_photons;
+    RawPhotonMap& global_raw_photons;
     std::vector<Photon>& caustic_raw_photons;
 
     Kernel* kernel;
@@ -63,6 +63,7 @@ struct LPHitContext {
     glm::vec3 power, color;
     Ray* r;
 
+    size_t num_emit_photons;
     size_t TTL;
     bool destroyed;
 };
@@ -91,7 +92,8 @@ void light_pass_hit(void* ct, HitResult& hit) {
         Photon p{hit.intersection_point, hit.incoming_ray.direction, ctx->power, mat->get_raw_color(hit) * ctx->color};
 
         if(ctx->num_diffuse_hits > 1) {
-            ctx->global_raw_photons.push_back(p);
+            insert_photon(ctx->global_raw_photons, hit.shape, p);
+            ctx->num_emit_photons += 1;
         }
 
         if(ctx->num_diffuse_hits == 1 && ctx->num_specular_hits > 0) {
@@ -157,7 +159,8 @@ void light_pass_hit(void* ct, HitResult& hit) {
                  ctx->power,
                  mat->get_raw_color(hit) * ctx->color};
 
-        ctx->global_raw_photons.push_back(p);
+        insert_photon(ctx->global_raw_photons, hit.shape, p);
+        ctx->num_emit_photons += 1;
 
         // Mark this photon as destroyed
         ctx->destroyed = true;
@@ -165,18 +168,20 @@ void light_pass_hit(void* ct, HitResult& hit) {
 }
 
 void Kernel::lightPass() {
-    std::vector<Photon> global_raw_photons;
+    RawPhotonMap global_raw_photons;
     std::vector<Photon> caustic_raw_photons;
 
     std::vector<Ray> photon_rays;
 
-    LPHitContext ctx{global_raw_photons, caustic_raw_photons, this, 0, 0, glm::vec3(0.0f), glm::vec3(1.0f), nullptr, false};
+    LPHitContext ctx{global_raw_photons, caustic_raw_photons, this, 0, 0, glm::vec3(0.0f), glm::vec3(1.0f), nullptr, 0, 0, false};
     
     Ray r;
     size_t rays_per_light = num_photons / lights.size();
+
+    size_t total_emit_photons = 0;
     size_t num_calcs = 0;
     size_t max_calcs = num_photons * 10;
-    while(num_calcs < max_calcs && global_raw_photons.size() < num_photons) {
+    while(num_calcs < max_calcs && total_emit_photons < num_photons) {
         for(size_t i=0; i < lights.size(); ++i) {
             if(lights[i]->gen_photon(r)) {
 
@@ -184,6 +189,7 @@ void Kernel::lightPass() {
                 ctx.color = glm::vec3(1.0f);
 
                 // Run every ray we fired into the scene to determine the hits
+                ctx.num_emit_photons = 0;
                 ctx.TTL = 10;
                 ctx.num_diffuse_hits = 0;
                 ctx.num_specular_hits = 0;
@@ -196,14 +202,20 @@ void Kernel::lightPass() {
                     ctx.destroyed = true;
                     spatial_index->find_closest_hit(r, light_pass_hit, &ctx, nullptr); 
                 }
+
+                total_emit_photons += ctx.num_emit_photons;
             }
         }
     }
 
     std::cout << global_raw_photons.size() << std::endl;
 
-    if(global_raw_photons.size() != 0)
-        global_photons.construct(global_raw_photons);
+    if(global_raw_photons.size() != 0) {
+        for(auto& pair : global_raw_photons)
+        {
+            pair.first->global_photons.construct(pair.second);
+        }
+    }
     
     if(caustic_raw_photons.size() != 0)
         caustic_photons.construct(caustic_raw_photons);

@@ -24,7 +24,7 @@ void final_gather_callback(void* ct, HitResult& hit) {
     FinalGatherContext* ctx = (FinalGatherContext*)ct;
 
     Photon p{ hit.intersection_point, hit.incoming_ray.direction, glm::vec3(0)};
-    auto global_photons = ctx->kernel->global_photons.kNearestNeighbors(p, ctx->kernel->global_knn);
+    auto global_photons = hit.shape->global_photons.kNearestNeighbors(p, ctx->kernel->global_knn);
     
     float A = 1.0f;
     bool found_A = false;
@@ -95,5 +95,5 @@ glm::vec3 PhotonMapped::get_color(Kernel* kernel, HitResult& hit) {
 
     caustic_result *= kernel->caustic_exposure / A;
 
-    return direct_result +indirect_result /*+ caustic_result*/;
+    return direct_result +indirect_result + caustic_result;
 }

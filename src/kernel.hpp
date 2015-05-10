@@ -34,7 +34,6 @@ struct Kernel {
     SpatialIndexPtr spatial_index;
 
     PhotonMap caustic_photons;
-    PhotonMap global_photons;
 
     std::vector<ToneOperatorPtr> tone_operators;
 

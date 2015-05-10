@@ -34,7 +34,7 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
     float u = glm::dot(P, T) / p_dot_e1;
     float v = glm::dot(Q, ray.direction) / p_dot_e1;
 
-    if (u < 0.0f || v < 0.0f || (u + v) > 1.0f) {
+    if (u <= 0.0f || v <= 0.0f || (u + v) >= 1.0f) {
         result.miss();
         return;
     }
