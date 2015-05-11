@@ -25,9 +25,7 @@ First install clang-format-3.5. Then to do formatting simply run the following c
 
 ## Valid Configuration Options
 
-# Misc
-
-## color
+### color
 * **name (stirng)** - The unique name of this color.
 * **value (glm::vec3)** - The RGB values of this color.
 
@@ -42,8 +40,6 @@ First install clang-format-3.5. Then to do formatting simply run the following c
 * **caustic_knn (int)** - For photon-mapped scenes, specifies the number of nearest neighbors to consider when sampling caustics.
 * **caustic_exposure (float)** - For photon-mapped scenes, specifics an amplication of the caustic light to aid in visibility.
 
-# Camera Models
-
 ### pinhole
 * **pixel_size (float)** - The size, in world units, of each pixel.
 * **num_samples (int)** - The number of samples to be taken per direction, per pixel. 
@@ -52,39 +48,31 @@ First install clang-format-3.5. Then to do formatting simply run the following c
 * **look_at (glm::vec)** - A vector along the line-of-sight of the camera, in world units.
 * **view_distance (float)** - The distance from the pinhole to the viewplane, in world units.
 
-# Viewplane Models
-
 ### ppm_viewplane
 * **hres (int)** - The number of pixels wide.
 * **vres (int)** - The number of pixels high
 * **filename (string)** - The name of the file to write the image to.
 
-# Spatial Indecies
-
-## naive_index
+### naive_index
 None required
 
-# Light Models
-
-## ambient
+### ambient
 * **intensity (float)** - The power of the ambient light.
 * **color (vec3)** - The color of the ambient light.
 
-## directional
+### directional
 * **intensity (float)** - The power of the directional light.
 * **direction (vec3)** - The direction of the directional light.
 * **color (vec3)** - The color of the ambient light.
 
-## triangular
+### triangular
 * **p0 (vec3)** - The first point on the triangle of light.
 * **p1 (vec3)** - The second point on the triangle of light.
 * **p2 (vec3)** - The third point on the triangle of light.
 * **intensity (float)** - The power of the triangular light.
 * **color (vec3)** - The color of the triangular light.
 
-# Material Models
-
-## phong
+### phong
 * **ka (float)** - Ambient coefficient.
 * **kd (float)** - Diffuse coefficient.
 * **ks (float)** - Specular coefficient.
@@ -93,41 +81,37 @@ None required
 * **ki (float)** - The index of refraction.
 * **is_hollow (bool)** - true if the object is hollow, false otherwise.
 
-## photon_mapped
+### photon_mapped
 * **kd (float)** - Diffuse coefficient.
 * **ks (float)** - Specular coefficient.
 * **kt (float)** - Transmission coefficient.
 * **ki (float)** - The index of refraction.
 * **is_hollow (bool)** - true if the object is hollow, false otherwise.
 
-# Sampler Models
-
-## solid
+### solid
 * **color (string)** - The solid color to use
 
-## checkered
+### checkered
 * **color1 (string)** - The first color of the checkerboard.
 * **color2 (string)** - The second color of the checkerboard.
 
-## circles
+### circles
 * **color1 (string)** - The first color of the circle checkerboard.
 * **color2 (string)** - The second color of the circle checkerboard.
 
-## rainbow
+### rainbow
 * color1 (string)** - The first color of the interpolation
 * color2 (string)** - The second color of the interpolation
 
-## png
+### png
 * **filename (string)** - The filename of the png texture to use.
 
-# Shape Models
-
-## sphere
+### sphere
 * **point (glm::vec3)** - center of sphere
 * **radius (float)** - self explainatory
 * **material (string)** - the material which handles the coloring of the sphere
 
-## triangle
+### triangle
 * **p0 (vec3)** - The first point, in world units.
 * **u0 (vec2)** - The uv-coordinates of the first point.
 * **p1 (vec3)** - The second point, in world units.
