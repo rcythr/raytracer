@@ -37,8 +37,8 @@ void Sphere::test_hit(const Ray& ray, HitResult& result) {
         float testValSqrt = sqrt(testVal);
         float tval;
 
-        float tval1 = (-b / 2) + testValSqrt;
-        float tval2 = (-b / 2) - testValSqrt;
+        float tval1 = ((-b + testValSqrt) / 2);
+        float tval2 = ((-b - testValSqrt) / 2);
 
         bool tval1gt0 = tval1 > 0.0f;
         bool tval2gt0 = tval2 > 0.0f;

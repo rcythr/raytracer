@@ -122,14 +122,14 @@ void light_pass_hit(void* ct, HitResult& hit) {
 
         float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
 
-        auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+        auto normal = ((dir <= 0.0f) ? 1.0f : -1.0f) * hit.intersection_normal;
 
         auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / mat->ki );
         if(refract1 != glm::vec3(0.0f))
         {
             refract1 = glm::normalize(refract1);
 
-            auto refract2 = (mat->is_hollow) ? glm::refract( refract1, -normal, mat->ki / ctx->kernel->world_ki ) : refract1;
+            auto refract2 = (mat->is_hollow) ? glm::refract( refract1, normal, mat->ki / ctx->kernel->world_ki ) : refract1;
             if(refract2 != glm::vec3(0.0f))
             {
                 refract2 = glm::normalize(refract2);
@@ -298,14 +298,14 @@ void color_rec_callback(void* ct, HitResult& hit) {
         {
             float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
 
-            auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+            auto normal = ((dir <= 0.0f) ? 1.0f : -1.0f) * hit.intersection_normal;
 
             auto refract1 = glm::refract( hit.incoming_ray.direction, normal, ctx->kernel->world_ki / ki );
             if(refract1 != glm::vec3(0.0f))
             {
                 refract1 = glm::normalize(refract1);
 
-                auto refract2 = (is_hollow) ? glm::refract( refract1, -normal, ki / ctx->kernel->world_ki ) : refract1;
+                auto refract2 = (is_hollow) ? glm::refract( refract1, normal, ki / ctx->kernel->world_ki ) : refract1;
                 if(refract2 != glm::vec3(0.0f))
                 {
                     refract2 = glm::normalize(refract2);
