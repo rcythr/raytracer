@@ -100,14 +100,14 @@ None required
 * **color2 (string)** - The second color of the circle checkerboard.
 
 ### rainbow
-* color1 (string)** - The first color of the interpolation
-* color2 (string)** - The second color of the interpolation
+* **color1 (string)** - The first color of the interpolation
+* **color2 (string)** - The second color of the interpolation
 
 ### png
 * **filename (string)** - The filename of the png texture to use.
 
 ### sphere
-* **point (glm::vec3)** - center of sphere
+* **point (vec3)** - center of sphere
 * **radius (float)** - self explainatory
 * **material (string)** - the material which handles the coloring of the sphere
 
