@@ -12,9 +12,11 @@ void raytracer::loadObj(std::string filename, glm::vec3 point, glm::vec3 rotate,
                         SpatialIndexPtr index) {
 
     // First construct the matrix to transform things into world space.
-    auto trans = buildRotationZ(rotate.z) * buildRotationY(rotate.y) *
-                 buildRotationX(rotate.x) * buildTranslation(point) *
-                 buildScale(scale);
+    auto trans = buildTranslation(point) 
+               * buildRotationZ(rotate.z) 
+               * buildRotationY(rotate.y) 
+               * buildRotationX(rotate.x) 
+               * buildScale(scale);
 
     std::ifstream strm(filename.c_str());
     std::vector<glm::vec3> points;

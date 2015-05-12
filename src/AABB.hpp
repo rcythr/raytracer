@@ -43,6 +43,16 @@ struct AABB {
         return true;
     }
 
+    inline bool contains(glm::vec3& pt) {
+        if(pt.x < min.x || pt.x > max.x)
+            return false;
+        if(pt.y < min.y || pt.y > max.y)
+            return false;
+        if(pt.z < min.z || pt.z > max.z)
+            return false;
+        return true;
+    }
+
     glm::vec3 min, max;
 };
 

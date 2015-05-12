@@ -2,19 +2,19 @@
     background_color="0 0 0"
     num_photons="100000"
    
-    final_gather_samples="5"
+    final_gather_samples="25"
 
-    global_knn="50" 
-    indirect_exposure="80000"
+    global_knn="100" 
+    global_exposure="0.3"
 
-    caustic_knn="1" 
-    caustic_exposure="1000"
+    caustic_knn="50" 
+    caustic_exposure="40"
     />
 
 <!-- Front View --!>
 <pinhole
     pixel_size="0.30"
-    num_samples="1"
+    num_samples="2"
     num_bounces="3"
     eye="278 273 -800"
     up="0 1 0"
@@ -86,13 +86,13 @@
         name="trans_sphere"
         kd="0.0"
         ks="0.0" ke="200"
-        kt="1.0" ki="3.9"
+        kt="1.0" ki="2.6"
         is_hollow="false">
         <solid color="white" />
     </photon_mapped>
 </materials>
     
-<naive_index>
+<kdtree_index>
     <triangle
         p0="549.6 0.0 559.2"
         p1="0 0 559.2"
@@ -201,18 +201,15 @@
         uv0="0 0" uv1="0 0" uv2="0 0"
         material="floor" />
     
-    <sphere
-        point="425.0 85.0 394"
-        radius="85.0"
-        material="refl_sphere"
-        />
-
-    <sphere
-        point="120.0 85.0 194"
-        radius="85.0"
+    <obj_mesh
+        filename="../mesh/dragon_low.obj"
+        point="280.0 -20.0 250.0"
+        rotate="90.0 0.0 0.0"
+        scale="1000.0 1000.0 1000.0"
         material="trans_sphere"
         />
-</naive_index>
+
+</kdtree_index>
 
 <tone_operators>
     <gaussian/>
@@ -220,16 +217,15 @@
 
 <lights>
     <triangular
-        p0="343.0 548.7 227.0"
-        p1="343.0 548.7 332.0"
-        p2="213.0 548.7 332.0"
-        color="white"
-        intensity="25000.0" />
-
-    <triangular
         p0="343.0 548.8 227.0"
         p1="213.0 548.8 332.0"
         p2="213.0 548.8 227.0"
+        color="white"
+        intensity="25000.0" />
+    <triangular
+        p0="343.0 548.7 227.0"
+        p1="343.0 548.7 332.0"
+        p2="213.0 548.7 332.0"
         color="white"
         intensity="25000.0" />
 </lights>

@@ -116,12 +116,12 @@ KDNodePtr<typename PolicyTy::value_type, typename PolicyTy::aabb_type> create(
     return std::make_shared<KDNodeLeaf<T, AABBTy> >(AABBTy(), shapes);
 }
 
-template<typename T>
-using ConfirmHitCallback = bool (*)(void* ctx, std::vector<T>&);
+template<typename T, typename AABBTy>
+using ConfirmHitCallback = bool (*)(void* ctx, AABBTy& bounds, std::vector<T>&);
 
 template <typename T, typename AABBTy, typename RayTy>
 bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
-                      ConfirmHitCallback<T> confirm_hit, void* ctx) {
+                      ConfirmHitCallback<T, AABBTy> confirm_hit, void* ctx) {
     if (node->type == Type::INNER) {
         auto inner = std::static_pointer_cast<KDNodeInner<T, AABBTy> >(node);
 
@@ -154,7 +154,7 @@ bool find_closest_hit(KDNodePtr<T, AABBTy>& node, const RayTy& ray,
         // Simply determine if a hit appears in this objectlist. If it does,
         // we're done.
         auto leaf = std::static_pointer_cast<KDNodeLeaf<T, AABBTy> >(node);
-        return confirm_hit(ctx, leaf->objects);
+        return confirm_hit(ctx, leaf->bounds, leaf->objects);
     }
 }
 

@@ -17,6 +17,15 @@ struct Triangle : public Shape {
         aabb.max = glm::vec3(std::max(std::max(p0.x, p1.x), p2.x),
                              std::max(std::max(p0.y, p1.y), p2.y),
                              std::max(std::max(p0.z, p1.z), p2.z));
+        
+        for(size_t i=0; i < 3; ++i)
+        {
+            if(aabb.min[i] == aabb.max[i])
+            {
+                aabb.min[i] -= 0.0001f;
+                aabb.max[i] += 0.0001f;
+            }
+        }
     }
 
     void test_hit(const Ray& ray, HitResult& result) override;

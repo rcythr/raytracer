@@ -70,7 +70,7 @@ struct CheckHitContext {
     ShapePtr omit_shape;
 };
 
-bool check_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
+bool check_hit_callback(void* ct, AABB& bounds,  std::vector<ShapePtr>& possible_hits) {
     CheckHitContext* ctx = (CheckHitContext*)ct;
     HitResult best_result;
     HitResult result;
@@ -81,9 +81,10 @@ bool check_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
         result.found_hit = false;
         obj->test_hit(ctx->ray, result);
         if (result.found_hit) {
-            if (best_result.found_hit == false ||
-                result.tval < best_result.tval) {
-                best_result = result;
+            if (best_result.found_hit == false || result.tval < best_result.tval) {
+                if(bounds.contains(result.intersection_point)) {
+                    best_result = result;
+                }
             }
         }
     }
@@ -106,13 +107,13 @@ struct HasHitContext {
     ShapePtr omit_shape;
 };
 
-bool has_hit_callback(void* ct, std::vector<ShapePtr>& possible_hits) {
+bool has_hit_callback(void* ct, AABB& bounds, std::vector<ShapePtr>& possible_hits) {
     HasHitContext* ctx = (HasHitContext*)ct;
     HitResult hit;
     for (auto obj : possible_hits) {
         if (obj != ctx->omit_shape) {
             obj->test_hit(ctx->ray, hit);
-            if (hit.found_hit) {
+            if (hit.found_hit && bounds.contains(hit.intersection_point)) {
                 ctx->result = hit.shape->is_light == false;
                 return true;
             }

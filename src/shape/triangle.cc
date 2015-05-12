@@ -14,9 +14,7 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
     e1 = p1 - p0;
     e2 = p2 - p0;
 
-    auto T = ray.origin - p0;
     auto P = glm::cross(ray.direction, e2);
-    auto Q = glm::cross(T, e1);
 
     float p_dot_e1 = glm::dot(P, e1);
 
@@ -24,6 +22,9 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
         result.miss();
         return;
     }
+    
+    auto T = ray.origin - p0;
+    auto Q = glm::cross(T, e1);
 
     float t = glm::dot(Q, e2) / p_dot_e1;
     if (t < 0.0f) {
@@ -34,7 +35,7 @@ void Triangle::test_hit(const Ray& ray, HitResult& result) {
     float u = glm::dot(P, T) / p_dot_e1;
     float v = glm::dot(Q, ray.direction) / p_dot_e1;
 
-    if (u <= 0.0f || v <= 0.0f || (u + v) >= 1.0f) {
+    if (u <= 0.0f || v <= 0.0f || (u + v) > 1.0001f) {
         result.miss();
         return;
     }
