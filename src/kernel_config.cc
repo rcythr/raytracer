@@ -235,7 +235,7 @@ Kernel::Kernel() {
         } },
        
         {"reinhard", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<ReinhardOperator>()); 
+            tone_operators.push_back(std::make_shared<ReinhardOperator>(extractFloat(params, "l_max"))); 
         } }
     };
 }

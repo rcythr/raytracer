@@ -6,7 +6,13 @@ namespace raytracer {
 
     struct ReinhardOperator : public ToneOperator {
 
+        ReinhardOperator(float l_max)
+            : l_max(l_max)
+        { }
+
         void apply(ViewPlanePtr view_plane) override;
+
+        float l_max;
 
     };
 
