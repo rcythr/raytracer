@@ -2,19 +2,19 @@
     background_color="0 0 0"
     num_photons="100000"
    
-    final_gather_samples="25"
+    final_gather_samples="0"
 
     global_knn="100" 
     global_exposure="0.3"
 
     caustic_knn="50" 
-    caustic_exposure="40"
+    caustic_exposure="20"
     />
 
 <!-- Front View --!>
 <pinhole
     pixel_size="0.30"
-    num_samples="2"
+    num_samples="1"
     num_bounces="3"
     eye="278 273 -800"
     up="0 1 0"
@@ -200,14 +200,16 @@
         p2="549.6 0.0 559.2"
         uv0="0 0" uv1="0 0" uv2="0 0"
         material="floor" />
-    
-    <obj_mesh
-        filename="../mesh/dragon_low.obj"
-        point="280.0 -20.0 250.0"
-        rotate="90.0 0.0 0.0"
-        scale="1000.0 1000.0 1000.0"
-        material="trans_sphere"
-        />
+
+    <sphere
+        point="425.0 85.0 394"
+        radius="85.0"
+        material="refl_sphere" />
+
+    <sphere
+        point="120.0 85.0 194"
+        radius="85.0"
+        material="trans_sphere" />
 
 </kdtree_index>
 
