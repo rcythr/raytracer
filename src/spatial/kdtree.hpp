@@ -13,11 +13,12 @@ struct KDTreeSpatialIndex : public SpatialIndex {
 
     void optimize() override;
 
-    void find_closest_hit(const Ray& ray, HitCallback hit_callback, void* ctx = nullptr, ShapePtr omit_shape = nullptr) override;
+    virtual void find_closest_hit(
+        const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape = nullptr) override;
 
     bool has_hit(Ray& ray, ShapePtr omit_shape) override;
 
-    void view_all_objects(ViewAllCallback functor, void* ctx = nullptr) override;
+    void view_all_objects(std::function<void(ShapePtr&)> view_all_callback) override;
 
     std::vector<ShapePtr> shapes;
     std::shared_ptr<kdtree::KDNode<ShapePtr, AABB> > node;

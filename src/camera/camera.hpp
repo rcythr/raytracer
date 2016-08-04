@@ -39,7 +39,7 @@ struct Camera {
      * @param spawn_callback the function to call for each ray with row, col,
      * and the ray.
      */
-    virtual std::vector<std::vector<RayContext>*> spawn_rays() = 0;
+    virtual void spawn_rays(std::function<void(size_t, size_t, Ray&)> spawn_callback) = 0;
 
     virtual size_t get_num_samples() = 0;
 

@@ -7,7 +7,7 @@ void NaiveSpatialIndex::insert(ShapePtr ptr) { shapes.push_back(ptr); }
 
 void NaiveSpatialIndex::optimize() {}
 
-void NaiveSpatialIndex::find_closest_hit(const Ray& ray, HitCallback hit_callback, void* ctx, ShapePtr omit_shape) {
+void NaiveSpatialIndex::find_closest_hit(const Ray& ray, std::function<void(HitResult&)> hit_callback, ShapePtr omit_shape) {
     HitResult best_result;
     HitResult result;
     for (auto obj : shapes) {
@@ -25,7 +25,7 @@ void NaiveSpatialIndex::find_closest_hit(const Ray& ray, HitCallback hit_callbac
     }
 
     if (best_result.found_hit) {
-        hit_callback(ctx, best_result);
+        hit_callback(best_result);
     }
 }
 
@@ -42,4 +42,4 @@ bool NaiveSpatialIndex::has_hit(Ray& ray, ShapePtr omit_shape) {
     return false;
 }
 
-void NaiveSpatialIndex::view_all_objects(ViewAllCallback functor, void* ctx) { }
+void NaiveSpatialIndex::view_all_objects(std::function<void(ShapePtr&)> view_all_callback) { }

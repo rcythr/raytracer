@@ -86,7 +86,7 @@
         kd="0.2" 
         ks="0.2" ke="100.0"
         kr="0.0"
-        kt="0.8" ki="0.90">
+        kt="0.8" ki="1.90">
         <solid color="white" />
     </phong>
     <phong 
@@ -103,7 +103,7 @@
     </phong>
 </materials>
     
-<kdtree_index>
+<naive_index>
     <triangle
         p0="-45 -30 -85"
         uv0="0 0"
@@ -128,4 +128,4 @@
         point="0 -3 0"
         radius="13"
         material="white" />
-</kdtree_index>
+</naive_index>

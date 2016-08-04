@@ -27,7 +27,7 @@ Kernel::Kernel() {
             caustic_knn = extractInt(params, "caustic_knn", 10);
             caustic_exposure = extractFloat(params, "caustic_exposure", 1.0f);
             
-            world_ki = extractFloat(params, "world_ki", 1.000293);
+            world_ki = extractFloat(params, "world_ki", 1.0);
         } },
 
         // Spatial Indecies
