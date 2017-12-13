@@ -17,7 +17,7 @@ Kernel::Kernel() {
             background_color = extractVec3(params, "background_color");
             num_threads = extractInt(params, "num_threads", std::max(std::thread::hardware_concurrency(), 1u));
             num_photons = extractInt(params, "num_photons", 0);
-            
+
             final_gather_samples = extractInt(params, "final_gather_samples", 10);
             final_gather_bounces = extractInt(params, "final_gather_bounces", 3);
 
@@ -26,13 +26,13 @@ Kernel::Kernel() {
 
             caustic_knn = extractInt(params, "caustic_knn", 10);
             caustic_exposure = extractFloat(params, "caustic_exposure", 1.0f);
-            
+
             world_ki = extractFloat(params, "world_ki", 1.0);
         } },
 
         // Spatial Indecies
         {"naive_index", [this](ParamMap& params) {
-            spatial_index = std::make_shared<NaiveSpatialIndex>();    
+            spatial_index = std::make_shared<NaiveSpatialIndex>();
         } },
 
         { "kdtree_index", [this](ParamMap& params) {
@@ -226,17 +226,20 @@ Kernel::Kernel() {
             tone_operators.push_back(std::make_shared<LinearOperator>());
         } },
 
-        {"gaussian", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<GaussianOperator>()); 
+        {"gaussian", [this](ParamMap& params) {
+            tone_operators.push_back(std::make_shared<GaussianOperator>());
         } },
 
-        {"ward", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<WardOperator>(extractFloat(params, "l_max"))); 
+        {"ward", [this](ParamMap& params) {
+            tone_operators.push_back(std::make_shared<WardOperator>(extractFloat(params, "l_max")));
         } },
-       
-        {"reinhard", [this](ParamMap& params) { 
-            tone_operators.push_back(std::make_shared<ReinhardOperator>(extractFloat(params, "l_max"))); 
+
+        {"reinhard", [this](ParamMap& params) {
+            tone_operators.push_back(std::make_shared<ReinhardOperator>(extractFloat(params, "l_max")));
+        } },
+
+        {"gamma_correction", [this](ParamMap& params) {
+            tone_operators.push_back(std::make_shared<GammaCorrectionOperator>(extractFloat(params, "gamma")));
         } }
     };
 }
-

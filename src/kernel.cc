@@ -47,7 +47,7 @@ void Kernel::lightPass() {
     size_t num_emit_photons = 0;
     size_t TTL = 0;
     bool destroyed = false;
-    
+
     Ray r;
     size_t rays_per_light = num_photons / lights.size();
 
@@ -90,7 +90,7 @@ void Kernel::lightPass() {
                         if(r1 < Pd) {
                             // Diffuse Reflection
                             num_diffuse_hits += 1;
-                                
+
                             Photon p{hit.intersection_point, hit.incoming_ray.direction, power, mat->get_raw_color(hit) * color};
 
                             if(num_diffuse_hits > 1) {
@@ -167,7 +167,7 @@ void Kernel::lightPass() {
                             // Mark this photon as destroyed
                             destroyed = true;
                         }
-                    }); 
+                    });
                 }
 
                 total_emit_photons += num_emit_photons;
@@ -183,7 +183,7 @@ void Kernel::lightPass() {
             pair.first->global_photons.construct(pair.second);
         }
     }
-    
+
     if(caustic_raw_photons.size() != 0)
         caustic_photons.construct(caustic_raw_photons);
 }
@@ -200,6 +200,10 @@ void Kernel::renderPass() {
         // Give the camera a function to call on each ray it generates.
         camera->spawn_rays([&](size_t row, size_t col, Ray& ray){
             tp.enqueue([=]() {
+
+                if(col == 0)
+                    std::cout << "Processing row " << row << "\n";
+
                 camera->view_plane->add_pixel(row, col, get_color_rec(ray, 1, camera->get_num_bounces()));
             });
         });
@@ -208,7 +212,7 @@ void Kernel::renderPass() {
 
         // Signal to the view plane that we're finished writing. -  It divide by num_samples.
         camera->view_plane->finish(pow(camera->get_num_samples(), 2));
-        
+
         // Apply all specified tone operators
         for(std::shared_ptr<ToneOperator> to : tone_operators) {
             to->apply(camera->view_plane);
@@ -256,7 +260,7 @@ glm::vec3 Kernel::get_color_rec(const Ray& ray, size_t num_bounces, size_t max_b
             {
                 float dir = glm::dot(hit.intersection_normal, hit.incoming_ray.direction);
 
-                auto normal = ((dir <= 0.0f) ? -1.0f : 1.0f) * hit.intersection_normal;
+                auto normal = ((dir <= 0.0f) ? 1.0f : -1.0f) * hit.intersection_normal;
 
                 auto refract1 = glm::refract( hit.incoming_ray.direction, normal, world_ki / ki );
                 if(refract1 != glm::vec3(0.0f))

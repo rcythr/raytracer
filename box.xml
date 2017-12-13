@@ -1,21 +1,21 @@
 <general
     background_color="0 0 0"
-    num_photons="100000"
-   
-    final_gather_samples="0"
+    num_photons="10000"
 
-    global_knn="100" 
-    global_exposure="0.3"
+    final_gather_samples="2"
 
-    caustic_knn="50" 
-    caustic_exposure="20"
+    global_knn="5"
+    global_exposure="1"
+
+    caustic_knn="1"
+    caustic_exposure="0"
     />
 
-<!-- Front View --!>
+<!-- Front View -->
 <pinhole
     pixel_size="0.30"
-    num_samples="1"
-    num_bounces="3"
+    num_samples="3"
+    num_bounces="4"
     eye="278 273 -800"
     up="0 1 0"
     look_at="278 273 1"
@@ -40,23 +40,23 @@
 </colors>
 
 <materials>
-    <photon_mapped 
+    <photon_mapped
         name="floor"
-        kd="0.75" 
+        kd="0.75"
         ks="0.0" ke="100.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
     </photon_mapped>
-    <photon_mapped 
+    <photon_mapped
         name="backwall"
-        kd="0.70" 
+        kd="0.70"
         ks="0.0" ke="100.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
     </photon_mapped>
-    <photon_mapped 
+    <photon_mapped
         name="ceiling"
-        kd="0.70" 
+        kd="0.70"
         ks="0.0" ke="100.0"
         kt="0.0" ki="1.0">
         <solid color="white" />
@@ -77,21 +77,21 @@
     </photon_mapped>
     <photon_mapped
         name="refl_sphere"
-        kd="0.0"
-        ks="1.0" ke="1000.0"
+        kd="0.1"
+        ks="0.9" ke="1000.0"
         kt="0.0" ki="1.0">
         <solid color="black" />
     </photon_mapped>
     <photon_mapped
         name="trans_sphere"
         kd="0.0"
-        ks="0.0" ke="200"
-        kt="1.0" ki="2.6"
+        ks="0.2" ke="800"
+        kt="0.8" ki="2.6"
         is_hollow="false">
         <solid color="white" />
     </photon_mapped>
 </materials>
-    
+
 <kdtree_index>
     <triangle
         p0="549.6 0.0 559.2"
@@ -105,7 +105,7 @@
         p2="556.0 548.8 559.2"
         uv0="0 0" uv1="0 0" uv2="0 0"
         material="backwall" />
-    
+
     <triangle
         p0="552.8 0 0"
         p1="549.6 0 559.2"
@@ -118,7 +118,7 @@
         p2="556.0 548.8 0"
         uv0="0 0" uv1="0 0" uv2="0 0"
         material="leftwall" />
-    
+
     <triangle
         p0="0.0 0.0 559.2"
         p1="0.0 0.0 0.0"
@@ -214,7 +214,8 @@
 </kdtree_index>
 
 <tone_operators>
-    <gaussian/>
+  <gaussian />
+  <gamma_correction gamma="2.0" />
 </tone_operators>
 
 <lights>
@@ -223,12 +224,11 @@
         p1="213.0 548.8 332.0"
         p2="213.0 548.8 227.0"
         color="white"
-        intensity="25000.0" />
+        intensity="250.0" />
     <triangular
-        p0="343.0 548.7 227.0"
-        p1="343.0 548.7 332.0"
-        p2="213.0 548.7 332.0"
+        p0="343.0 548.8 227.0"
+        p1="343.0 548.8 332.0"
+        p2="213.0 548.8 332.0"
         color="white"
-        intensity="25000.0" />
+        intensity="250.0" />
 </lights>
-

@@ -38,3 +38,4 @@
 #include "tone_operators/ward_operator.hpp"
 #include "tone_operators/reinhard_operator.hpp"
 #include "tone_operators/linear_operator.hpp"
+#include "tone_operators/gamma_correction_operator.hpp"
