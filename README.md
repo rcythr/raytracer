@@ -1,4 +1,4 @@
-# GI Raytracer Project
+# Global Illumination Raytracer
 
 ## Requirements
  * A C++11 compliant compiler (e.g. **gcc** or **clang**)
